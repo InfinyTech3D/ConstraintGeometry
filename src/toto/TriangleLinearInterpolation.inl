@@ -48,10 +48,7 @@ void TriangleLinearInterpolation<DataTypes>::prepareDetection() {
     m_cellSize[1] = (m_Bmax[1] - m_Bmin[1]) / d_nbox.getValue()[1];
     m_cellSize[2] = (m_Bmax[2] - m_Bmin[2]) / d_nbox.getValue()[2];
 
-    m_Bmin -= m_cellSize * 0.5;
-    m_Bmax -= m_cellSize * 0.5;
-
-    unsigned nbox = (d_nbox.getValue()[0]+1)*(d_nbox.getValue()[1]+1)*(d_nbox.getValue()[2]+1);
+    unsigned nbox = d_nbox.getValue()[0]*d_nbox.getValue()[1]*d_nbox.getValue()[2];
     m_triangleboxes.resize(nbox);
     for (unsigned i=0;i<nbox;i++) m_triangleboxes[i].clear();
 
@@ -100,11 +97,11 @@ void TriangleLinearInterpolation<DataTypes>::prepareDetection() {
         cmaxbox[1] = ceil((maxbox[1] - m_Bmin[1])/m_cellSize[1]);
         cmaxbox[2] = ceil((maxbox[2] - m_Bmin[2])/m_cellSize[2]);
 
-        for (unsigned i=cminbox[0];i<=cmaxbox[0];i++) {
+        for (unsigned i=cminbox[0];i<cmaxbox[0];i++) {
             unsigned cX = i * d_nbox.getValue()[1] * d_nbox.getValue()[2];
-            for (unsigned j=cminbox[1];j<=cmaxbox[1];j++) {
+            for (unsigned j=cminbox[1];j<cmaxbox[1];j++) {
                 unsigned cY = j*d_nbox.getValue()[2];
-                for (unsigned k=cminbox[2];k<=cmaxbox[2];k++) {
+                for (unsigned k=cminbox[2];k<cmaxbox[2];k++) {
                     m_triangleboxes[cX + cY + k].push_back(t);
                 }
             }
@@ -205,17 +202,11 @@ void TriangleLinearInterpolation<DataTypes>::projectPointOnTriangle(const Vector
 }
 
 template<class DataTypes>
-void TriangleLinearInterpolation<DataTypes>::fillProximity(const Coord & pP,ConstraintProximity & pinfo) {
+void TriangleLinearInterpolation<DataTypes>::fillProximity(const Coord & P,ConstraintProximity & pinfo) {
     helper::ReadAccessor<Data <VecCoord> > x = *this->m_state->read(core::VecCoordId::position());
 
     pinfo.pid.resize(3);
     pinfo.fact.resize(3);
-
-    //project P in the bounding box of the pbject
-    Vector3 P;
-    P[0] = std::min(std::max(pP[0] , m_Bmin[0]) , m_Bmax[0]);
-    P[1] = std::min(std::max(pP[1] , m_Bmin[1]) , m_Bmax[1]);
-    P[2] = std::min(std::max(pP[2] , m_Bmin[2]) , m_Bmax[2]);
 
     Vec3i cbox;
     cbox[0] = floor((P[0] - m_Bmin[0])/m_cellSize[0]);
@@ -300,11 +291,11 @@ void TriangleLinearInterpolation<DataTypes>::draw(const core::visual::VisualPara
 
 
 
-    for (unsigned i=0;i<=d_nbox.getValue()[0];i++) {
+    for (unsigned i=0;i<d_nbox.getValue()[0];i++) {
         unsigned cX = i * d_nbox.getValue()[1] * d_nbox.getValue()[2];
-        for (unsigned j=0;j<=d_nbox.getValue()[1];j++) {
+        for (unsigned j=0;j<d_nbox.getValue()[1];j++) {
             unsigned cY = j*d_nbox.getValue()[2];
-            for (unsigned k=0;k<=d_nbox.getValue()[2];k++) {
+            for (unsigned k=0;k<d_nbox.getValue()[2];k++) {
                 if (m_triangleboxes[cX + cY + k].empty()) continue;
 
                 Vector3 points[8];
