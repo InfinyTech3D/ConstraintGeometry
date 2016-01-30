@@ -51,9 +51,13 @@ void TriangleLinearInterpolation<DataTypes>::prepareDetection() {
     m_Bmin -= m_cellSize * 0.5;
     m_Bmax -= m_cellSize * 0.5;
 
-    unsigned nbox = (d_nbox.getValue()[0]+1)*(d_nbox.getValue()[1]+1)*(d_nbox.getValue()[2]+1);
-    m_triangleboxes.resize(nbox);
-    for (unsigned i=0;i<nbox;i++) m_triangleboxes[i].clear();
+    for (unsigned i=0;i<m_triangleboxes.size();i++) {
+        for (unsigned j=0;j<m_triangleboxes[i].size();j++) {
+            for (unsigned k=0;k<m_triangleboxes[i][j].size();k++) {
+                m_triangleboxes[i][j][k].clear();
+            }
+        }
+    }
 
     m_triangle_info.resize(this->m_container->getNbTriangles());
     for (int t=0;t<this->m_container->getNbTriangles();t++) {
@@ -100,12 +104,10 @@ void TriangleLinearInterpolation<DataTypes>::prepareDetection() {
         cmaxbox[1] = ceil((maxbox[1] - m_Bmin[1])/m_cellSize[1]);
         cmaxbox[2] = ceil((maxbox[2] - m_Bmin[2])/m_cellSize[2]);
 
-        for (unsigned i=cminbox[0];i<=cmaxbox[0];i++) {
-            unsigned cX = i * d_nbox.getValue()[1] * d_nbox.getValue()[2];
-            for (unsigned j=cminbox[1];j<=cmaxbox[1];j++) {
-                unsigned cY = j*d_nbox.getValue()[2];
-                for (unsigned k=cminbox[2];k<=cmaxbox[2];k++) {
-                    m_triangleboxes[cX + cY + k].push_back(t);
+        for (unsigned i=cminbox[0];i<cmaxbox[0];i++) {
+            for (unsigned j=cminbox[1];j<cmaxbox[1];j++) {
+                for (unsigned k=cminbox[2];k<cmaxbox[2];k++) {
+                    m_triangleboxes[i][j][k].push_back(t);
                 }
             }
         }
@@ -126,11 +128,19 @@ void TriangleLinearInterpolation<DataTypes>::prepareDetection() {
 
 template<class DataTypes>
 void TriangleLinearInterpolation<DataTypes>::bwdInit() {
-    prepareDetection();
+    reinit();
 }
 
 template<class DataTypes>
 void TriangleLinearInterpolation<DataTypes>::reinit() {
+    m_triangleboxes.resize(d_nbox.getValue()[0]+1);
+    for (unsigned i=0;i<m_triangleboxes.size();i++) {
+        m_triangleboxes[i].resize(d_nbox.getValue()[1]+1);
+        for (unsigned j=0;j<m_triangleboxes[i].size();j++) {
+            m_triangleboxes[i][j].resize(d_nbox.getValue()[2]+1);
+        }
+    }
+
     prepareDetection();
 }
 
@@ -205,25 +215,11 @@ void TriangleLinearInterpolation<DataTypes>::projectPointOnTriangle(const Vector
 }
 
 template<class DataTypes>
-void TriangleLinearInterpolation<DataTypes>::fillProximity(const Coord & pP,ConstraintProximity & pinfo) {
+void TriangleLinearInterpolation<DataTypes>::findClosestTriangle(const Coord & P,helper::vector<unsigned> & triangles,ConstraintProximity & pinfo) {
     helper::ReadAccessor<Data <VecCoord> > x = *this->m_state->read(core::VecCoordId::position());
 
     pinfo.pid.resize(3);
     pinfo.fact.resize(3);
-
-    //project P in the bounding box of the pbject
-    Vector3 P;
-    P[0] = std::min(std::max(pP[0] , m_Bmin[0]) , m_Bmax[0]);
-    P[1] = std::min(std::max(pP[1] , m_Bmin[1]) , m_Bmax[1]);
-    P[2] = std::min(std::max(pP[2] , m_Bmin[2]) , m_Bmax[2]);
-
-    Vec3i cbox;
-    cbox[0] = floor((P[0] - m_Bmin[0])/m_cellSize[0]);
-    cbox[1] = floor((P[1] - m_Bmin[1])/m_cellSize[1]);
-    cbox[2] = floor((P[2] - m_Bmin[2])/m_cellSize[2]);
-
-    helper::vector<unsigned> & triangles = m_triangleboxes[cbox[0] * d_nbox.getValue()[1] * d_nbox.getValue()[2] + cbox[1] * d_nbox.getValue()[2] + cbox[2]];
-
     double minDist = 0;
     for(unsigned tb=0;tb<triangles.size();tb++) {
         unsigned t = triangles[tb];
@@ -259,6 +255,31 @@ void TriangleLinearInterpolation<DataTypes>::fillProximity(const Coord & pP,Cons
             minDist = dist;
         }
     }
+}
+
+template<class DataTypes>
+void TriangleLinearInterpolation<DataTypes>::fillProximity(const Coord & P,ConstraintProximity & pinfo) {
+    Vec3i cbox;
+    cbox[0] = floor((P[0] - m_Bmin[0])/m_cellSize[0]);
+    cbox[1] = floor((P[1] - m_Bmin[1])/m_cellSize[1]);
+    cbox[2] = floor((P[2] - m_Bmin[2])/m_cellSize[2]);
+
+    //project P in the bounding box of the pbject
+    //search with the closest box in bbox
+    for (int i=0;i<3;i++) {
+        if (cbox[i]<0) cbox[i] = 0;
+        else if (cbox[i]>=d_nbox.getValue()[i]) cbox[i] = d_nbox.getValue()[i] - 1;
+    }
+
+
+    helper::vector<unsigned> & triangles = m_triangleboxes[cbox[0]][cbox[1]][cbox[2]];
+    if (! triangles.empty()) {
+        findClosestTriangle(P,triangles,pinfo);
+        return;
+    }
+
+    //else we need to find the closest box not empty
+
 }
 
 template<class DataTypes>
@@ -301,11 +322,9 @@ void TriangleLinearInterpolation<DataTypes>::draw(const core::visual::VisualPara
 
 
     for (unsigned i=0;i<=d_nbox.getValue()[0];i++) {
-        unsigned cX = i * d_nbox.getValue()[1] * d_nbox.getValue()[2];
         for (unsigned j=0;j<=d_nbox.getValue()[1];j++) {
-            unsigned cY = j*d_nbox.getValue()[2];
             for (unsigned k=0;k<=d_nbox.getValue()[2];k++) {
-                if (m_triangleboxes[cX + cY + k].empty()) continue;
+                if (m_triangleboxes[i][j][k].empty()) continue;
 
                 Vector3 points[8];
                 points[0] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;

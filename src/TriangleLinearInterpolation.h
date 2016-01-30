@@ -67,6 +67,7 @@ public:
 
     void handleEvent(sofa::core::objectmodel::Event* event);
 
+    void findClosestTriangle(const Coord & P,helper::vector<unsigned> & triangles,ConstraintProximity & pinfo);
 
     Data<Vec3i> d_nbox;
 
@@ -96,7 +97,7 @@ protected:
     helper::vector<Vector3> m_point_normal;
 
     Vector3 m_Bmin,m_Bmax,m_cellSize;
-    helper::vector<helper::vector<unsigned> > m_triangleboxes;
+    helper::vector<helper::vector<helper::vector<helper::vector<unsigned> > > >  m_triangleboxes;
 };
 
 
