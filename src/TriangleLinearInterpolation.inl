@@ -215,7 +215,7 @@ void TriangleLinearInterpolation<DataTypes>::projectPointOnTriangle(const Vector
 }
 
 template<class DataTypes>
-void TriangleLinearInterpolation<DataTypes>::findClosestTriangle(const Coord & P,helper::vector<unsigned> & triangles,ConstraintProximity & pinfo) {
+void TriangleLinearInterpolation<DataTypes>::findClosestTriangle(const Coord & P,const helper::vector<unsigned> & triangles,ConstraintProximity & pinfo) {
     helper::ReadAccessor<Data <VecCoord> > x = *this->m_state->read(core::VecCoordId::position());
 
     pinfo.pid.resize(3);
@@ -243,7 +243,7 @@ void TriangleLinearInterpolation<DataTypes>::findClosestTriangle(const Coord & P
         //1.0 + 0.1 i.e. 0.1 is to avoid zero
         double dist = (Q-P).norm();
 
-        if ((t==0) || (dist < minDist)) {
+        if ((tb==0) || (dist < minDist)) {
             pinfo.pid[0] = tri[0];
             pinfo.pid[1] = tri[1];
             pinfo.pid[2] = tri[2];
@@ -271,15 +271,49 @@ void TriangleLinearInterpolation<DataTypes>::fillProximity(const Coord & P,Const
         else if (cbox[i]>=d_nbox.getValue()[i]) cbox[i] = d_nbox.getValue()[i] - 1;
     }
 
+    std::vector<ConstraintProximity> prox_around;
 
-    helper::vector<unsigned> & triangles = m_triangleboxes[cbox[0]][cbox[1]][cbox[2]];
-    if (! triangles.empty()) {
-        findClosestTriangle(P,triangles,pinfo);
-        return;
+    unsigned max = max3(d_nbox.getValue()[0],d_nbox.getValue()[1],d_nbox.getValue()[2]);
+
+    for (int d=0;d<max;d++) {
+        for (int i=-d;i<=d;i++) {
+            if (cbox[0]+i < 0 || cbox[0]+i >= d_nbox.getValue()[0]) continue;
+
+            for (int j=-d;j<=d;j++) {
+                if (cbox[1]+j < 0 || cbox[1]+j >= d_nbox.getValue()[1]) continue;
+
+                for (int k=-d;k<=d;k++) {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= d_nbox.getValue()[2]) continue;
+
+                    const helper::vector<unsigned> & triangles = m_triangleboxes[cbox[0] + i][cbox[1] + j][cbox[2] + k];
+
+                    if (triangles.empty()) continue; // no triangle
+
+                    ConstraintProximity pinfo;
+                    this->findClosestTriangle(P,triangles,pinfo);
+
+                    prox_around.push_back(pinfo);
+                }
+            }
+        }
+
+        if (! prox_around.empty()) {
+            // we found proximities in boxes around of P with distance (in box) equal to d
+            // we now search for the closer point and return it
+            double dist = 0;
+
+            for (unsigned i=0;i<prox_around.size();i++) {
+                double cdist = (P-this->getContactPosition(prox_around[i])).norm();
+                if (i==0 || cdist<dist) {
+                    pinfo = prox_around[i];
+                    dist = cdist;
+                }
+            }
+
+            // we have at least one proximity
+            return;
+        }
     }
-
-    //else we need to find the closest box not empty
-
 }
 
 template<class DataTypes>
