@@ -118,7 +118,7 @@ void TriangleLinearInterpolation<DataTypes>::prepareDetection() {
 
     m_point_normal.resize(x.size());
     for (unsigned p=0;p<x.size();p++) {
-        const sofa::component::topology::TrianglesAroundVertex & tav = this->m_container->getTrianglesAroundVertex(p);
+        const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = this->m_container->getTrianglesAroundVertex(p);
 
         m_point_normal[p] = Vector3(0,0,0);
         for (unsigned t=0;t<tav.size();t++) {
