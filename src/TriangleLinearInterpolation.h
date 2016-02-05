@@ -67,9 +67,11 @@ public:
 
     void handleEvent(sofa::core::objectmodel::Event* event);
 
-    void findClosestTriangle(const Coord & P,const helper::vector<unsigned> & triangles,ConstraintProximity & pinfo);
+    void findClosestTriangle(const Coord & P,const helper::set<unsigned> & triangles,ConstraintProximity & pinfo);
+
 
     Data<Vec3i> d_nbox;
+    Data<bool> d_drawBbox;
 
 protected:
 
@@ -92,6 +94,8 @@ protected:
     void projectPointOnTriangle(const Vector3 & s,const TriangleInfo & tinfo, const Vector3 & p0, const Vector3 & p1,const Vector3 & p2, double & fact_w,double & fact_u, double & fact_v);
 
     void computeBaryCoords(const Vector3 & proj_P,const TriangleInfo & tinfo, const Vector3 & p0, double & fact_w,double & fact_u, double & fact_v);
+
+    void fillTriangleSet(int d,const Vec3i & cbox,std::set<unsigned> & vecpinfo);
 
     helper::vector<TriangleInfo> m_triangle_info;
     helper::vector<Vector3> m_point_normal;

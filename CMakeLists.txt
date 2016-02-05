@@ -16,14 +16,16 @@ set(HEADER_FILES
      src/EdgeLinearInterpolation.inl
      src/TriangleInterpolation.h
      src/TriangleLinearInterpolation.h
-     src/TriangleLinearInterpolation.h
      src/TriangleLinearInterpolation.inl
+     src/FullTriangleLinearInterpolation.h
+     src/FullTriangleLinearInterpolation.inl
 )
 
 set(SOURCE_FILES
      src/initConstraintGeometryPlugin.cpp
      src/EdgeLinearInterpolation.cpp
      src/TriangleLinearInterpolation.cpp
+     src/FullTriangleLinearInterpolation.cpp
 )
 
 set(SCENES_FILES

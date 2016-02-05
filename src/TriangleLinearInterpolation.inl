@@ -13,6 +13,8 @@
 
 #define min3(a,b,c) std::min(std::min(a,b),c)
 #define max3(a,b,c) std::max(std::max(a,b),c)
+#define depl(a,b,c) max3(abs(a),abs(b),abs(c))
+//#define depl(a,b,c) floor(sqrt((a*a) + (b*b) + (c*c)))
 
 namespace sofa {
 
@@ -24,6 +26,7 @@ template<class DataTypes>
 TriangleLinearInterpolation<DataTypes>::TriangleLinearInterpolation()
 : TriangleInterpolation<DataTypes>()
 , d_nbox(initData(&d_nbox, Vec3i(8,8,8),"nbox","Number of bbox subdivision"))
+, d_drawBbox(initData(&d_drawBbox, false,"drawBbox","Draw Bbox"))
 {
     this->f_listening.setValue(true);
 }
@@ -215,14 +218,15 @@ void TriangleLinearInterpolation<DataTypes>::projectPointOnTriangle(const Vector
 }
 
 template<class DataTypes>
-void TriangleLinearInterpolation<DataTypes>::findClosestTriangle(const Coord & P,const helper::vector<unsigned> & triangles,ConstraintProximity & pinfo) {
+void TriangleLinearInterpolation<DataTypes>::findClosestTriangle(const Coord & P,const helper::set<unsigned> & triangleSet,ConstraintProximity & pinfo) {
     helper::ReadAccessor<Data <VecCoord> > x = *this->m_state->read(core::VecCoordId::position());
 
     pinfo.pid.resize(3);
     pinfo.fact.resize(3);
     double minDist = 0;
-    for(unsigned tb=0;tb<triangles.size();tb++) {
-        unsigned t = triangles[tb];
+    for(std::set<unsigned>::iterator it=triangleSet.begin();it!=triangleSet.end();++it) {
+        unsigned t = *it;
+
         const topology::Triangle tri = this->m_container->getTriangle(t);
 
         //Compute Bezier Positions
@@ -243,7 +247,7 @@ void TriangleLinearInterpolation<DataTypes>::findClosestTriangle(const Coord & P
         //1.0 + 0.1 i.e. 0.1 is to avoid zero
         double dist = (Q-P).norm();
 
-        if ((tb==0) || (dist < minDist)) {
+        if ((it==triangleSet.begin()) || (dist < minDist)) {
             pinfo.pid[0] = tri[0];
             pinfo.pid[1] = tri[1];
             pinfo.pid[2] = tri[2];
@@ -258,6 +262,29 @@ void TriangleLinearInterpolation<DataTypes>::findClosestTriangle(const Coord & P
 }
 
 template<class DataTypes>
+void TriangleLinearInterpolation<DataTypes>::fillTriangleSet(int d,const Vec3i & cbox,std::set<unsigned> & triangleSet) {
+    for (int i=-d;i<=d;i++) {
+        if (cbox[0]+i < 0 || cbox[0]+i > d_nbox.getValue()[0]) continue;
+
+        for (int j=-d;j<=d;j++) {
+            if (cbox[1]+j < 0 || cbox[1]+j > d_nbox.getValue()[1]) continue;
+
+            for (int k=-d;k<=d;k++) {
+                if (cbox[2]+k < 0 || cbox[2]+k > d_nbox.getValue()[2]) continue;
+
+                if (depl(i,j,k)!=d) continue;
+
+                const helper::vector<unsigned> & triangles = m_triangleboxes[cbox[0] + i][cbox[1] + j][cbox[2] + k];
+
+                for (unsigned t=0;t<triangles.size();t++) triangleSet.insert(triangles[t]);
+            }
+        }
+    }
+}
+
+//static helper::set<unsigned> s_drawT;
+
+template<class DataTypes>
 void TriangleLinearInterpolation<DataTypes>::fillProximity(const Coord & P,ConstraintProximity & pinfo) {
     Vec3i cbox;
     cbox[0] = floor((P[0] - m_Bmin[0])/m_cellSize[0]);
@@ -268,52 +295,25 @@ void TriangleLinearInterpolation<DataTypes>::fillProximity(const Coord & P,Const
     //search with the closest box in bbox
     for (int i=0;i<3;i++) {
         if (cbox[i]<0) cbox[i] = 0;
-        else if (cbox[i]>=d_nbox.getValue()[i]) cbox[i] = d_nbox.getValue()[i] - 1;
+        else if (cbox[i]>d_nbox.getValue()[i]) cbox[i] = d_nbox.getValue()[i];
     }
 
-    std::vector<ConstraintProximity> prox_around;
 
     unsigned max = max3(d_nbox.getValue()[0],d_nbox.getValue()[1],d_nbox.getValue()[2]);
+    std::set<unsigned> triangleSet;
 
-    for (int d=0;d<max;d++) {
-        for (int i=-d;i<=d;i++) {
-            if (cbox[0]+i < 0 || cbox[0]+i >= d_nbox.getValue()[0]) continue;
-
-            for (int j=-d;j<=d;j++) {
-                if (cbox[1]+j < 0 || cbox[1]+j >= d_nbox.getValue()[1]) continue;
-
-                for (int k=-d;k<=d;k++) {
-                    if (cbox[2]+k < 0 || cbox[2]+k >= d_nbox.getValue()[2]) continue;
-
-                    const helper::vector<unsigned> & triangles = m_triangleboxes[cbox[0] + i][cbox[1] + j][cbox[2] + k];
-
-                    if (triangles.empty()) continue; // no triangle
-
-                    ConstraintProximity pinfo;
-                    this->findClosestTriangle(P,triangles,pinfo);
-
-                    prox_around.push_back(pinfo);
-                }
-            }
-        }
-
-        if (! prox_around.empty()) {
-            // we found proximities in boxes around of P with distance (in box) equal to d
-            // we now search for the closer point and return it
-            double dist = 0;
-
-            for (unsigned i=0;i<prox_around.size();i++) {
-                double cdist = (P-this->getContactPosition(prox_around[i])).norm();
-                if (i==0 || cdist<dist) {
-                    pinfo = prox_around[i];
-                    dist = cdist;
-                }
-            }
-
-            // we have at least one proximity
-            return;
-        }
+    int d = 0;
+    while (d<max && triangleSet.empty()) {
+        fillTriangleSet(d,cbox,triangleSet);
+        d++;
     }
+
+    // we take distance+1 to make shure to not forget any triangle
+    fillTriangleSet(d,cbox,triangleSet);
+
+//    s_drawT = triangleSet;
+
+    findClosestTriangle(P,triangleSet,pinfo);
 }
 
 template<class DataTypes>
@@ -337,59 +337,77 @@ void TriangleLinearInterpolation<DataTypes>::fillConstraintNormal(const Constrai
 
 template<class DataTypes>
 void TriangleLinearInterpolation<DataTypes>::draw(const core::visual::VisualParams * vparams) {
-    if (!this->d_draw.getValue()) return;
+    if (this->d_draw.getValue()) {
+        helper::ReadAccessor<Data <VecCoord> > x = *this->m_state->read(core::VecCoordId::position());
+        for(unsigned t=0;t<m_triangle_info.size();t++) {
+            const topology::Triangle tri = this->m_container->getTriangle(t);
 
-    helper::ReadAccessor<Data <VecCoord> > x = *this->m_state->read(core::VecCoordId::position());
-    for(unsigned t=0;t<m_triangle_info.size();t++) {
-        const topology::Triangle tri = this->m_container->getTriangle(t);
+            //Compute Bezier Positions
+            Vector3 p0 = x[tri[0]];
+            Vector3 p1 = x[tri[1]];
+            Vector3 p2 = x[tri[2]];
 
-        //Compute Bezier Positions
-        Vector3 p0 = x[tri[0]];
-        Vector3 p1 = x[tri[1]];
-        Vector3 p2 = x[tri[2]];
-
-        vparams->drawTool()->drawArrow(p0,p0 + m_point_normal[tri[0]],0.01, defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
-        vparams->drawTool()->drawArrow(p1,p1 + m_point_normal[tri[1]],0.01, defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
-        vparams->drawTool()->drawArrow(p2,p2 + m_point_normal[tri[2]],0.01, defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
+            vparams->drawTool()->drawArrow(p0,p0 + m_point_normal[tri[0]],0.01, defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
+            vparams->drawTool()->drawArrow(p1,p1 + m_point_normal[tri[1]],0.01, defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
+            vparams->drawTool()->drawArrow(p2,p2 + m_point_normal[tri[2]],0.01, defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
+        }
     }
 
 
+    if (this->d_drawBbox.getValue()) {
+        for (unsigned i=0;i<=d_nbox.getValue()[0];i++) {
+            for (unsigned j=0;j<=d_nbox.getValue()[1];j++) {
+                for (unsigned k=0;k<=d_nbox.getValue()[2];k++) {
+                    if (m_triangleboxes[i][j][k].empty()) continue;
 
-    for (unsigned i=0;i<=d_nbox.getValue()[0];i++) {
-        for (unsigned j=0;j<=d_nbox.getValue()[1];j++) {
-            for (unsigned k=0;k<=d_nbox.getValue()[2];k++) {
-                if (m_triangleboxes[i][j][k].empty()) continue;
+                    Vector3 points[8];
+                    points[0] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
+                    points[1] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
+                    points[2] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j+1) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
+                    points[3] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
+                    points[4] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
+                    points[5] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j  ) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
+                    points[6] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
+                    points[7] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
 
-                Vector3 points[8];
-                points[0] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-                points[1] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-                points[2] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j+1) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-                points[3] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-                points[4] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
-                points[5] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j  ) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
-                points[6] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
-                points[7] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
+                    glColor4f(1,1,1,1);
+                    glBegin(GL_LINES);
+                        helper::gl::glVertexT(points[0]);helper::gl::glVertexT(points[1]);
+                        helper::gl::glVertexT(points[3]);helper::gl::glVertexT(points[2]);
+                        helper::gl::glVertexT(points[7]);helper::gl::glVertexT(points[6]);
+                        helper::gl::glVertexT(points[4]);helper::gl::glVertexT(points[5]);
 
-                glColor4f(1,1,1,1);
-                glBegin(GL_LINES);
-                    helper::gl::glVertexT(points[0]);helper::gl::glVertexT(points[1]);
-                    helper::gl::glVertexT(points[3]);helper::gl::glVertexT(points[2]);
-                    helper::gl::glVertexT(points[7]);helper::gl::glVertexT(points[6]);
-                    helper::gl::glVertexT(points[4]);helper::gl::glVertexT(points[5]);
+                        helper::gl::glVertexT(points[0]);helper::gl::glVertexT(points[2]);
+                        helper::gl::glVertexT(points[1]);helper::gl::glVertexT(points[3]);
+                        helper::gl::glVertexT(points[4]);helper::gl::glVertexT(points[6]);
+                        helper::gl::glVertexT(points[5]);helper::gl::glVertexT(points[7]);
 
-                    helper::gl::glVertexT(points[0]);helper::gl::glVertexT(points[2]);
-                    helper::gl::glVertexT(points[1]);helper::gl::glVertexT(points[3]);
-                    helper::gl::glVertexT(points[4]);helper::gl::glVertexT(points[6]);
-                    helper::gl::glVertexT(points[5]);helper::gl::glVertexT(points[7]);
-
-                    helper::gl::glVertexT(points[0]);helper::gl::glVertexT(points[4]);
-                    helper::gl::glVertexT(points[1]);helper::gl::glVertexT(points[5]);
-                    helper::gl::glVertexT(points[2]);helper::gl::glVertexT(points[6]);
-                    helper::gl::glVertexT(points[3]);helper::gl::glVertexT(points[7]);
-                glEnd();
+                        helper::gl::glVertexT(points[0]);helper::gl::glVertexT(points[4]);
+                        helper::gl::glVertexT(points[1]);helper::gl::glVertexT(points[5]);
+                        helper::gl::glVertexT(points[2]);helper::gl::glVertexT(points[6]);
+                        helper::gl::glVertexT(points[3]);helper::gl::glVertexT(points[7]);
+                    glEnd();
+                }
             }
         }
     }
+
+//    helper::ReadAccessor<Data <VecCoord> > x = *this->m_state->read(core::VecCoordId::position());
+//    for(std::set<unsigned>::iterator it=s_drawT.begin();it!=s_drawT.end();++it) {
+//        unsigned t = *it;
+//        const topology::Triangle tri = this->m_container->getTriangle(t);
+//        //Compute Bezier Positions
+//        Vector3 p0 = x[tri[0]];
+//        Vector3 p1 = x[tri[1]];
+//        Vector3 p2 = x[tri[2]];
+
+//        glColor4f(1,0,1,1);
+//        glBegin(GL_TRIANGLES);
+//            helper::gl::glVertexT(p0);
+//            helper::gl::glVertexT(p1);
+//            helper::gl::glVertexT(p2);
+//        glEnd();
+//    }
 }
 
 } //controller
