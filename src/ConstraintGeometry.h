@@ -23,6 +23,10 @@ public :
 class ConstraintNormal {
 public:
     helper::vector<defaulttype::Vector3> normals;
+
+    void createFrame() {
+
+    }
 };
 
 template<class DataTypes>

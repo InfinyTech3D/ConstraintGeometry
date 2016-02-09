@@ -28,8 +28,9 @@ set(SOURCE_FILES
      src/FullTriangleLinearInterpolation.cpp
 )
 
-set(SCENES_FILES
-
+file(GLOB_RECURSE SCENES_FILES
+    "scenes/*.scn"
+    "scenes/*.xml"
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${README_FILES} )
