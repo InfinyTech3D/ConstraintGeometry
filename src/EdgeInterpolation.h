@@ -70,6 +70,10 @@ public:
 
     virtual void fillConstraintNormal(const ConstraintProximity & pinfo, ConstraintNormal & ninfo) = 0;
 
+    sofa::component::topology::EdgeSetTopologyContainer* getTopologyContainer() {
+        return m_container;
+    }
+
 protected :
     sofa::core::behavior::MechanicalState<DataTypes> * m_state;
     sofa::component::topology::EdgeSetTopologyContainer* m_container;
