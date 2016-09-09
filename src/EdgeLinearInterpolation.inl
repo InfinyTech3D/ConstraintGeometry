@@ -19,6 +19,9 @@ template<class DataTypes>
 void EdgeLinearInterpolation<DataTypes>::fillProximity(const Coord & P,ConstraintProximity & pinfo) {
     const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
 
+    int min_pid[2] = {0,0};
+    double min_fact[2] = {0,0};
+
     double minDist = 0;
     for(int e=0;e<this->m_container->getNbEdges();e++) {
         double fact_u;
@@ -40,27 +43,25 @@ void EdgeLinearInterpolation<DataTypes>::fillProximity(const Coord & P,Constrain
         double dist = (Q-P).norm();
 
         if ((e==0) || (dist < minDist)) {
-            pinfo.pid.resize(2);
-            pinfo.fact.resize(2);
+            min_pid[0] = edge[0];
+            min_pid[1] = edge[1];
 
-            pinfo.pid[0] = edge[0];
-            pinfo.pid[1] = edge[1];
-
-            pinfo.fact[0] = fact_u;
-            pinfo.fact[1] = fact_v;
+            min_fact[0] = fact_u;
+            min_fact[1] = fact_v;
 
             minDist = dist;
         }
     }
+
+    pinfo.clear();
+    pinfo.add(min_pid[0],min_fact[0]);
+    pinfo.add(min_pid[1],min_fact[1]);
 }
 
 template<class DataTypes>
 void EdgeLinearInterpolation<DataTypes>::fillProximity(unsigned pid,ConstraintProximity & pinfo) {
-    pinfo.pid.resize(1);
-    pinfo.fact.resize(1);
-
-    pinfo.pid[0] = pid;
-    pinfo.fact[0] = 1.0;
+    pinfo.clear();
+    pinfo.add(pid,1.0);
 }
 
 template<class DataTypes>
@@ -70,11 +71,13 @@ void EdgeLinearInterpolation<DataTypes>::fillConstraintNormal(const ConstraintPr
     //Compute the normals
     Vector3 N1;
 
-    if (pinfo.pid.size()==1) {
+    if (pinfo.size()==1) {
         if (pinfo.pid[0]==x.size()-1) N1 = x[pinfo.pid[0]] - x[pinfo.pid[0]-1];
         else N1 = x[pinfo.pid[0]+1] - x[pinfo.pid[0]];
-    } else {
+    } else if (pinfo.size()==2) {
         N1 = x[pinfo.pid[1]] - x[pinfo.pid[0]];
+    } else {
+        return;
     }
 
     N1.normalize();
@@ -85,10 +88,10 @@ void EdgeLinearInterpolation<DataTypes>::fillConstraintNormal(const ConstraintPr
     Vector3 N3 = cross(N1,N2);
     N3.normalize();
 
-    ninfo.normals.clear();
-    ninfo.normals.push_back(N1);
-    ninfo.normals.push_back(N2);
-    ninfo.normals.push_back(N3);
+    ninfo.clear();
+    ninfo.add(N1);
+    ninfo.add(N2);
+    ninfo.add(N3);
 
 }
 

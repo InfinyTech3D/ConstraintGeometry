@@ -16,17 +16,42 @@ namespace behavior {
 
 class ConstraintProximity {
 public :
+
+    void clear() {
+        pid.clear();
+        fact.clear();
+    }
+
+    unsigned size() const {
+        return pid.size();
+    }
+
+    void add(unsigned id,double f) {
+        pid.push_back(id);
+        fact.push_back(f);
+    }
+
     helper::vector<unsigned> pid;
     helper::vector<double> fact;
 };
 
 class ConstraintNormal {
 public:
+
+    void clear() {
+        normals.clear();
+    }
+
+    void add(const defaulttype::Vector3 & P) {
+        normals.push_back(P);
+    }
+
+    unsigned size() const {
+        return normals.size();
+    }
+
     helper::vector<defaulttype::Vector3> normals;
 
-    void createFrame() {
-
-    }
 };
 
 template<class DataTypes>
@@ -89,7 +114,21 @@ public :
 
         c_d.endEdit();
     }
+
 };
+
+template<class DataType1,class DataType2>
+static void addConstraint(core::MultiMatrixDerivId cId,unsigned & cline,ConstraintGeometry<DataType1> * cg1,const ConstraintProximity & pinfo1,ConstraintGeometry<DataType2> * cg2,const ConstraintProximity & pinfo2,const ConstraintNormal & ninfo) {
+    cg1->addConstraint(cId,cline,pinfo1,ninfo,false);
+    cg2->addConstraint(cId,cline,pinfo2,ninfo,true);
+    cline += ninfo.size();
+}
+
+template<class DataType1>
+static void addConstraint(core::MultiMatrixDerivId cId,unsigned & cline,ConstraintGeometry<DataType1> * cg,const ConstraintProximity & pinfo,const ConstraintNormal & ninfo) {
+    cg->addConstraint(cId,cline,pinfo,ninfo,false);
+    cline += ninfo.size();
+}
 
 } // namespace controller
 

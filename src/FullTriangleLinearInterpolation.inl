@@ -144,8 +144,9 @@ template<class DataTypes>
 void FullTriangleLinearInterpolation<DataTypes>::fillProximity(const Coord & P,ConstraintProximity & pinfo) {
     helper::ReadAccessor<Data <VecCoord> > x = *this->m_state->read(core::VecCoordId::position());
 
-    pinfo.pid.resize(3);
-    pinfo.fact.resize(3);
+
+    int min_pid[3] = {0,0,0};
+    double min_fact[3] = {0,0,0};
 
     double minDist = 0;
     for(unsigned t=0;t<m_triangle_info.size();t++) {
@@ -170,17 +171,22 @@ void FullTriangleLinearInterpolation<DataTypes>::fillProximity(const Coord & P,C
         double dist = (Q-P).norm();
 
         if ((t==0) || (dist < minDist)) {
-            pinfo.pid[0] = tri[0];
-            pinfo.pid[1] = tri[1];
-            pinfo.pid[2] = tri[2];
+            min_pid[0] = tri[0];
+            min_pid[1] = tri[1];
+            min_pid[2] = tri[2];
 
-            pinfo.fact[0] = fact_u;
-            pinfo.fact[1] = fact_v;
-            pinfo.fact[2] = fact_w;
-
+            min_fact[0] = fact_u;
+            min_fact[1] = fact_v;
+            min_fact[2] = fact_w;
             minDist = dist;
         }
     }
+
+
+    pinfo.clear();
+    pinfo.add(min_pid[0],min_fact[0]);
+    pinfo.add(min_pid[1],min_fact[1]);
+    pinfo.add(min_pid[2],min_fact[2]);
 }
 
 template<class DataTypes>
@@ -190,16 +196,16 @@ void FullTriangleLinearInterpolation<DataTypes>::fillConstraintNormal(const Cons
     Vector3 N1 = -normal;
     N1.normalize();
 
-    Vector3 N2 = cross(N1,((fabs(dot(N1,Vector3(1,0,0)))>0.999999) ? Vector3(0,1,0) : Vector3(1,0,0)));
+    Vector3 N2 = cross(N1,((fabs(dot(N1,Vector3(1,0,0)))>0.99) ? Vector3(0,1,0) : Vector3(1,0,0)));
     N2.normalize();
 
     Vector3 N3 = cross(N1,N2);
     N3.normalize();
 
-    ninfo.normals.clear();
-    ninfo.normals.push_back(N1);
-    ninfo.normals.push_back(N2);
-    ninfo.normals.push_back(N3);
+    ninfo.clear();
+    ninfo.add(N1);
+    ninfo.add(N2);
+    ninfo.add(N3);
 }
 
 template<class DataTypes>
