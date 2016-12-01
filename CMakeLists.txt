@@ -19,6 +19,10 @@ set(HEADER_FILES
      src/TriangleLinearInterpolation.inl
      src/FullTriangleLinearInterpolation.h
      src/FullTriangleLinearInterpolation.inl
+     src/TetrahedronCutting.h
+     src/TetrahedronCutting.inl
+     src/PlaneCutting.h
+     src/PlaneCutting.inl
 )
 
 set(SOURCE_FILES
@@ -26,6 +30,8 @@ set(SOURCE_FILES
      src/EdgeLinearInterpolation.cpp
      src/TriangleLinearInterpolation.cpp
      src/FullTriangleLinearInterpolation.cpp
+     src/TetrahedronCutting.cpp
+     src/PlaneCutting.cpp
 )
 
 file(GLOB_RECURSE SCENES_FILES
