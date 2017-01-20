@@ -325,7 +325,7 @@ template<class DataTypes>
 void TriangleLinearInterpolation<DataTypes>::fillConstraintNormal(const ConstraintProximity & pinfo,ConstraintNormal & ninfo) {
     Vector3 normal = m_point_normal[pinfo.pid[0]] * pinfo.fact[0] + m_point_normal[pinfo.pid[1]] * pinfo.fact[1] + m_point_normal[pinfo.pid[2]] * pinfo.fact[2];
 
-    Vector3 N1 = -normal;
+    Vector3 N1 = normal;
     N1.normalize();
 
     Vector3 N2 = cross(N1,((fabs(dot(N1,Vector3(1,0,0)))>0.99) ? Vector3(0,1,0) : Vector3(1,0,0)));
