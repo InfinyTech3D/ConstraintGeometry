@@ -67,7 +67,7 @@ public:
 
     void handleEvent(sofa::core::objectmodel::Event* event);
 
-    void findClosestTriangle(const Coord & P,const helper::set<unsigned> & triangles,ConstraintProximity & pinfo);
+    void findClosestTriangle(const Coord & P,const std::set<unsigned> & triangles,ConstraintProximity & pinfo);
 
 
     Data<Vec3i> d_nbox;

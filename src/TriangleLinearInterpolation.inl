@@ -218,7 +218,7 @@ void TriangleLinearInterpolation<DataTypes>::projectPointOnTriangle(const Vector
 }
 
 template<class DataTypes>
-void TriangleLinearInterpolation<DataTypes>::findClosestTriangle(const Coord & P,const helper::set<unsigned> & triangleSet,ConstraintProximity & pinfo) {
+void TriangleLinearInterpolation<DataTypes>::findClosestTriangle(const Coord & P,const std::set<unsigned> & triangleSet,ConstraintProximity & pinfo) {
     helper::ReadAccessor<Data <VecCoord> > x = *this->m_state->read(core::VecCoordId::position());
 
     int min_pid[3] = {0,0,0} ;
