@@ -6,6 +6,8 @@ find_package(SofaBase REQUIRED)
 find_package(SofaSimulation REQUIRED)
 find_package(SofaGeneral REQUIRED)
 
+#find_package(TRI6FEM REQUIRED)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set(HEADER_FILES      
@@ -23,6 +25,12 @@ set(HEADER_FILES
      src/TetrahedronCutting.inl
      src/PlaneCutting.h
      src/PlaneCutting.inl
+
+     src/TriangleNonLinearInterpolation.h
+     src/BezierTriangleNonLinearInterpolation.h
+     src/BezierTriangleNonLinearInterpolation.inl
+     #src/QuadraticTriangleNonLinearInterpolation.h
+     #src/QuadraticTriangleNonLinearInterpolation.inl
 )
 
 set(SOURCE_FILES
@@ -32,6 +40,9 @@ set(SOURCE_FILES
      src/FullTriangleLinearInterpolation.cpp
      src/TetrahedronCutting.cpp
      src/PlaneCutting.cpp
+
+     src/BezierTriangleNonLinearInterpolation.cpp
+     #src/QuadraticTriangleNonLinearInterpolation.cpp
 )
 
 file(GLOB_RECURSE SCENES_FILES
@@ -47,6 +58,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${CONSTRAIN
 target_include_directories(${PROJECT_NAME} PUBLIC "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DPLUGIN_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\"")
+#target_link_libraries(${PROJECT_NAME} SofaCore SofaComponentBase SofaSimulationTree SofaUserInteraction SofaConstraint TRI6FEM)
 target_link_libraries(${PROJECT_NAME} SofaCore SofaComponentBase SofaSimulationTree SofaUserInteraction SofaConstraint)
 
 ## Install rules for the library and headers; CMake package configurations files
