@@ -29,8 +29,8 @@ set(HEADER_FILES
      src/TriangleNonLinearInterpolation.h
      src/BezierTriangleNonLinearInterpolation.h
      src/BezierTriangleNonLinearInterpolation.inl
-     #src/QuadraticTriangleNonLinearInterpolation.h
-     #src/QuadraticTriangleNonLinearInterpolation.inl
+#     src/QuadraticTriangleNonLinearInterpolation.h
+#     src/QuadraticTriangleNonLinearInterpolation.inl
 )
 
 set(SOURCE_FILES
@@ -42,7 +42,7 @@ set(SOURCE_FILES
      src/PlaneCutting.cpp
 
      src/BezierTriangleNonLinearInterpolation.cpp
-     #src/QuadraticTriangleNonLinearInterpolation.cpp
+#     src/QuadraticTriangleNonLinearInterpolation.cpp
 )
 
 file(GLOB_RECURSE SCENES_FILES

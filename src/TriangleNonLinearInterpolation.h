@@ -47,121 +47,87 @@ public:
    typedef typename DataTypes::VecCoord VecCoord;
    typedef typename DataTypes::VecDeriv VecDeriv;
 
-
    Data <bool> f_activateNewton;
    Data <unsigned> f_nonlin_max_it;
-   Data <double> f_nonlin_tol;
+   Data <double> f_nonlin_tolerance;
+   Data <double> f_nonlin_threshold;
 
    TriangleNonLinearInterpolation()
    : Inherit()
    , f_activateNewton(initData(&f_activateNewton, (bool) true,"activateNewton","activate newton iterator in order to refine position on non linear triangle"))
-   , f_nonlin_max_it(initData(&this->f_nonlin_max_it, (unsigned) 10,"nonlin_max_it","Max iteration in the Newton Raphson solver used for projection of points on bezier curve"))
-   , f_nonlin_tol(initData(&f_nonlin_tol, (double) 0.1,"nonlin_tol","Tolerance in the Newton Raphson solver used for projection of points on bezier curve"))
+   , f_nonlin_max_it(initData(&this->f_nonlin_max_it, (unsigned) 10,"nonlin_max_it","Max iteration in the Newton Raphson solver used for projection of points on non linear triangle"))
+   , f_nonlin_tolerance(initData(&f_nonlin_tolerance, (double) 0.01,"nonlin_tol","Tolerance in the Newton Raphson solver used for projection of points on non linear triangle"))
+   , f_nonlin_threshold(initData(&f_nonlin_threshold, (double) 0.001,"nonlin_th","Threshold in the Newton Raphson solver used for projection of points on non linear triangle"))
    {}
 
+protected:
    void newtonIterations(const Vector3 & P,ConstraintProximity &pinfo) {
-       double epsilon = f_nonlin_tol.getValue() * f_nonlin_tol.getValue();
-       unsigned int it=0;
+       const double &tolerance = f_nonlin_tolerance.getValue();
+       const double &threshold = f_nonlin_threshold.getValue();
 
-       const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
-       const Vector3 & p300 = x[pinfo.pid[2]];
-       const Vector3 & p030 = x[pinfo.pid[1]];
-       const Vector3 & p003 = x[pinfo.pid[0]];
+       unsigned int it=0;
 
        double & fact_w = pinfo.fact[2];
        double & fact_u = pinfo.fact[1];
        double & fact_v = pinfo.fact[0];
 
+       double delta = 0.000001;
+
        while(it< f_nonlin_max_it.getValue()) {
-           ///Compute Point on bezier patch
 
-           Vector3 Q_i = getContactPosition(pinfo);
-           Vector3 p = Q_i - P;
+            Vector3 Q_i = getContactPosition(pinfo);
 
-           ///First derivative
-           Vector3 dpdu = getdpdu(pinfo);
-           Vector3 dpdv = getdpdv(pinfo);
+            Vector3 p = P - Q_i;
 
-           /// F(u,v) = ( (Q(u,v)-P).(dpdu(u,v)), (Q(u,v)-P).(dpdv(u,v)))
-           Vector2 F( p*dpdu, p*dpdv);
+            ConstraintNormal C_i;
+            fillConstraintNormal(pinfo,C_i);
 
-           ////////// Convergence
-           if(F.norm()<epsilon) return;
+            Vector2 e_0(dot(p,C_i.normals[1]),dot(p,C_i.normals[2]));
 
-           ///Second derivative
-           Vector3 d2pdu2 = getd2pdu2(pinfo);
-           Vector3 d2pdv2 = getd2pdv2(pinfo);
-           Vector3 d2pduv = getd2pduv(pinfo);
+            if(e_0.norm() < tolerance) break;
 
-           defaulttype::Mat<2,2,double> dFdUV, invM;
-           dFdUV[0][0] = dpdu*dpdu-d2pdu2*p;
-           dFdUV[1][0] = dFdUV[0][1] = dpdv*dpdu-d2pduv*p;
-           dFdUV[1][1] = dpdv*dpdv-d2pdv2*p;
+            ConstraintProximity P_v = pinfo;
+            P_v.fact[0] += delta;
+            P_v.fact[2] = 1.0 - P_v.fact[0] - P_v.fact[1];
+            Vector3 Q_v = getContactPosition(P_v);
+            Vector3 p_v = (P - Q_v);
+            Vector2 e_v(dot(p_v,C_i.normals[1]),dot(p_v,C_i.normals[2]));
 
-           invertMatrix(invM, dFdUV);
+            ConstraintProximity P_u = pinfo;
+            P_u.fact[1] += delta;
+            P_u.fact[2] = 1.0 - P_u.fact[0] - P_u.fact[1];
+            Vector3 Q_u = getContactPosition(P_u);
+            Vector3 p_u = (P - Q_u);
+            Vector2 e_u(dot(p_u,C_i.normals[1]),dot(p_u,C_i.normals[2]));
 
-//           double det = dFdUV[0][0]*dFdUV[1][1]-dFdUV[1][0]*dFdUV[1][0];
-//           if (fabs(det) < 0.000000000000000001) {
-//               msg_error(this) << "fail to converge";
-//               return; /// fails to converge
-//           }
+            defaulttype::Mat<2,2,double> J, invJ;
+            J[0][0] = (e_u[0] - e_0[0])/delta;
+            J[1][0] = (e_u[1] - e_0[1])/delta;
+            J[0][1] = (e_v[0] - e_0[0])/delta;
+            J[1][1] = (e_v[1] - e_0[1])/delta;
 
-//           invM[0][0] = dFdUV[1][1]/det;
-//           invM[1][1] = dFdUV[0][0]/det;
-//           invM[1][0] = invM[0][1] = -dFdUV[0][1]/det;
+            invertMatrix(invJ, J);
 
-           Vector2 dUV = invM*F;
+            Vector2 dUV = -invJ * e_0;
 
-           //if (dUV[0]*dUV[0] + dUV[1]*dUV[1] < epsilon) return;///check dx;
+            double new_u = fact_u+dUV[0];
+            double new_v = fact_v+dUV[1];
+            double new_w = 1.0 - new_u - new_v;
 
-           double new_u = fact_u-dUV[0];
-           double new_v = fact_v-dUV[1];
-           //double new_w = 1.0 - new_u - new_v;
+            if (new_u < 0.0) break;
+            if (new_u > 1.0) break;
+            if (new_v < 0.0) break;
+            if (new_v > 1.0) break;
+            if (new_w < 0.0) break;
+            if (new_w > 1.0) break;
 
-           if (new_u < 0.0) new_u = 0.0;
-           if (new_u > 1.0) new_u = 1.0;
-           if (new_v < 0.0) new_v = 0.0;
-           if (new_v > 1.0) new_v = 1.0;
+            fact_u = (fact_u + new_u) * 0.5;
+            fact_v = (fact_v + new_v) * 0.5;
+            fact_w = (fact_w + new_w) * 0.5;
 
-           if (new_u+new_v>1.0) {
-               printf("HOHO\n");
-               ///project the point on edge 2 and recompute barycoord
-               Vector3 edge_e0 = p003 - p030;
-               Vector3 edge_v2 = Q_i - p030;
+            if(dUV.norm() < threshold) break;
 
-               double dot2 = dot(edge_v2,edge_e0) / dot(edge_e0,edge_e0);
-               if (dot2<0.0) dot2 = 0.0;
-               else if (dot2>1.0) dot2 = 1.0;
-
-               Vector3 edge_P = p030 + edge_e0 * dot2;
-
-               Vector3 v0 = p030 - p300;
-               Vector3 v1 = p003 - p300;
-
-               double d00 = dot(v0, v0);
-               double d01 = dot(v0, v1);
-               double d11 = dot(v1, v1);
-               double invDenom = 1.0 / (d00 * d11 - d01 * d01);
-
-               Vector3 v2 = edge_P - p300;
-               double d20 = dot(v2, v0);
-               double d21 = dot(v2, v1);
-               new_u = (d11 * d20 - d01 * d21) * invDenom;
-               new_v = (d00 * d21 - d01 * d20) * invDenom;
-           }
-           double new_w = 1.0 - new_u - new_v;
-
-           double dx = (fact_u-new_u) * (fact_u-new_u) +
-                       (fact_v-new_v) * (fact_v-new_v) +
-                       (fact_w-new_w) * (fact_w-new_w);
-
-           fact_u = new_u;
-           fact_v = new_v;
-           fact_w = new_w;
-
-           if (dx < epsilon) return;
-
-           it++;
+            it++;
        }
    }
 
@@ -172,20 +138,9 @@ public:
             newtonIterations(P,pinfo);
    }
 
-//   void draw(const core::visual::VisualParams *vparams);
-
-   virtual Vector3 getContactPosition(const ConstraintProximity & pinfo) = 0;
+   virtual Vector3 getContactPosition    (const ConstraintProximity & pinfo) = 0;
    virtual Vector3 getContactFreePosition(const ConstraintProximity & pinfo) = 0;
-
-
-   ///Get first derivative
-   virtual Vector3 getdpdu(const ConstraintProximity & pinfo) = 0;
-   virtual Vector3 getdpdv(const ConstraintProximity & pinfo) = 0;
-
-   ///Get second derivative
-   virtual Vector3 getd2pdu2(const ConstraintProximity & pinfo) = 0;
-   virtual Vector3 getd2pdv2(const ConstraintProximity & pinfo) = 0;
-   virtual Vector3 getd2pduv(const ConstraintProximity & pinfo) = 0;
+   virtual void    fillConstraintNormal  (const ConstraintProximity & pinfo,ConstraintNormal & ninfo) = 0;
 
 };
 

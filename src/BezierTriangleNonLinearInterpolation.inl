@@ -13,7 +13,6 @@ namespace behavior {
 template<class DataTypes>
 BezierTriangleNonLinearInterpolation<DataTypes>::BezierTriangleNonLinearInterpolation()
 : Inherit()
-, f_use_bezier(initData(&f_use_bezier, true,"use_bezier","Use cubic bezier triangle. if false, project on flat triangle"))
 , f_draw_bezier_inc(initData(&f_draw_bezier_inc, (double) 0.0,"draw_bezier_inc","Draw bezier triangle"))
 {}
 
@@ -153,125 +152,216 @@ BezierTriangleNonLinearInterpolation<DataTypes>::getContactFreePosition(const Co
            p111_Free * 6*fact_w*fact_u*fact_v;
 }
 
-
 template<class DataTypes>
-typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
-BezierTriangleNonLinearInterpolation<DataTypes>::getdpdu(const ConstraintProximity & pinfo) {
-    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
-
-    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
+void BezierTriangleNonLinearInterpolation<DataTypes>::fillConstraintNormal(const ConstraintProximity & pinfo,ConstraintNormal & ninfo) {
+    const unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
     const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[trid];
-    const Vector3 & p300 = x[pinfo.pid[2]];
-    const Vector3 & p030 = x[pinfo.pid[1]];
+
+    const Vector3 &n200 = this->m_point_normal[pinfo.pid[2]];
+    const Vector3 &n020 = this->m_point_normal[pinfo.pid[1]];
+    const Vector3 &n002 = this->m_point_normal[pinfo.pid[0]];
 
     double fact_w = pinfo.fact[2];
     double fact_u = pinfo.fact[1];
     double fact_v = pinfo.fact[0];
 
-    return -3.0 * p300 * fact_w * fact_w +
-            3.0 * p030 * fact_u * fact_u -
-            3.0 * tbinfo.p210 * (2.0 * fact_w * fact_u - fact_w * fact_w) -
-            3.0 * tbinfo.p120 * (fact_u * fact_u - 2.0 * fact_w * fact_u) -
-            6.0 * tbinfo.p201 * fact_w * fact_v +
-            6.0 * tbinfo.p021 * fact_u * fact_v -
-            3.0 * tbinfo.p102 * fact_v * fact_v +
-            3.0 * tbinfo.p012 * fact_v * fact_v -
-            6.0 * tbinfo.p111 * (fact_u * fact_v - fact_w * fact_v);
+    Vector3 normal = n200 * fact_w*fact_w +
+                     n020 * fact_u*fact_u +
+                     n002 * fact_v*fact_v +
+                     tbinfo.n110 * fact_w*fact_u +
+                     tbinfo.n011 * fact_u*fact_v +
+                     tbinfo.n101 * fact_w*fact_v;
+
+    Vector3 N1 = normal;
+    N1.normalize();
+
+    Vector3 N2 = cross(N1,((fabs(dot(N1,Vector3(1,0,0)))>0.99) ? Vector3(0,1,0) : Vector3(1,0,0)));
+    N2.normalize();
+
+    Vector3 N3 = cross(N1,N2);
+    N3.normalize();
+
+    ninfo.clear();
+    ninfo.add(N1);
+    ninfo.add(N2);
+    ninfo.add(N3);
 }
 
-template<class DataTypes>
-typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
-BezierTriangleNonLinearInterpolation<DataTypes>::getdpdv(const ConstraintProximity & pinfo) {
-    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
 
-    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
-    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[trid];
-    const Vector3 & p300 = x[pinfo.pid[2]];
-    const Vector3 & p003 = x[pinfo.pid[0]];
+//template<class DataTypes>
+//typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
+//BezierTriangleNonLinearInterpolation<DataTypes>::getdpdu(const ConstraintProximity & pinfo) {
+//    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
 
-    double fact_w = pinfo.fact[2];
-    double fact_u = pinfo.fact[1];
-    double fact_v = pinfo.fact[0];
+//    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
+//    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[trid];
+//    const Vector3 & pointsP300 = x[pinfo.pid[2]];
+//    const Vector3 & pointsP030 = x[pinfo.pid[1]];
+//    const Vector3 & pointsP003 = x[pinfo.pid[0]];
 
-    return -3.0 * p300 * fact_w * fact_w +
-            3.0 * p003 * fact_v * fact_v -
-            6.0 * tbinfo.p210 * fact_w * fact_u -
-            3.0 * tbinfo.p120 * fact_u * fact_u -
-            3.0 * tbinfo.p201 * (2.0 * fact_w * fact_v - fact_w * fact_w) +
-            3.0 * tbinfo.p021 * fact_u * fact_u -
-            3.0 * tbinfo.p102 * (fact_v * fact_v - 2.0 * fact_w * fact_v) +
-            6.0 * tbinfo.p012 * fact_u * fact_v -
-            6.0 * tbinfo.p111 * (fact_u * fact_v - fact_w * fact_u);
-}
+//    const Vector3 & pointsP210 = tbinfo.p210;
+//    const Vector3 & pointsP120 = tbinfo.p120;
+//    const Vector3 & pointsP201 = tbinfo.p201;
+//    const Vector3 & pointsP021 = tbinfo.p021;
+//    const Vector3 & pointsP102 = tbinfo.p102;
+//    const Vector3 & pointsP012 = tbinfo.p012;
+//    const Vector3 & pointsP111 = tbinfo.p111;
 
-template<class DataTypes>
-typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
-BezierTriangleNonLinearInterpolation<DataTypes>::getd2pdu2(const ConstraintProximity & pinfo) {
-    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
+//    double fact_w = pinfo.fact[2];
+//    double fact_u = pinfo.fact[1];
+//    double fact_v = pinfo.fact[0];
 
-    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
-    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[trid];
-    const Vector3 & p300 = x[pinfo.pid[2]];
-    const Vector3 & p030 = x[pinfo.pid[1]];
+//    return -3.0 * pointsP300 * (-fact_u - fact_v + 1)*(-fact_u - fact_v + 1)
+//           +3.0 * pointsP030 * fact_u * fact_u
 
-    double fact_w = pinfo.fact[2];
-    double fact_u = pinfo.fact[1];
-    double fact_v = pinfo.fact[0];
+//           -3.0 * pointsP210 * (2.0 * fact_u * (-fact_u - fact_v + 1) - (fact_u - fact_v + 1) * (-fact_u - fact_v + 1))
+//           -3.0 * pointsP120 * (fact_u * fact_u - 2*fact_u * (-fact_u - fact_v + 1))
+//           -6.0 * pointsP201 * fact_v * (-fact_u - fact_v + 1)
+//           +6.0 * pointsP021 * fact_u * fact_v
+//           -3.0 * pointsP102 * fact_v * fact_v
+//           +3.0 * pointsP012 * fact_v * fact_v
+//           -6.0 * pointsP111 * (fact_u * fact_v - fact_v * (-fact_u - fact_v + 1));
+//}
 
-    return 6.0  * p300 * fact_w +
-           6.0  * p030 * fact_u +
-           6.0  * tbinfo.p210 * (fact_u - 2.0 * fact_w) -
-           6.0  * tbinfo.p120 * (2.0 * fact_u - fact_w) +
-           6.0  * tbinfo.p201 * fact_v +
-           6.0  * tbinfo.p021 * fact_v -
-           12.0 * tbinfo.p111 * fact_v;
-}
+//template<class DataTypes>
+//typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
+//BezierTriangleNonLinearInterpolation<DataTypes>::getdpdv(const ConstraintProximity & pinfo) {
+//    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
 
-template<class DataTypes>
-typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
-BezierTriangleNonLinearInterpolation<DataTypes>::getd2pdv2(const ConstraintProximity & pinfo) {
-    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
+//    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
+//    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[trid];
 
-    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
-    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[trid];
-    const Vector3 & p300 = x[pinfo.pid[2]];
-    const Vector3 & p003 = x[pinfo.pid[0]];
 
-    double fact_w = pinfo.fact[2];
-    double fact_u = pinfo.fact[1];
-    double fact_v = pinfo.fact[0];
+//    const Vector3 & pointsP300 = x[pinfo.pid[2]];
+//    const Vector3 & pointsP030 = x[pinfo.pid[1]];
+//    const Vector3 & pointsP003 = x[pinfo.pid[0]];
 
-    return 6.0  * p300 * fact_w +
-           6.0  * p003 * fact_v +
-           6.0  * tbinfo.p210 * fact_u +
-           6.0  * tbinfo.p201 * (fact_v - 2.0 * fact_w) -
-           6.0  * tbinfo.p102 * (2.0 * fact_v - fact_w) +
-           6.0  * tbinfo.p012 * fact_u -
-           12.0 * tbinfo.p111 * fact_u;
-}
+//    const Vector3 & pointsP210 = tbinfo.p210;
+//    const Vector3 & pointsP120 = tbinfo.p120;
+//    const Vector3 & pointsP201 = tbinfo.p201;
+//    const Vector3 & pointsP021 = tbinfo.p021;
+//    const Vector3 & pointsP102 = tbinfo.p102;
+//    const Vector3 & pointsP012 = tbinfo.p012;
+//    const Vector3 & pointsP111 = tbinfo.p111;
 
-template<class DataTypes>
-typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
-BezierTriangleNonLinearInterpolation<DataTypes>::getd2pduv(const ConstraintProximity & pinfo) {
-    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
+//    double fact_w = pinfo.fact[2];
+//    double fact_u = pinfo.fact[1];
+//    double fact_v = pinfo.fact[0];
 
-    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
-    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[trid];
-    const Vector3 & p300 = x[pinfo.pid[2]];
+//    return -3.0 * pointsP300 * (-fact_u - fact_v + 1) * (-fact_u - fact_v + 1)
 
-    double fact_w = pinfo.fact[2];
-    double fact_u = pinfo.fact[1];
-    double fact_v = pinfo.fact[0];
+//           +3.0 * pointsP003 * fact_v * fact_v
+//           -6.0 * pointsP210 * (-fact_u - fact_v + 1) * fact_u
+//           -3.0 * pointsP120 * fact_u * fact_u
+//           -3.0 * pointsP201 * (2.0 * fact_v * (-fact_u - fact_v + 1) - (-fact_u - fact_v + 1) * (-fact_u - fact_v + 1))
+//           +3.0 * pointsP021 * fact_u * fact_u
+//           -3.0 * pointsP102 * (fact_v * fact_v - 2.0 * fact_v * (-fact_u - fact_v + 1))
+//           +6.0 * pointsP012 * fact_u * fact_v
+//           -6.0 * pointsP111 * (fact_u * fact_v - fact_u * (-fact_u - fact_v + 1));
+//}
 
-    return 6.0 * p300 * fact_w +
-           6.0 * tbinfo.p210 * (fact_u - fact_w) -
-           6.0 * tbinfo.p120 * fact_u +
-           6.0 * tbinfo.p201 * (fact_v - fact_w) +
-           6.0 * tbinfo.p021 * fact_u -
-           6.0 * tbinfo.p102 * fact_v +
-           6.0 * tbinfo.p012 * fact_v -
-           6.0 * tbinfo.p111 * (fact_u + fact_v - fact_w);
-}
+//template<class DataTypes>
+//typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
+//BezierTriangleNonLinearInterpolation<DataTypes>::getd2pdu2(const ConstraintProximity & pinfo) {
+//    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
+
+//    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
+//    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[trid];
+//    const Vector3 & p300 = x[pinfo.pid[2]];
+//    const Vector3 & p030 = x[pinfo.pid[1]];
+
+//    double fact_w = pinfo.fact[2];
+//    double fact_u = pinfo.fact[1];
+//    double fact_v = pinfo.fact[0];
+
+//    return  6.0  * p300 * (-fact_u - fact_v + 1)
+//           +6.0  * p030 * fact_u
+
+//           +6.0  * tbinfo.p210 * (3.0 * fact_u + 2.0 * fact_v - 2.0)
+//           -6.0  * tbinfo.p120 * (3.0 * fact_u + fact_v - 1)
+//           +6.0  * tbinfo.p201 * fact_v
+//           +6.0  * tbinfo.p021 * fact_v
+
+
+//           -12.0 * tbinfo.p111 * fact_v;
+//}
+
+//template<class DataTypes>
+//typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
+//BezierTriangleNonLinearInterpolation<DataTypes>::getd2pdv2(const ConstraintProximity & pinfo) {
+//    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
+
+//    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
+//    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[trid];
+//    const Vector3 & p300 = x[pinfo.pid[2]];
+//    const Vector3 & p003 = x[pinfo.pid[0]];
+
+//    double fact_w = pinfo.fact[2];
+//    double fact_u = pinfo.fact[1];
+//    double fact_v = pinfo.fact[0];
+
+
+//    return  6.0  * p300 * (-fact_u - fact_v + 1)
+
+//           +6.0  * p003 * fact_v
+//           +6.0  * tbinfo.p210 * fact_u
+
+//           +6.0  * tbinfo.p201 * (2.0 * fact_u + 3.0 * fact_v - 2.0)
+
+//           -6.0  * tbinfo.p102 * (fact_u + 3.0 * fact_v - 1.0)
+//           +6.0  * tbinfo.p012 * fact_u
+//           -12.0 * tbinfo.p111 * fact_u;
+//}
+
+//template<class DataTypes>
+//typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
+//BezierTriangleNonLinearInterpolation<DataTypes>::getd2pduv(const ConstraintProximity & pinfo) {
+//    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
+
+//    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
+//    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[trid];
+//    const Vector3 & p300 = x[pinfo.pid[2]];
+
+//    double fact_w = pinfo.fact[2];
+//    double fact_u = pinfo.fact[1];
+//    double fact_v = pinfo.fact[0];
+
+//    return  6.0 * p300 * (-fact_u - fact_v + 1)
+
+
+//           +6.0 * tbinfo.p210 * (2.0 * fact_u + fact_v - 1.0)
+//           -6.0 * tbinfo.p120 * fact_u
+//           +6.0 * tbinfo.p201 * (fact_u + 2.0 * fact_v - 1.0)
+//           +6.0 * tbinfo.p021 * fact_u
+//           -6.0 * tbinfo.p102 * fact_v
+//           +6.0 * tbinfo.p012 * fact_v
+//           -6.0 * tbinfo.p111 * (2.0*fact_u + 2.0*fact_v - 1.0);
+//}
+
+//template<class DataTypes>
+//typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
+//BezierTriangleNonLinearInterpolation<DataTypes>::getd2pdvu(const ConstraintProximity & pinfo) {
+//    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
+
+//    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
+//    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[trid];
+//    const Vector3 & p300 = x[pinfo.pid[2]];
+
+//    double fact_w = pinfo.fact[2];
+//    double fact_u = pinfo.fact[1];
+//    double fact_v = pinfo.fact[0];
+
+//    return  6.0 * p300 * (-fact_u - fact_v + 1)
+
+
+//           +6.0 * tbinfo.p210 * (2.0 * fact_u + fact_v - 1.0)
+//           -6.0 * tbinfo.p120 * fact_u
+//           +6.0 * tbinfo.p201 * (fact_u + 2.0 * fact_v - 1.0)
+//           +6.0 * tbinfo.p021 * fact_u
+//           -6.0 * tbinfo.p102 * fact_v
+//           +6.0 * tbinfo.p012 * fact_v
+//           -6.0 * tbinfo.p111 * (2.0*fact_u + 2.0*fact_v - 1.0);
+//}
 
 
 template<class DataTypes>
@@ -310,13 +400,6 @@ void BezierTriangleNonLinearInterpolation<DataTypes>::draw(const core::visual::V
                                 tbinfo.p012 * 3*fact_u*fact_v*fact_v +
                                 tbinfo.p111 * 6*fact_w*fact_u*fact_v;
 
-//                    Vector3 N = tinfo.n200 * fact_w*fact_w +
-//                                tinfo.n020 * fact_u*fact_u +
-//                                tinfo.n002 * fact_v*fact_v +
-//                                tbinfo.n110 * fact_w*fact_u +
-//                                tbinfo.n011 * fact_u*fact_v +
-//                                tbinfo.n101 * fact_w*fact_v;
-
                     helper::gl::glVertexT(Q);
                 }
             }
@@ -335,8 +418,6 @@ void BezierTriangleNonLinearInterpolation<DataTypes>::draw(const core::visual::V
             vparams->drawTool()->drawArrow(p003,p003 + n002,0.0001, defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
         }
     }
-
-
 }
 
 } //behavior

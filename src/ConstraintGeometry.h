@@ -51,7 +51,6 @@ public:
     }
 
     helper::vector<defaulttype::Vector3> normals;
-
 };
 
 template<class DataTypes>

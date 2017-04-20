@@ -59,11 +59,11 @@ public:
 
     Vector3 getContactFreePosition(const ConstraintProximity & pinfo);
 
+    virtual void fillConstraintNormal(const ConstraintProximity & pinfo,ConstraintNormal & ninfo);
+
     void draw(const core::visual::VisualParams *vparams);
 
-    Data <bool> f_use_bezier;
     Data <double> f_draw_bezier_inc;
-
 
 private :
     typedef struct {
@@ -71,16 +71,17 @@ private :
         Vector3 n110,n011,n101;
     } BezierTriangleInfo;
 
-    ///Get first derivative
-    Vector3 getdpdu(const ConstraintProximity & pinfo);
-    Vector3 getdpdv(const ConstraintProximity & pinfo);
-
-    ///Get second derivative
-    Vector3 getd2pdu2(const ConstraintProximity & pinfo);
-    Vector3 getd2pdv2(const ConstraintProximity & pinfo);
-    Vector3 getd2pduv(const ConstraintProximity & pinfo);
-
     helper::vector<BezierTriangleInfo> m_beziertriangle_info;
+
+//    ///Get first derivative
+//    Vector3 getdpdu(const ConstraintProximity & pinfo);
+//    Vector3 getdpdv(const ConstraintProximity & pinfo);
+
+//    ///Get second derivative
+//    Vector3 getd2pdu2(const ConstraintProximity & pinfo);
+//    Vector3 getd2pdv2(const ConstraintProximity & pinfo);
+//    Vector3 getd2pduv(const ConstraintProximity & pinfo);
+//    Vector3 getd2pdvu(const ConstraintProximity & pinfo);
 };
 
 
