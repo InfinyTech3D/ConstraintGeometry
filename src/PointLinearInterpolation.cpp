@@ -23,7 +23,7 @@
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
 
-#include "FullTriangleLinearInterpolation.inl"
+#include "PointLinearInterpolation.inl"
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <SofaOpenglVisual/OglModel.h>
@@ -42,10 +42,10 @@ namespace behavior
 
 using namespace sofa::defaulttype;
 
-SOFA_DECL_CLASS(FullTriangleLinearInterpolation)
+SOFA_DECL_CLASS(PointLinearInterpolation)
 
-int FullTriangleLinearInterpolationClass = core::RegisterObject("Triangle liear interpolation")
-.add<FullTriangleLinearInterpolation<sofa::defaulttype::Vec3dTypes> >();
+int PointLinearInterpolationClass = core::RegisterObject("Solver toticulated system objects")
+.add<PointLinearInterpolation<sofa::defaulttype::Vec3dTypes> >();
 } // namespace controller
 
 } // namespace component

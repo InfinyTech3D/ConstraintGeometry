@@ -16,46 +16,37 @@
 * along with this library; if not, write to the Free Software Foundation,     *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.          *
 *******************************************************************************
-*                               SOFA :: Modules                               *
+*                               SOFA :: Plugins                               *
 *                                                                             *
 * Authors: The SOFA Team and external contributors (see Authors.txt)          *
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#define SOFA_COMPONENT_TOPOLOGY_TetrahedronCutting_CPP
 
-#include "TetrahedronCutting.inl"
-#include <sofa/defaulttype/Vec3Types.h>
+#include "TriangleAABBDecorator.inl"
 #include <sofa/core/ObjectFactory.h>
-   
-namespace sofa {
+#include <sofa/core/visual/VisualParams.h>
+#include <SofaOpenglVisual/OglModel.h>
+#include <math.h>
+#include <assert.h>     /* assert */
 
-namespace component {
 
-namespace topology {
+namespace sofa
+{
+
+namespace core
+{
+
+namespace behavior
+{
 
 using namespace sofa::defaulttype;
-SOFA_DECL_CLASS(TetrahedronCutting)
-    int TetrahedronCuttingClass = core::RegisterObject("Tetrahedron set topology algorithms")
-#ifdef SOFA_FLOAT
-    .add< TetrahedronCutting<Vec3fTypes> >(true) // default template
-#else
-    .add< TetrahedronCutting<Vec3dTypes> >(true) // default template
-#ifndef SOFA_DOUBLE
-    .add< TetrahedronCutting<Vec3fTypes> >() // default template
-#endif
-#endif
-	;
 
-#ifndef SOFA_FLOAT
-    template class SOFA_BASE_TOPOLOGY_API TetrahedronCutting<Vec3dTypes>;
-#endif
+SOFA_DECL_CLASS(TriangleAABBDecorator)
 
-#ifndef SOFA_DOUBLE
-    template class SOFA_BASE_TOPOLOGY_API TetrahedronCutting<Vec3fTypes>;
-#endif
-
-} // namespace topology
+int TriangleAABBDecoratorClass = core::RegisterObject("Triangle liear interpolation")
+.add<TriangleAABBDecorator<sofa::defaulttype::Vec3dTypes> >();
+} // namespace controller
 
 } // namespace component
 

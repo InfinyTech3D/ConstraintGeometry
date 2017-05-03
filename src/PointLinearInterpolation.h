@@ -22,35 +22,51 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#include "PlaneCutting.inl"
-#include <sofa/core/ObjectFactory.h>
+#ifndef SOFA_COMPONENT_POINTLINEARINTERPOLATION_H
+#define SOFA_COMPONENT_POINTLINEARINTERPOLATION_H
+
+#include "ConstraintGeometry.h"
+#include <sofa/core/behavior/ForceField.h>
+#include <sofa/core/behavior/MechanicalState.h>
+#include <sofa/core/objectmodel/Data.h>
+#include <sofa/defaulttype/VecTypes.h>
+#include <SofaConstraint/BilateralInteractionConstraint.h>
+
 
 namespace sofa {
 
-namespace component {
+namespace core {
 
-namespace collision {
+namespace behavior {
 
-SOFA_DECL_CLASS(PlaneCutting)
+template<class DataTypes>
+class PointLinearInterpolation : public PointGeometry<DataTypes>
+{
+public:
+    SOFA_CLASS(SOFA_TEMPLATE(PointLinearInterpolation,DataTypes) , SOFA_TEMPLATE(PointGeometry,DataTypes) );
 
-int PlaneCuttingClass = core::RegisterObject("Manager handling cutting operations between a SharpLineModel and a TetrahedronSetModel")
-#ifndef SOFA_FLOAT
-.add< PlaneCutting<sofa::defaulttype::Vec3dTypes> >()
-#endif
-#ifndef SOFA_DOUBLE
-//.add< PlaneCutting<sofa::defaulttype::Vec3fTypes> >()
-#endif
-;
+    typedef typename DataTypes::Coord Coord;
+    typedef typename DataTypes::Real Real;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef typename DataTypes::VecDeriv VecDeriv;
+    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
+    typedef typename DataTypes::Deriv Deriv1;
+    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
+    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
+    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    typedef defaulttype::Vector3 Vector3;
 
-#ifndef SOFA_FLOAT
-template class PlaneCutting<sofa::defaulttype::Vec3dTypes>;
-#endif
-#ifndef SOFA_DOUBLE
-//template class SOFA_ADVANCED_INTERACTION_API PlaneCutting<sofa::defaulttype::Vec3fTypes>;
-#endif
+    virtual ConstraintProximity findClosestProximity(const defaulttype::Vector3 & P);
 
-} // namespace collision
+};
+
+
+} // namespace forcefield
 
 } // namespace component
 
 } // namespace sofa
+
+
+#endif // NeedleLinearDescription_H

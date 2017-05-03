@@ -22,10 +22,10 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_FULLTRIANGLELINEARINTERPOLATION_H
-#define SOFA_COMPONENT_FULLTRIANGLELINEARINTERPOLATION_H
+#ifndef SOFA_COMPONENT_TRIANGLEAABBDECORATOR_H
+#define SOFA_COMPONENT_TRIANGLEAABBDECORATOR_H
 
-#include "TriangleInterpolation.h"
+#include "ConstraintGeometry.h"
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
@@ -39,11 +39,12 @@ namespace core {
 namespace behavior {
 
 template<class DataTypes>
-class FullTriangleLinearInterpolation : public TriangleInterpolation<DataTypes>
+class TriangleAABBDecorator : public TriangleGeometry<DataTypes>::TriangleDecorator
 {
 public:
-    SOFA_CLASS(SOFA_TEMPLATE(FullTriangleLinearInterpolation,DataTypes) , SOFA_TEMPLATE(TriangleInterpolation,DataTypes) );
+    SOFA_CLASS(SOFA_TEMPLATE(TriangleAABBDecorator,DataTypes) , SOFA_TEMPLATE(GeometryDecorator,DataTypes) );
 
+//    typedef TriangleDecorator<DataTypes> Inherit;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
     typedef typename DataTypes::VecCoord VecCoord;
@@ -55,39 +56,31 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
     typedef defaulttype::Vector3 Vector3;
+    typedef defaulttype::Vec3i Vec3i;
 
-    FullTriangleLinearInterpolation();
+    TriangleAABBDecorator();
 
-    virtual void fillProximity(const Coord & P,ConstraintProximity & pinfo);
-
-    virtual void fillConstraintNormal(const ConstraintProximity & pinfo,ConstraintNormal & ninfo);
+    virtual ConstraintProximity findClosestTriangle(TriangleGeometry<DataTypes> * geo, const defaulttype::Vector3 & P);
 
     void draw(const core::visual::VisualParams */*vparams*/);
 
-    void handleEvent(sofa::core::objectmodel::Event* event);
-
-
+    Data<Vec3i> d_nbox;
+    Data<bool> d_drawBbox;
 
 protected:
 
-    typedef struct {
-        Vector3 v0,v1;
-        double d00;
-        double d01;
-        double d11;
-        double invDenom;
+    virtual void init();
 
-        Vector3 tn,ax1,ax2;
-    } TriangleInfo;
+    virtual void reinit();
 
     virtual void prepareDetection();
 
-    void projectPointOnTriangle(const Vector3 & s,const TriangleInfo & tinfo, const Vector3 & p0, const Vector3 & p1,const Vector3 & p2, double & fact_w,double & fact_u, double & fact_v);
+    ConstraintProximity findClosestTriangle(TriangleGeometry<DataTypes> * geo, const defaulttype::Vector3 & P,const std::set<unsigned> & triangles);
 
-    void computeBaryCoords(const Vector3 & proj_P,const TriangleInfo & tinfo, const Vector3 & p0, double & fact_w,double & fact_u, double & fact_v);
+    void fillTriangleSet(int d,const Vec3i & cbox,std::set<unsigned> & vecpinfo);
 
-    helper::vector<TriangleInfo> m_triangle_info;
-    helper::vector<Vector3> m_point_normal;
+    Vector3 m_Bmin,m_Bmax,m_cellSize;    
+    helper::vector<helper::vector<helper::vector<helper::vector<unsigned> > > >  m_triangleboxes;
 };
 
 

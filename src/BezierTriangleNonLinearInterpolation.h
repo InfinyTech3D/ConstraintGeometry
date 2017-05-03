@@ -49,21 +49,15 @@ public:
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::VecDeriv VecDeriv;
 
-
     BezierTriangleNonLinearInterpolation();
 
     virtual void prepareDetection();
 
-    Vector3 getContactPosition(const ConstraintProximity & pinfo);
-    Vector3 getContactPosition(const ConstraintProximity & pinfo,double & fact_w,double & fact_u, double & fact_v);
+    Vector3 getPosition(const ConstraintProximity & pinfo);
 
-    Vector3 getContactFreePosition(const ConstraintProximity & pinfo);
+    Vector3 getFreePosition(const ConstraintProximity & pinfo);
 
-    virtual void fillConstraintNormal(const ConstraintProximity & pinfo,ConstraintNormal & ninfo);
-
-    void draw(const core::visual::VisualParams *vparams);
-
-    Data <double> f_draw_bezier_inc;
+    defaulttype::Vector3 getSurfaceNormal(const ConstraintProximity & pinfo);
 
 private :
     typedef struct {
@@ -73,15 +67,6 @@ private :
 
     helper::vector<BezierTriangleInfo> m_beziertriangle_info;
 
-//    ///Get first derivative
-//    Vector3 getdpdu(const ConstraintProximity & pinfo);
-//    Vector3 getdpdv(const ConstraintProximity & pinfo);
-
-//    ///Get second derivative
-//    Vector3 getd2pdu2(const ConstraintProximity & pinfo);
-//    Vector3 getd2pdv2(const ConstraintProximity & pinfo);
-//    Vector3 getd2pduv(const ConstraintProximity & pinfo);
-//    Vector3 getd2pdvu(const ConstraintProximity & pinfo);
 };
 
 

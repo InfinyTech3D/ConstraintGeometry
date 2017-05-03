@@ -25,7 +25,8 @@
 #ifndef SOFA_COMPONENT_TRIANGLELINEARINTERPOLATION_H
 #define SOFA_COMPONENT_TRIANGLELINEARINTERPOLATION_H
 
-#include "TriangleInterpolation.h"
+#include "ConstraintProximity.h"
+#include "EdgeLinearInterpolation.h"
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
@@ -39,10 +40,10 @@ namespace core {
 namespace behavior {
 
 template<class DataTypes>
-class TriangleLinearInterpolation : public TriangleInterpolation<DataTypes>
+class TriangleLinearInterpolation : public TriangleGeometry<DataTypes>
 {
 public:
-    SOFA_CLASS(SOFA_TEMPLATE(TriangleLinearInterpolation,DataTypes) , SOFA_TEMPLATE(TriangleInterpolation,DataTypes) );
+    SOFA_CLASS(SOFA_TEMPLATE(TriangleLinearInterpolation,DataTypes) , SOFA_TEMPLATE(TriangleGeometry,DataTypes) );
 
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
@@ -55,23 +56,12 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
     typedef defaulttype::Vector3 Vector3;
-    typedef defaulttype::Vec3i Vec3i;
 
-    TriangleLinearInterpolation();
+    ConstraintProximity projectPointOnTriangle(unsigned tid, const Vector3 & s);
 
-    virtual void fillProximity(const Coord & P,ConstraintProximity & pinfo);
-
-    virtual void fillConstraintNormal(const ConstraintProximity & pinfo,ConstraintNormal & ninfo);
+    defaulttype::Vector3 getSurfaceNormal(const ConstraintProximity & pinfo);
 
     void draw(const core::visual::VisualParams */*vparams*/);
-
-    void handleEvent(sofa::core::objectmodel::Event* event);
-
-    void findClosestTriangle(const Coord & P,const std::set<unsigned> & triangles,ConstraintProximity & pinfo);
-
-
-    Data<Vec3i> d_nbox;
-    Data<bool> d_drawBbox;
 
 protected:
 
@@ -85,23 +75,14 @@ protected:
         Vector3 tn,ax1,ax2;
     } TriangleInfo;
 
-    virtual void bwdInit();
-
-    virtual void reinit();
-
     virtual void prepareDetection();
-
-    void projectPointOnTriangle(const Vector3 & s,const TriangleInfo & tinfo, const Vector3 & p0, const Vector3 & p1,const Vector3 & p2, double & fact_w,double & fact_u, double & fact_v);
 
     void computeBaryCoords(const Vector3 & proj_P,const TriangleInfo & tinfo, const Vector3 & p0, double & fact_w,double & fact_u, double & fact_v);
 
-    void fillTriangleSet(int d,const Vec3i & cbox,std::set<unsigned> & vecpinfo);
-
     helper::vector<TriangleInfo> m_triangle_info;
-    helper::vector<Vector3> m_point_normal;
+    helper::vector<defaulttype::Vector3> m_pointNormal;
 
-    Vector3 m_Bmin,m_Bmax,m_cellSize;
-    helper::vector<helper::vector<helper::vector<helper::vector<unsigned> > > >  m_triangleboxes;
+    void drawTriangle(const core::visual::VisualParams * vparams,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C);
 };
 
 

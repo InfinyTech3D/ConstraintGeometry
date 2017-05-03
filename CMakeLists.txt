@@ -13,19 +13,14 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(HEADER_FILES      
      src/initConstraintGeometryPlugin.h
      src/ConstraintGeometry.h
-     src/EdgeInterpolation.h
+     src/PointLinearInterpolation.h
+     src/PointLinearInterpolation.inl
      src/EdgeLinearInterpolation.h
      src/EdgeLinearInterpolation.inl
-     src/TriangleInterpolation.h
+     src/TriangleAABBDecorator.h
+     src/TriangleAABBDecorator.inl
      src/TriangleLinearInterpolation.h
      src/TriangleLinearInterpolation.inl
-     src/FullTriangleLinearInterpolation.h
-     src/FullTriangleLinearInterpolation.inl
-     src/TetrahedronCutting.h
-     src/TetrahedronCutting.inl
-     src/PlaneCutting.h
-     src/PlaneCutting.inl
-
      src/TriangleNonLinearInterpolation.h
      src/BezierTriangleNonLinearInterpolation.h
      src/BezierTriangleNonLinearInterpolation.inl
@@ -35,12 +30,10 @@ set(HEADER_FILES
 
 set(SOURCE_FILES
      src/initConstraintGeometryPlugin.cpp
+     src/PointLinearInterpolation.cpp
      src/EdgeLinearInterpolation.cpp
+     src/TriangleAABBDecorator.cpp
      src/TriangleLinearInterpolation.cpp
-     src/FullTriangleLinearInterpolation.cpp
-     src/TetrahedronCutting.cpp
-     src/PlaneCutting.cpp
-
      src/BezierTriangleNonLinearInterpolation.cpp
 #     src/QuadraticTriangleNonLinearInterpolation.cpp
 )

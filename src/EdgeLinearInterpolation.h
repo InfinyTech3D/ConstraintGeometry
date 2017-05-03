@@ -25,7 +25,7 @@
 #ifndef SOFA_COMPONENT_EDGELINEARINTERPOLATION_H
 #define SOFA_COMPONENT_EDGELINEARINTERPOLATION_H
 
-#include "EdgeInterpolation.h"
+#include "PointLinearInterpolation.h"
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
@@ -40,10 +40,10 @@ namespace core {
 namespace behavior {
 
 template<class DataTypes>
-class EdgeLinearInterpolation : public EdgeInterpolation<DataTypes>
+class EdgeLinearInterpolation : public EdgeGeometry<DataTypes>
 {
 public:
-    SOFA_CLASS(SOFA_TEMPLATE(EdgeLinearInterpolation,DataTypes) , SOFA_TEMPLATE(EdgeInterpolation,DataTypes) );
+    SOFA_CLASS(SOFA_TEMPLATE(EdgeLinearInterpolation,DataTypes) , SOFA_TEMPLATE(EdgeGeometry,DataTypes) );
 
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
@@ -57,11 +57,9 @@ public:
     typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
     typedef defaulttype::Vector3 Vector3;
 
-    virtual void fillProximity(unsigned id,ConstraintProximity & pinfo);
+    virtual ConstraintProximity findClosestProximity(const defaulttype::Vector3 & P);
 
-    virtual void fillProximity(const Coord & P,ConstraintProximity & pinfo);
-
-    virtual void fillConstraintNormal(const ConstraintProximity & pinfo, ConstraintNormal & ninfo);
+    void draw(const core::visual::VisualParams * /*vparams*/);
 
 };
 
