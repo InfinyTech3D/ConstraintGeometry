@@ -13,6 +13,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(HEADER_FILES      
      src/initConstraintGeometryPlugin.h
      src/ConstraintGeometry.h
+     src/ConstraintProximity.h
+     src/ConstraintCollisionAlgorithms.h
      src/PointLinearInterpolation.h
      src/PointLinearInterpolation.inl
      src/EdgeLinearInterpolation.h

@@ -20,6 +20,8 @@ namespace core {
 namespace behavior {
 
 class ConstraintProximity;
+class ElementDecorator;
+class CollisionDecorator;
 
 class BaseGeometry : public core::BehaviorModel {
 public :
@@ -38,131 +40,18 @@ public :
 
     virtual defaulttype::Vector3 getFreePosition(const ConstraintProximity & pinfo) = 0;
 
+    virtual void getCollisionDecorator();
+
 private :
     void updatePosition(SReal /*dt*/) {
         prepareDetection();
     }
+
+    CollisionDecorator * m_colliDecorator;
+    ElementDecorator * m_elmtDecorator;
 };
 
-class ConstraintProximity {
-public :
-    friend class BaseConstraintGeometry;
 
-    ConstraintProximity() {
-        m_cg = NULL;
-    }
-
-    ConstraintProximity(BaseGeometry * cg,unsigned eid) {
-        m_cg = cg;
-        m_eid = eid;
-    }
-
-    unsigned getEid() const {
-        return m_eid;
-    }
-
-    unsigned size() const {
-        return m_pid.size();
-    }
-
-    void push(unsigned id, double f) {
-        m_pid.push_back(id);
-        m_fact.push_back(f);
-    }
-
-
-    void addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const defaulttype::Vector3 & normal) const {
-        if (m_cg == NULL) return ;
-        m_cg->addConstraint(cId,cline,*this,normal);
-    }
-
-    defaulttype::Vector3 getPosition() const {
-        if (m_cg == NULL) return defaulttype::Vector3();
-        return m_cg->getPosition(*this);
-    }
-
-    defaulttype::Vector3 getFreePosition() const {
-        if (m_cg == NULL) return defaulttype::Vector3();
-        return m_cg->getFreePosition(*this);
-    }
-
-    helper::vector<unsigned> m_pid;
-    helper::vector<double> m_fact;
-    unsigned m_eid;
-
-protected:
-    BaseGeometry * m_cg;
-
-
-};
-
-class ConstraintNormal {
-public :
-
-    void addNormal(defaulttype::Vector3 N1) {
-        N1.normalize();
-        m_normals.push_back(N1);
-    }
-
-    void addFrame(defaulttype::Vector3 N1) {
-        N1.normalize();
-
-        defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(1,0,0)))>0.99) ? defaulttype::Vector3(0,1,0) : defaulttype::Vector3(1,0,0)));
-        N2.normalize();
-
-        defaulttype::Vector3 N3 = cross(N1,N2);
-        N3.normalize();
-
-        m_normals.push_back(N1);
-        m_normals.push_back(N2);
-        m_normals.push_back(N3);
-    }
-
-    void addFrame(defaulttype::Vector3 N1,defaulttype::Vector3 N2,defaulttype::Vector3 N3) {
-        N1.normalize();
-        N2.normalize();
-        N3.normalize();
-
-        m_normals.push_back(N1);
-        m_normals.push_back(N2);
-        m_normals.push_back(N3);
-    }
-
-    void addConstraint(core::MultiMatrixDerivId cId, unsigned & cline, const ConstraintProximity & pinfo) {
-        for (unsigned i=0;i<m_normals.size();i++) {
-            pinfo.addConstraint(cId,cline+i,m_normals[i]);
-        }
-
-        cline += m_normals.size();
-    }
-
-    void addConstraint(core::MultiMatrixDerivId cId, unsigned & cline, const ConstraintProximity & pinfo1, const ConstraintProximity & pinfo2) {
-        for (unsigned i=0;i<m_normals.size();i++) {
-            pinfo1.addConstraint(cId,cline+i,m_normals[i]);
-            pinfo2.addConstraint(cId,cline+i,-m_normals[i]);
-        }
-
-        cline += m_normals.size();
-    }
-
-    void addViolation(defaulttype::BaseVector *v,unsigned & cid, defaulttype::Vector3 PQFree) {
-        for (unsigned i=0;i<m_normals.size();i++) {
-            v->set(cid+i,dot(m_normals[i],PQFree));
-        }
-
-        cid += m_normals.size();
-    }
-
-    unsigned size() {
-        return m_normals.size();
-    }
-
-    void clear() {
-        return m_normals.clear();
-    }
-
-    helper::vector<defaulttype::Vector3> m_normals;
-};
 
 template<class DataTypes>
 class GeometryImpl : public BaseGeometry {
@@ -263,9 +152,6 @@ public:
         res.push(eid,1.0);
         return res;
     }
-
-    virtual ConstraintProximity findClosestProximity(const defaulttype::Vector3 & P) = 0;
-
 };
 
 template<class DataTypes>
@@ -278,8 +164,6 @@ public:
         res.push(edge[1],f2);
         return res;
     }
-
-    virtual ConstraintProximity findClosestProximity(const defaulttype::Vector3 & P) = 0;
 
     virtual defaulttype::Vector3 getEdgeNormal(unsigned eid) {
         const helper::ReadAccessor<Data <typename DataTypes::VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::position());
@@ -308,33 +192,6 @@ public:
         res.push(tri[2],f3);
 
         return res;
-    }
-
-    ConstraintProximity findClosestProximity(const defaulttype::Vector3 & P) {
-        TriangleDecorator * decorator;
-        this->getContext()->get(decorator);
-
-        if (decorator == NULL) {
-            ConstraintProximity min_pinfo;
-            double minDist = 0;
-
-            for(int tri=0;tri<this->getTopology()->getNbTriangles();tri++) {
-                ConstraintProximity pinfo = projectPointOnTriangle(tri,P);
-
-                defaulttype::Vector3 Q = pinfo.getPosition();
-
-                double dist = (Q-P).norm();
-
-                if ((tri==0) || (dist < minDist)) {
-                    min_pinfo = pinfo;
-                    minDist = dist;
-                }
-            }
-
-            return min_pinfo;
-        } else {
-            return decorator->findClosestTriangle(this,P);
-        }
     }
 
     virtual defaulttype::Vector3 getSurfaceNormal(const ConstraintProximity & pinfo) = 0;
