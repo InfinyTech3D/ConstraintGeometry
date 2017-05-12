@@ -23,7 +23,7 @@
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
 
-#include "EdgeLinearInterpolation.inl"
+#include "EdgeGeometry.inl"
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <SofaOpenglVisual/OglModel.h>
@@ -42,10 +42,10 @@ namespace behavior
 
 using namespace sofa::defaulttype;
 
-SOFA_DECL_CLASS(EdgeLinearInterpolation)
+SOFA_DECL_CLASS(EdgeGeometry)
 
-int EdgeLinearInterpolationClass = core::RegisterObject("Solver toticulated system objects")
-.add<EdgeLinearInterpolation<sofa::defaulttype::Vec3dTypes> >();
+int EdgeGeometryClass = core::RegisterObject("Solver toticulated system objects")
+.add<EdgeGeometry >();
 } // namespace controller
 
 } // namespace component

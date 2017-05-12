@@ -1,13 +1,9 @@
 #ifndef SOFA_COMPONENT_CONSTRAINT_CONSTRAINTPROXIMITYT_H
 #define SOFA_COMPONENT_CONSTRAINT_CONSTRAINTPROXIMITYT_H
 
-#include <sofa/defaulttype/SolidTypes.h>
-#include <sofa/core/behavior/BaseController.h>
-#include <sofa/core/behavior/MechanicalState.h>
-#include <sofa/core/behavior/PairInteractionConstraint.h>
+#include "ConstraintGeometry.h"
 #include <math.h>
 #include <sofa/defaulttype/Vec.h>
-#include "ConstraintGeometry.h"
 
 namespace sofa {
 
@@ -18,8 +14,6 @@ namespace behavior {
 
 class ConstraintProximity {
 public :
-    friend class BaseConstraintGeometry;
-
     ConstraintProximity() {
         m_cg = NULL;
     }
@@ -42,9 +36,12 @@ public :
         m_fact.push_back(f);
     }
 
+    BaseGeometry * getGeometry() {
+        return m_cg;
+    }
 
     void addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const defaulttype::Vector3 & normal) const {
-        if (m_cg == NULL) return ;
+        if (m_cg == NULL) return;
         m_cg->addConstraint(cId,cline,*this,normal);
     }
 
@@ -58,13 +55,17 @@ public :
         return m_cg->getFreePosition(*this);
     }
 
+    defaulttype::Vector3 getNormal() const {
+        if (m_cg == NULL) return defaulttype::Vector3();
+        return m_cg->getNormal(*this);
+    }
+
     helper::vector<unsigned> m_pid;
     helper::vector<double> m_fact;
     unsigned m_eid;
 
 protected:
     BaseGeometry * m_cg;
-
 
 };
 
@@ -76,31 +77,9 @@ public :
         m_normals.push_back(N1);
     }
 
-    void addFrame(defaulttype::Vector3 N1) {
-        N1.normalize();
-
-        defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(1,0,0)))>0.99) ? defaulttype::Vector3(0,1,0) : defaulttype::Vector3(1,0,0)));
-        N2.normalize();
-
-        defaulttype::Vector3 N3 = cross(N1,N2);
-        N3.normalize();
-
-        m_normals.push_back(N1);
-        m_normals.push_back(N2);
-        m_normals.push_back(N3);
-    }
-
-    void addFrame(defaulttype::Vector3 N1,defaulttype::Vector3 N2,defaulttype::Vector3 N3) {
-        N1.normalize();
-        N2.normalize();
-        N3.normalize();
-
-        m_normals.push_back(N1);
-        m_normals.push_back(N2);
-        m_normals.push_back(N3);
-    }
-
     void addConstraint(core::MultiMatrixDerivId cId, unsigned & cline, const ConstraintProximity & pinfo) {
+        if (empty()) return;
+
         for (unsigned i=0;i<m_normals.size();i++) {
             pinfo.addConstraint(cId,cline+i,m_normals[i]);
         }
@@ -109,6 +88,8 @@ public :
     }
 
     void addConstraint(core::MultiMatrixDerivId cId, unsigned & cline, const ConstraintProximity & pinfo1, const ConstraintProximity & pinfo2) {
+        if (empty()) return;
+
         for (unsigned i=0;i<m_normals.size();i++) {
             pinfo1.addConstraint(cId,cline+i,m_normals[i]);
             pinfo2.addConstraint(cId,cline+i,-m_normals[i]);
@@ -117,7 +98,13 @@ public :
         cline += m_normals.size();
     }
 
-    void addViolation(defaulttype::BaseVector *v,unsigned & cid, defaulttype::Vector3 PQFree) {
+    void addViolation(defaulttype::BaseVector *v,unsigned & cid, const ConstraintProximity & pinfo1, const ConstraintProximity & pinfo2) {
+        if (empty()) return;
+
+        defaulttype::Vector3 PFree = pinfo1.getFreePosition();
+        defaulttype::Vector3 QFree = pinfo2.getFreePosition();
+        defaulttype::Vector3 PQFree = PFree - QFree;
+
         for (unsigned i=0;i<m_normals.size();i++) {
             v->set(cid+i,dot(m_normals[i],PQFree));
         }
@@ -125,13 +112,23 @@ public :
         cid += m_normals.size();
     }
 
+    void addConstraintResolution(std::vector<core::behavior::ConstraintResolution*>& resTab, unsigned int& offset, core::behavior::ConstraintResolution* cr) {
+        if (empty()) return;
+
+        resTab[offset] = cr;
+
+        offset+=m_normals.size();
+    }
+
+
     unsigned size() {
         return m_normals.size();
     }
 
-    void clear() {
-        return m_normals.clear();
+    bool empty() {
+        return m_normals.empty();
     }
+
 
     helper::vector<defaulttype::Vector3> m_normals;
 };

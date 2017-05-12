@@ -16,39 +16,48 @@
 * along with this library; if not, write to the Free Software Foundation,     *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.          *
 *******************************************************************************
-*                               SOFA :: Plugins                               *
+*                               SOFA :: Modules                               *
 *                                                                             *
 * Authors: The SOFA Team and external contributors (see Authors.txt)          *
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
+#ifndef SOFA_COMPONENT_POINTGEOMETRY_H
+#define SOFA_COMPONENT_POINTGEOMETRY_H
 
-#include "PointLinearInterpolation.inl"
-#include <sofa/core/ObjectFactory.h>
-#include <sofa/core/visual/VisualParams.h>
-#include <SofaOpenglVisual/OglModel.h>
-#include <math.h>
-#include <assert.h>     /* assert */
+#include "ConstraintGeometry.h"
+#include <sofa/core/objectmodel/Data.h>
+#include <sofa/defaulttype/VecTypes.h>
 
 
-namespace sofa
+namespace sofa {
+
+namespace core {
+
+namespace behavior {
+
+class PointGeometry : public BaseGeometry
 {
+public:
+    SOFA_CLASS(PointGeometry , BaseGeometry );
 
-namespace core
-{
+    typedef defaulttype::Vector3 Vector3;
 
-namespace behavior
-{
+    virtual defaulttype::Vector3 getNormal(const ConstraintProximity & /*pinfo*/);
 
-using namespace sofa::defaulttype;
+    ConstraintProximity getPointProximity(unsigned eid);
 
-SOFA_DECL_CLASS(PointLinearInterpolation)
+    virtual ConstraintProximity projectPoint(unsigned eid,const defaulttype::Vector3 & /*T*/);
 
-int PointLinearInterpolationClass = core::RegisterObject("Solver toticulated system objects")
-.add<PointLinearInterpolation<sofa::defaulttype::Vec3dTypes> >();
-} // namespace controller
+    unsigned getNbElements();
+
+};
+
+} // namespace forcefield
 
 } // namespace component
 
 } // namespace sofa
 
+
+#endif // NeedleLinearDescription_H

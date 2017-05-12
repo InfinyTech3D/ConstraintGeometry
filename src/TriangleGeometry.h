@@ -22,10 +22,23 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_BEZIERTRIANGLENONLINEARINTERPOLATION_H
-#define SOFAa_COMPONENT_BEZIERTRIANGLENONLINEARINTERPOLATION_H
+#ifndef SOFA_COMPONENT_TRIANGLEGEOMETRY_H
+#define SOFA_COMPONENT_TRIANGLEGEOMETRY_H
 
-#include "TriangleNonLinearInterpolation.h"
+#include "EdgeGeometry.h"
+#include <sofa/core/behavior/ForceField.h>
+#include <sofa/core/behavior/MechanicalState.h>
+#include <sofa/core/objectmodel/Data.h>
+#include <sofa/defaulttype/VecTypes.h>
+#include <SofaConstraint/BilateralInteractionConstraint.h>
+#include <sofa/helper/Quater.h>
+#include <sofa/core/visual/VisualParams.h>
+#include <SofaOpenglVisual/OglModel.h>
+#include <sofa/simulation/AnimateBeginEvent.h>
+#include <SofaConstraint/BilateralInteractionConstraint.h>
+#include <SofaBaseMechanics/MechanicalObject.h>
+#include <sofa/core/visual/VisualParams.h>
+#include <SofaOpenglVisual/OglModel.h>
 
 namespace sofa {
 
@@ -33,40 +46,43 @@ namespace core {
 
 namespace behavior {
 
-template<class DataTypes>
-class BezierTriangleNonLinearInterpolation : public TriangleNonLinearInterpolation<DataTypes>
+class TriangleGeometry : public EdgeGeometry
 {
 public:
-    SOFA_CLASS(SOFA_TEMPLATE(BezierTriangleNonLinearInterpolation,DataTypes) , SOFA_TEMPLATE(TriangleNonLinearInterpolation,DataTypes) );
+    SOFA_CLASS(TriangleGeometry , BaseGeometry );
 
-    typedef  TriangleNonLinearInterpolation<DataTypes> Inherit;
-    typedef typename Inherit::TriangleInfo TriangleInfo;
+    typedef defaulttype::Vector3 Coord;
 
-    typedef typename defaulttype::Vector2 Vector2;
-    typedef typename defaulttype::Vector3 Vector3;
-    typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::Real Real;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef typename DataTypes::VecDeriv VecDeriv;
+    ConstraintProximity projectPoint(unsigned tid, const defaulttype::Vector3 & s);
 
-    BezierTriangleNonLinearInterpolation();
+    defaulttype::Vector3 getNormal(const ConstraintProximity & pinfo);
+
+    void draw(const core::visual::VisualParams */*vparams*/);
+
+    unsigned getNbElements();
+
+    ConstraintProximity getTriangleProximity(unsigned eid,double fact_w,double fact_u,double fact_v);
+
+protected:
+
+    typedef struct {
+        defaulttype::Vector3 v0,v1;
+        double d00;
+        double d01;
+        double d11;
+        double invDenom;
+
+        defaulttype::Vector3 tn,ax1,ax2;
+    } TriangleInfo;
 
     virtual void prepareDetection();
 
-    Vector3 getPosition(const ConstraintProximity & pinfo);
+    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_w,double & fact_u, double & fact_v);
 
-    Vector3 getFreePosition(const ConstraintProximity & pinfo);
+    helper::vector<TriangleInfo> m_triangle_info;
+    helper::vector<defaulttype::Vector3> m_pointNormal;
 
-    defaulttype::Vector3 getSurfaceNormal(const ConstraintProximity & pinfo);
-
-private :
-    typedef struct {
-        Vector3 p210,p120,p021,p012,p102,p201,p111;
-        Vector3 n110,n011,n101;
-    } BezierTriangleInfo;
-
-    helper::vector<BezierTriangleInfo> m_beziertriangle_info;
-
+    void drawTriangle(const core::visual::VisualParams * vparams,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C);
 };
 
 

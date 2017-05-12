@@ -23,9 +23,13 @@
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
 
+#include "TriangleGeometry.inl"
 #include <sofa/core/ObjectFactory.h>
-#include "TriangleLinearInterpolation.inl"
-#include "BezierTriangleNonLinearInterpolation.inl"
+#include <sofa/core/visual/VisualParams.h>
+#include <SofaOpenglVisual/OglModel.h>
+#include <math.h>
+#include <assert.h>     /* assert */
+
 
 namespace sofa
 {
@@ -38,10 +42,10 @@ namespace behavior
 
 using namespace sofa::defaulttype;
 
-SOFA_DECL_CLASS(BezierTriangleNonLinearInterpolation)
+SOFA_DECL_CLASS(TriangleGeometry)
 
-int BezierTriangleNonLinearInterpolationClass = core::RegisterObject("Solver toticulated system objects")
-.add<BezierTriangleNonLinearInterpolation<defaulttype::Vec3dTypes> >();
+int TriangleGeometryClass = core::RegisterObject("Triangle liear interpolation")
+.add<TriangleGeometry >();
 } // namespace controller
 
 } // namespace component

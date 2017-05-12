@@ -1,7 +1,8 @@
-﻿#ifndef SOFA_COMPONENT_TRIANGLELINEARINTERPOLATION_INL
-#define SOFA_COMPONENT_TRIANGLELINEARINTERPOLATION_INL
+﻿#ifndef SOFA_COMPONENT_TRIANGLEGEOMETRY_INL
+#define SOFA_COMPONENT_TRIANGLEGEOMETRY_INL
 
-#include "TriangleLinearInterpolation.h"
+#include "ConstraintProximity.h"
+#include "TriangleGeometry.h"
 #include <sofa/helper/Quater.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <SofaOpenglVisual/OglModel.h>
@@ -17,8 +18,19 @@ namespace core {
 
 namespace behavior {
 
-template<class DataTypes>
-void TriangleLinearInterpolation<DataTypes>::prepareDetection() {
+ConstraintProximity TriangleGeometry::getTriangleProximity(unsigned eid,double fact_w,double fact_u,double fact_v) {
+    ConstraintProximity res(this,eid);
+    const topology::Triangle tri = this->getTopology()->getTriangle(eid);
+
+    res.push(tri[0],fact_w);
+    res.push(tri[1],fact_u);
+    res.push(tri[2],fact_v);
+
+    return res;
+}
+
+
+void TriangleGeometry::prepareDetection() {
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
 
     m_triangle_info.resize(this->getTopology()->getNbTriangles());
@@ -29,9 +41,9 @@ void TriangleLinearInterpolation<DataTypes>::prepareDetection() {
         const topology::Triangle tri = this->getTopology()->getTriangle(t);
 
         //Compute Bezier Positions
-        Vector3 p0 = x[tri[0]];
-        Vector3 p1 = x[tri[1]];
-        Vector3 p2 = x[tri[2]];
+        defaulttype::Vector3 p0 = x[tri[0]];
+        defaulttype::Vector3 p1 = x[tri[1]];
+        defaulttype::Vector3 p2 = x[tri[2]];
 
         tinfo.v0 = p1 - p0;
         tinfo.v1 = p2 - p0;
@@ -54,7 +66,7 @@ void TriangleLinearInterpolation<DataTypes>::prepareDetection() {
     m_pointNormal.resize(x.size());
     for (unsigned p=0;p<x.size();p++) {
         const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = this->getTopology()->getTrianglesAroundVertex(p);
-        m_pointNormal[p] = Vector3(0,0,0);
+        m_pointNormal[p] = defaulttype::Vector3(0,0,0);
         for (unsigned t=0;t<tav.size();t++) {
             m_pointNormal[p] += this->m_triangle_info[tav[t]].tn;
         }
@@ -63,9 +75,9 @@ void TriangleLinearInterpolation<DataTypes>::prepareDetection() {
 }
 
 //proj_P must be on the plane
-template<class DataTypes>
-void TriangleLinearInterpolation<DataTypes>::computeBaryCoords(const Vector3 & proj_P,const TriangleInfo & tinfo, const Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) {
-    Vector3 v2 = proj_P - p0;
+
+void TriangleGeometry::computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) {
+    defaulttype::Vector3 v2 = proj_P - p0;
 
     double d20 = dot(v2, tinfo.v0);
     double d21 = dot(v2, tinfo.v1);
@@ -75,26 +87,30 @@ void TriangleLinearInterpolation<DataTypes>::computeBaryCoords(const Vector3 & p
     fact_u = 1.0 - fact_v  - fact_w;
 }
 
+unsigned TriangleGeometry::getNbElements() {
+    return this->getTopology()->getNbTriangles();
+}
+
 //Barycentric coordinates are computed according to
 //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-template<class DataTypes>
-ConstraintProximity TriangleLinearInterpolation<DataTypes>::projectPointOnTriangle(unsigned tid,const Vector3 & s) {
+
+ConstraintProximity TriangleGeometry::projectPoint(unsigned tid,const defaulttype::Vector3 & s) {
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
     const topology::Triangle tri = this->getTopology()->getTriangle(tid);
 
     //Compute Bezier Positions
-    Vector3 p0 = x[tri[0]];
-    Vector3 p1 = x[tri[1]];
-    Vector3 p2 = x[tri[2]];
+    defaulttype::Vector3 p0 = x[tri[0]];
+    defaulttype::Vector3 p1 = x[tri[1]];
+    defaulttype::Vector3 p2 = x[tri[2]];
 
-    Vector3 x1x2 = s - p0;
+    defaulttype::Vector3 x1x2 = s - p0;
 
     const TriangleInfo & tinfo = m_triangle_info[tid];
 
     //corrdinate on the plane
     double c0 = dot(x1x2,tinfo.ax1);
     double c1 = dot(x1x2,tinfo.ax2);
-    Vector3 proj_P = p0 + c0 * tinfo.ax1 + c1 * tinfo.ax2;
+    defaulttype::Vector3 proj_P = p0 + c0 * tinfo.ax1 + c1 * tinfo.ax2;
 
     double fact_u;
     double fact_v;
@@ -103,8 +119,8 @@ ConstraintProximity TriangleLinearInterpolation<DataTypes>::projectPointOnTriang
     computeBaryCoords(proj_P, tinfo, p0, fact_u,fact_v,fact_w);
 
     if (fact_u<0) {
-        Vector3 v3 = p1 - p2;
-        Vector3 v4 = proj_P - p2;
+        defaulttype::Vector3 v3 = p1 - p2;
+        defaulttype::Vector3 v4 = proj_P - p2;
         double alpha = dot (v4,v3) / dot(v3,v3);
 
         if (alpha<0) alpha = 0;
@@ -114,8 +130,8 @@ ConstraintProximity TriangleLinearInterpolation<DataTypes>::projectPointOnTriang
         fact_v = alpha;
         fact_w = 1.0 - alpha;
     } else if (fact_v<0) {
-        Vector3 v3 = p0 - p2;
-        Vector3 v4 = proj_P - p2;
+        defaulttype::Vector3 v3 = p0 - p2;
+        defaulttype::Vector3 v4 = proj_P - p2;
         double alpha = dot (v4,v3) / dot(v3,v3);
 
         if (alpha<0) alpha = 0;
@@ -125,8 +141,8 @@ ConstraintProximity TriangleLinearInterpolation<DataTypes>::projectPointOnTriang
         fact_v = 0;
         fact_w = 1.0 - alpha;
     } else if (fact_w<0) {
-        Vector3 v3 = p1 - p0;
-        Vector3 v4 = proj_P - p0;
+        defaulttype::Vector3 v3 = p1 - p0;
+        defaulttype::Vector3 v4 = proj_P - p0;
         double alpha = dot (v4,v3) / dot(v3,v3);
 
         if (alpha<0) alpha = 0;
@@ -140,19 +156,19 @@ ConstraintProximity TriangleLinearInterpolation<DataTypes>::projectPointOnTriang
     return this->getTriangleProximity(tid,fact_u,fact_v,fact_w);
 }
 
-template<class DataTypes>
-defaulttype::Vector3 TriangleLinearInterpolation<DataTypes>::getSurfaceNormal(const ConstraintProximity & pinfo) {
+
+defaulttype::Vector3 TriangleGeometry::getNormal(const ConstraintProximity & pinfo) {
 //    if (pinfo.m_fact[0] <= 0 || pinfo.m_fact[1] <= 0 || pinfo.m_fact[2] <= 0 || pinfo.m_fact[0] >= 1 || pinfo.m_fact[1] >= 1 || pinfo.m_fact[2] >= 0) {
-        return m_pointNormal[pinfo.m_pid[0]] * pinfo.m_fact[0] +
-               m_pointNormal[pinfo.m_pid[1]] * pinfo.m_fact[1] +
-               m_pointNormal[pinfo.m_pid[2]] * pinfo.m_fact[2];
+//        return m_pointNormal[pinfo.m_pid[0]] * pinfo.m_fact[0] +
+//               m_pointNormal[pinfo.m_pid[1]] * pinfo.m_fact[1] +
+//               m_pointNormal[pinfo.m_pid[2]] * pinfo.m_fact[2];
 //    } else {
-//        return m_triangle_info[pinfo.getEid()].tn;
+      return m_triangle_info[pinfo.getEid()].tn;
 //    }
 }
 
-template<class DataTypes>
-void TriangleLinearInterpolation<DataTypes>::drawTriangle(const core::visual::VisualParams * vparams,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C) {
+
+void TriangleGeometry::drawTriangle(const core::visual::VisualParams * vparams,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C) {
     glColor3f(1,0.45,0);helper::gl::glVertexT(A);
     glColor3f(1,0.40,0);helper::gl::glVertexT(B); // A<->B
 
@@ -163,16 +179,14 @@ void TriangleLinearInterpolation<DataTypes>::drawTriangle(const core::visual::Vi
     if (vparams->displayFlags().getShowWireFrame()) {glColor3f(1,0.45,0);helper::gl::glVertexT(A);}// C<->A
 }
 
-template<class DataTypes>
-void TriangleLinearInterpolation<DataTypes>::draw(const core::visual::VisualParams * vparams) {
+
+void TriangleGeometry::draw(const core::visual::VisualParams * vparams) {
 
     if (! vparams->displayFlags().getShowCollisionModels()) return;
 
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
 
     glDisable(GL_LIGHTING);
-
-
 
     if (vparams->displayFlags().getShowWireFrame()) glBegin(GL_LINES);
     else {
@@ -184,9 +198,9 @@ void TriangleLinearInterpolation<DataTypes>::draw(const core::visual::VisualPara
         const topology::Triangle tri = this->getTopology()->getTriangle(t);
 
         //Compute Bezier Positions
-        Vector3 p0 = x[tri[0]];
-        Vector3 p1 = x[tri[1]];
-        Vector3 p2 = x[tri[2]];
+        defaulttype::Vector3 p0 = x[tri[0]];
+        defaulttype::Vector3 p1 = x[tri[1]];
+        defaulttype::Vector3 p2 = x[tri[2]];
 
         drawTriangle(vparams,p0,p1,p2);
     }

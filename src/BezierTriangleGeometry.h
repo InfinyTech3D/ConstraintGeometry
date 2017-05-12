@@ -22,16 +22,10 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_TRIANGLELINEARINTERPOLATION_H
-#define SOFA_COMPONENT_TRIANGLELINEARINTERPOLATION_H
+#ifndef SOFA_COMPONENT_BEZIERTRIANGLEGEOMETRY_H
+#define SOFA_COMPONENT_BEZIERTRIANGLEGEOMETRY_H
 
-#include "ConstraintProximity.h"
-#include "EdgeLinearInterpolation.h"
-#include <sofa/core/behavior/ForceField.h>
-#include <sofa/core/behavior/MechanicalState.h>
-#include <sofa/core/objectmodel/Data.h>
-#include <sofa/defaulttype/VecTypes.h>
-#include <SofaConstraint/BilateralInteractionConstraint.h>
+#include "TriangleNonLinearGeometry.h"
 
 namespace sofa {
 
@@ -39,50 +33,39 @@ namespace core {
 
 namespace behavior {
 
-template<class DataTypes>
-class TriangleLinearInterpolation : public TriangleGeometry<DataTypes>
+class BezierTriangleGeometry : public TriangleNonLinearGeometry
 {
 public:
-    SOFA_CLASS(SOFA_TEMPLATE(TriangleLinearInterpolation,DataTypes) , SOFA_TEMPLATE(TriangleGeometry,DataTypes) );
+    SOFA_CLASS(BezierTriangleGeometry , TriangleGeometry );
 
+    typedef TriangleNonLinearGeometry Inherit;
+    typedef typename Inherit::TriangleInfo TriangleInfo;
+
+    typedef typename defaulttype::Vector2 Vector2;
+    typedef typename defaulttype::Vector3 Vector3;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::VecDeriv VecDeriv;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename DataTypes::Deriv Deriv1;
-    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
-    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
-    typedef defaulttype::Vector3 Vector3;
 
-    ConstraintProximity projectPointOnTriangle(unsigned tid, const Vector3 & s);
-
-    defaulttype::Vector3 getSurfaceNormal(const ConstraintProximity & pinfo);
-
-    void draw(const core::visual::VisualParams */*vparams*/);
-
-protected:
-
-    typedef struct {
-        Vector3 v0,v1;
-        double d00;
-        double d01;
-        double d11;
-        double invDenom;
-
-        Vector3 tn,ax1,ax2;
-    } TriangleInfo;
+    BezierTriangleGeometry();
 
     virtual void prepareDetection();
 
-    void computeBaryCoords(const Vector3 & proj_P,const TriangleInfo & tinfo, const Vector3 & p0, double & fact_w,double & fact_u, double & fact_v);
+    Vector3 getPosition(const ConstraintProximity & pinfo);
 
-    helper::vector<TriangleInfo> m_triangle_info;
-    helper::vector<defaulttype::Vector3> m_pointNormal;
+    Vector3 getFreePosition(const ConstraintProximity & pinfo);
 
-    void drawTriangle(const core::visual::VisualParams * vparams,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C);
+    defaulttype::Vector3 getNormal(const ConstraintProximity & pinfo);
+
+private :
+    typedef struct {
+        Vector3 p210,p120,p021,p012,p102,p201,p111;
+        Vector3 n110,n011,n101;
+    } BezierTriangleInfo;
+
+    helper::vector<BezierTriangleInfo> m_beziertriangle_info;
+
 };
 
 

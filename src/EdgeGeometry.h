@@ -22,15 +22,16 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_TRIANGLEAABBDECORATOR_H
-#define SOFA_COMPONENT_TRIANGLEAABBDECORATOR_H
+#ifndef SOFA_COMPONENT_EDGEGEOMETRY_H
+#define SOFA_COMPONENT_EDGEGEOMETRY_H
 
-#include "ConstraintGeometry.h"
+#include "PointGeometry.h"
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
 #include <sofa/defaulttype/VecTypes.h>
 #include <SofaConstraint/BilateralInteractionConstraint.h>
+
 
 namespace sofa {
 
@@ -38,49 +39,22 @@ namespace core {
 
 namespace behavior {
 
-template<class DataTypes>
-class TriangleAABBDecorator : public TriangleGeometry<DataTypes>::TriangleDecorator
+class EdgeGeometry : public PointGeometry
 {
 public:
-    SOFA_CLASS(SOFA_TEMPLATE(TriangleAABBDecorator,DataTypes) , SOFA_TEMPLATE(GeometryDecorator,DataTypes) );
+    SOFA_CLASS(EdgeGeometry , BaseGeometry );
 
-//    typedef TriangleDecorator<DataTypes> Inherit;
-    typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::Real Real;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef typename DataTypes::VecDeriv VecDeriv;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename DataTypes::Deriv Deriv1;
-    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
-    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
     typedef defaulttype::Vector3 Vector3;
-    typedef defaulttype::Vec3i Vec3i;
 
-    TriangleAABBDecorator();
+    virtual defaulttype::Vector3 getNormal(const ConstraintProximity & /*pinfo*/);
 
-    virtual ConstraintProximity findClosestTriangle(TriangleGeometry<DataTypes> * geo, const defaulttype::Vector3 & P);
+    ConstraintProximity getEdgeProximity(unsigned eid, double fact_u,double fact_v);
 
-    void draw(const core::visual::VisualParams */*vparams*/);
+    virtual ConstraintProximity projectPoint(unsigned eid,const defaulttype::Vector3 & /*T*/);
 
-    Data<Vec3i> d_nbox;
-    Data<bool> d_drawBbox;
+    unsigned getNbElements();
 
-protected:
-
-    virtual void init();
-
-    virtual void reinit();
-
-    virtual void prepareDetection();
-
-    ConstraintProximity findClosestTriangle(TriangleGeometry<DataTypes> * geo, const defaulttype::Vector3 & P,const std::set<unsigned> & triangles);
-
-    void fillTriangleSet(int d,const Vec3i & cbox,std::set<unsigned> & vecpinfo);
-
-    Vector3 m_Bmin,m_Bmax,m_cellSize;    
-    helper::vector<helper::vector<helper::vector<helper::vector<unsigned> > > >  m_triangleboxes;
+    void draw(const core::visual::VisualParams * /*vparams*/);
 };
 
 

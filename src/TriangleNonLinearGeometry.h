@@ -22,10 +22,11 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_TRIANGLENONLINEARINTERPOLATION_H
-#define SOFA_COMPONENT_TRIANGLENONLINEARINTERPOLATION_H
+#ifndef SOFA_COMPONENT_TRIANGLENONLINEARGEOMETRY_H
+#define SOFA_COMPONENT_TRIANGLENONLINEARGEOMETRY_H
 
-#include "TriangleLinearInterpolation.h"
+#include "TriangleGeometry.h"
+#include "ConstraintProximity.h"
 
 namespace sofa {
 
@@ -33,13 +34,14 @@ namespace core {
 
 namespace behavior {
 
-template<class DataTypes>
-class TriangleNonLinearInterpolation : public TriangleLinearInterpolation<DataTypes>
+//#define DEBUG_VISUAL
+
+class TriangleNonLinearGeometry : public TriangleGeometry
 {
 public:
-    SOFA_CLASS(SOFA_TEMPLATE(TriangleNonLinearInterpolation,DataTypes) , SOFA_TEMPLATE(TriangleLinearInterpolation,DataTypes) );
+    SOFA_CLASS(TriangleNonLinearGeometry , TriangleGeometry );
 
-    typedef  TriangleLinearInterpolation<DataTypes> Inherit;
+    typedef  TriangleGeometry Inherit;
     typedef typename defaulttype::Vector2 Vector2;
     typedef typename defaulttype::Vector3 Vector3;
     typedef typename DataTypes::Coord Coord;
@@ -53,7 +55,7 @@ public:
     Data <double> d_nonlin_threshold;
     Data <unsigned> d_draw_tesselation;
 
-    TriangleNonLinearInterpolation()
+    TriangleNonLinearGeometry()
         : Inherit()
         , d_activateNewton(initData(&d_activateNewton, (bool) true,"activateNewton","activate newton iterator in order to refine position on non linear triangle"))
         , d_nonlin_max_it(initData(&d_nonlin_max_it, (unsigned) 20,"nonlin_max_it","Max iteration in the Newton Raphson solver used for projection of points on non linear triangle"))
@@ -62,32 +64,26 @@ public:
         , d_draw_tesselation(initData(&d_draw_tesselation, (unsigned) 0.0,"tesselation","Draw tesselated triangles"))
     {}
 
+#ifdef DEBUG_VISUAL
     helper::vector<defaulttype::Vector3> m_pointsNewton;
     helper::vector<defaulttype::Vector3> m_normalNewton;
-    //       helper::vector<defaulttype::Vector3> m_clamp;
-    //       helper::vector<defaulttype::Vector3> m_Q;
-    unsigned m_tid;
+    helper::vector<unsigned> m_tid;
+#endif
 
 protected:
-    inline bool checkpos(const helper::vector<double> & fact,const defaulttype::Vector3 & dir) {
-        return (fact[0] + dir[0])>=0 && (fact[1] + dir[1])>=0 && (fact[2] + dir[2])>=0;
-    }
-
-
     void newtonIterations(const Vector3 & P,ConstraintProximity & pinfo) {
         const double &tolerance = d_nonlin_tolerance.getValue();
         const double &threshold = d_nonlin_threshold.getValue();
 
         unsigned int it=0;
-
         double delta = 0.00001;
 
-        m_tid = pinfo.getEid();
-
+#ifdef DEBUG_VISUAL
+        m_tid.push_back(pinfo.getEid());
         m_pointsNewton.clear();
         m_normalNewton.clear();
-        //        m_clamp.clear();
-        //        m_Q.clear();
+#endif
+
         while(it< d_nonlin_max_it.getValue()) {
             Vector3 Q = pinfo.getPosition();
 
@@ -95,12 +91,10 @@ protected:
             if (nQP.norm() < d_nonlin_tolerance.getValue()) break;
             nQP.normalize();
 
-            defaulttype::Vector3 N1 = this->getSurfaceNormal(pinfo);
+            defaulttype::Vector3 N1 = this->getNormal(pinfo);
             N1.normalize();
 
             if (pinfo.m_fact[0] < 0 || pinfo.m_fact[1] < 0 || pinfo.m_fact[2] < 0) break;
-
-            m_pointsNewton.push_back(pinfo.getPosition());
 
             defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(1,0,0)))>0.99) ? defaulttype::Vector3(0,1,0) : defaulttype::Vector3(1,0,0)));
             N2.normalize();
@@ -165,12 +159,15 @@ protected:
             if (P_a.m_fact[0] < 0 || P_a.m_fact[1] < 0 || P_a.m_fact[2] < 0) break;
 
             Vector3 QA = P_a.getPosition();
-            m_normalNewton.push_back((Q - QA).normalized()*0.5);
 
+#ifdef DEBUG_VISUAL
+            m_pointsNewton.push_back(pinfo.getPosition());
+            m_normalNewton.push_back((Q - QA).normalized()*0.5);
+#endif
             double fact;
             if (fabs(dot(nQP,N1))>0.8) {
                 double fx = acos(fabs(dot(nQP,N1)));
-                double fxdx = acos(fabs(dot((P - QA).normalized(),this->getSurfaceNormal(P_a))));
+                double fxdx = acos(fabs(dot((P - QA).normalized(),this->getNormal(P_a))));
                 double j = (fxdx - fx) / delta;
                 fact = -fx / j;
             } else {
@@ -189,89 +186,34 @@ protected:
             double new_u = pinfo.m_fact[1] + dir2d[1];
             double new_w = pinfo.m_fact[2] + dir2d[2];
 
-            //            if (new_v<0 && fabs(dir2d[0])>0) dir2d *= -pinfo.m_fact[0] / dir2d[0];
-            //            if (new_u<0 && fabs(dir2d[1])>0) dir2d *= -pinfo.m_fact[1] / dir2d[1];
-            //            if (new_w<0 && fabs(dir2d[2])>0) dir2d *= -pinfo.m_fact[2] / dir2d[2];
+            if (new_v<0 && fabs(dir2d[0])>0) dir2d *= -pinfo.m_fact[0] / dir2d[0];
+            if (new_u<0 && fabs(dir2d[1])>0) dir2d *= -pinfo.m_fact[1] / dir2d[1];
+            if (new_w<0 && fabs(dir2d[2])>0) dir2d *= -pinfo.m_fact[2] / dir2d[2];
 
-            //            pinfo.m_fact[0] += dir2d[0];
-            //            pinfo.m_fact[1] += dir2d[1];
-            //            pinfo.m_fact[2] += dir2d[2];
-
-            if (new_v<0 || new_u<0 || new_w<0) {
-                changeTriangle(pinfo, dir2d);
-            } else {
-                pinfo.m_fact[0] += dir2d[0];
-                pinfo.m_fact[1] += dir2d[1];
-                pinfo.m_fact[2] += dir2d[2];
-            }
+            pinfo.m_fact[0] += dir2d[0];
+            pinfo.m_fact[1] += dir2d[1];
+            pinfo.m_fact[2] += dir2d[2];
 
             it++;
         }
     }
 
-    void changeTriangle(ConstraintProximity & pinfo, defaulttype::Vector3 dir2d) {
-        double new_v = pinfo.m_fact[0] + dir2d[0];
-        double new_u = pinfo.m_fact[1] + dir2d[1];
-        double new_w = pinfo.m_fact[2] + dir2d[2];
-
-        //first we find the tid
-        ConstraintProximity P_N = pinfo;
-        P_N.m_fact[0] = new_v;
-        P_N.m_fact[1] = new_u;
-        P_N.m_fact[2] = new_w;
-        defaulttype::Vector3 new_Q = P_N.getPosition();
-
-        //        m_Q.push_back(new_Q);
-
-        //find the closest point to new Q
-        const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::position());
-        double dist[3] = {(new_Q - x[pinfo.m_pid[0]]).norm(),
-                          (new_Q - x[pinfo.m_pid[1]]).norm(),
-                          (new_Q - x[pinfo.m_pid[2]]).norm()};
-
-        int min_p = 0;
-        if (dist[1]<dist[min_p]) min_p = 1;
-        if (dist[2]<dist[min_p]) min_p = 2;
-
-        // search in all the triangle connected to this closest point the triangle containing new_Q
-        const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = this->getTopology()->getTrianglesAroundVertex(pinfo.m_pid[min_p]);
-        int min_t=-1;
-        double dmin=0;
-        for (unsigned i=0;i<tav.size();i++) {
-            if (tav[i] == pinfo.getEid()) continue;
-            sofa::core::topology::Topology::Triangle tri = this->getTopology()->getTriangle(tav[i]);
-            defaulttype::Vector3 G = (x[tri[0]] + x[tri[1]] + x[tri[2]])/3.0;
-
-            double d = (new_Q-G).norm();
-            if (min_t==-1 || d<dmin) {
-                min_t = i;
-                dmin = d;
-            }
-        }
-
-        // clamp coordinates on the edge or the point
-        if (new_v<0 && fabs(dir2d[0])>0) dir2d *= -pinfo.m_fact[0] / dir2d[0];
-        if (new_u<0 && fabs(dir2d[1])>0) dir2d *= -pinfo.m_fact[1] / dir2d[1];
-        if (new_w<0 && fabs(dir2d[2])>0) dir2d *= -pinfo.m_fact[2] / dir2d[2];
-
-        // compute the barycentric coordinates in the new triangle
-        defaulttype::Vector3 clamp_Q = x[pinfo.m_pid[0]] * (pinfo.m_fact[0] + dir2d[0]) +
-                x[pinfo.m_pid[1]] * (pinfo.m_fact[1] + dir2d[1]) +
-                x[pinfo.m_pid[2]] * (pinfo.m_fact[2] + dir2d[2]);
-
-        pinfo = Inherit::projectPointOnTriangle(tav[min_t],clamp_Q);
+#ifdef DEBUG_VISUAL
+    void prepareDetection() {
+        m_tid.clear();
+        Inherit::prepareDetection();
     }
+#endif
 
-    ConstraintProximity findClosestProximity(const defaulttype::Vector3 & P) {
-        ConstraintProximity pinfo = Inherit::findClosestProximity(P);
-        if (d_activateNewton.getValue()) newtonIterations(P,pinfo);
+    ConstraintProximity projectPoint(unsigned tid,const defaulttype::Vector3 & s) {
+        ConstraintProximity pinfo = Inherit::projectPoint(tid,s);
+        newtonIterations(s,pinfo);
         return pinfo;
-
     }
 
     virtual defaulttype::Vector3 getPosition(const ConstraintProximity & pinfo) = 0;
 
-    virtual defaulttype::Vector3 getSurfaceNormal  (const ConstraintProximity & pinfo) = 0;
+    virtual defaulttype::Vector3 getNormal  (const ConstraintProximity & pinfo) = 0;
 
     void tesselate(const core::visual::VisualParams * vparams, unsigned level,int tid, const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C) {
         if (level >= d_draw_tesselation.getValue()) {
@@ -305,6 +247,7 @@ protected:
 
         glDisable(GL_LIGHTING);
 
+#ifdef DEBUG_VISUAL
         glBegin(GL_LINE_STRIP);
         for (unsigned i=0;i<m_pointsNewton.size();i++) {
             glColor3f(i*1.0/m_pointsNewton.size(),0,1.0-(i*1.0/m_pointsNewton.size()));
@@ -318,95 +261,18 @@ protected:
 
         }
 
-
-
-        //        for (unsigned i=0;i<m_clamp.size();i++) {
-        //            glColor3f(1,0,0);vparams->drawTool()->drawSphere(m_clamp[i],0.1);
-        //            glColor3f(0,0,1);vparams->drawTool()->drawSphere(m_Q[i],0.1);
-        //        }
-
         const helper::ReadAccessor<Data <typename DataTypes::VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::position());
-        sofa::core::topology::Topology::Triangle tri = this->getTopology()->getTriangle(m_tid);
 
-        glColor3f(0,1,0);
-        glBegin(GL_TRIANGLES);
-        helper::gl::glVertexT(x[tri[0]]);
-        helper::gl::glVertexT(x[tri[1]]);
-        helper::gl::glVertexT(x[tri[2]]);
-        glEnd();
-
-
-        //        glBegin(GL_LINES);
-        //        for (unsigned i=0;i<m_pointsNewton.size();i++) {
-        //            glColor3f(1,0,0);helper::gl::glVertexT(Pq);helper::gl::glVertexT(Pu);
-        //            glColor3f(0,1,0);helper::gl::glVertexT(Pq);helper::gl::glVertexT(Pv);
-        //            //           glColor3f(1,0,1);helper::gl::glVertexT(Pq);helper::gl::glVertexT(PJ);
-        //            //           glColor3f(0,1,1);helper::gl::glVertexT(Pq);helper::gl::glVertexT(PJn);
-        //            glColor3f(0,0,1);helper::gl::glVertexT(Pq);helper::gl::glVertexT(Pa);
-
-        //        }
-        //        glEnd();
-
-
-
-
-
-
-
-
-
-
-        //        double fact = 1.0 - d_baryC.getValue()[0] - d_baryC.getValue()[1];
-        //        d_baryC.setValue(defaulttype::Vector3(d_baryC.getValue()[0],d_baryC.getValue()[1],fact));
-
-
-        //        ConstraintProximity pinfo1 = this->getTriangleProximity(0,
-        //                                                                d_baryC.getValue()[0],
-        //                                                                d_baryC.getValue()[1],
-        //                                                                d_baryC.getValue()[2]);
-
-        //        ConstraintProximity pinfo2 = this->getTriangleProximity(0,d_baryC.getValue()[0]+d_duv.getValue()[0],
-        //                                                                  d_baryC.getValue()[1]+d_duv.getValue()[1],
-        //                                                                  1.0 - (d_baryC.getValue()[0]+d_duv.getValue()[0]) - (d_baryC.getValue()[1]+d_duv.getValue()[1]));
-
-
-        //        defaulttype::Vector3 dir(pinfo2.m_fact[0] - pinfo1.m_fact[0],
-        //                                 pinfo2.m_fact[1] - pinfo1.m_fact[1],
-        //                                 pinfo2.m_fact[2] - pinfo1.m_fact[2]);
-
-
-        ////        pinfo2.m_fact[2] = 1.0 - pinfo2.m_fact[0] - pinfo2.m_fact[1];
-
-        //        glColor3f(0,0,1);
-        //        vparams->drawTool()->drawSphere(pinfo1.getPosition(),0.1);
-        //        vparams->drawTool()->drawArrow(pinfo1.getPosition(),pinfo2.getPosition(),0.01, defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
-
-        //        double u = d_baryC.getValue()[0]+dir[0];
-        //        double v = d_baryC.getValue()[1]+dir[1];
-        //        double w = d_baryC.getValue()[2]+dir[2];
-
-        //        std::cout << dir << std::endl;
-
-        //        if (u<0) dir *= -d_baryC.getValue()[0] / dir[0];
-        //        if (v<0) dir *= -d_baryC.getValue()[1] / dir[1];
-        //        if (w<0) dir *= -d_baryC.getValue()[2] / dir[2];
-
-        //        u = d_baryC.getValue()[0]+dir[0];
-        //        v = d_baryC.getValue()[1]+dir[1];
-        //        w = d_baryC.getValue()[2]+dir[2];
-
-        //        printf("v %f\n",v);
-
-        //        ConstraintProximity pinfof = this->getTriangleProximity(0,u,v,w);
-        //        glColor3f(1,0,1);
-        //        vparams->drawTool()->drawSphere(pinfof.getPosition(),0.1);
-
-
-
-
-
-
-
+        for (unsigned i=0;i<m_tid.size();i++) {
+            sofa::core::topology::Topology::Triangle tri = this->getTopology()->getTriangle(m_tid[i]);
+            glColor3f(0,1,0);
+            glBegin(GL_TRIANGLES);
+            helper::gl::glVertexT(x[tri[0]]);
+            helper::gl::glVertexT(x[tri[1]]);
+            helper::gl::glVertexT(x[tri[2]]);
+            glEnd();
+        }
+#endif
 
         if (vparams->displayFlags().getShowWireFrame()) glBegin(GL_LINES);
         else {

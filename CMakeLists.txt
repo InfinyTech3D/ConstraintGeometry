@@ -13,30 +13,27 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(HEADER_FILES      
      src/initConstraintGeometryPlugin.h
      src/ConstraintGeometry.h
+     src/ConstraintGeometry.inl
      src/ConstraintProximity.h
-     src/ConstraintCollisionAlgorithms.h
-     src/PointLinearInterpolation.h
-     src/PointLinearInterpolation.inl
-     src/EdgeLinearInterpolation.h
-     src/EdgeLinearInterpolation.inl
-     src/TriangleAABBDecorator.h
-     src/TriangleAABBDecorator.inl
-     src/TriangleLinearInterpolation.h
-     src/TriangleLinearInterpolation.inl
-     src/TriangleNonLinearInterpolation.h
-     src/BezierTriangleNonLinearInterpolation.h
-     src/BezierTriangleNonLinearInterpolation.inl
+     src/PointGeometry.h
+     src/PointGeometry.inl
+     src/EdgeGeometry.h
+     src/EdgeGeometry.inl
+     src/TriangleGeometry.h
+     src/TriangleGeometry.inl
+     src/TriangleNonLinearGeometry.h
+     src/BezierTriangleGeometry.h
+     src/BezierTriangleGeometry.inl
 #     src/QuadraticTriangleNonLinearInterpolation.h
 #     src/QuadraticTriangleNonLinearInterpolation.inl
 )
 
 set(SOURCE_FILES
      src/initConstraintGeometryPlugin.cpp
-     src/PointLinearInterpolation.cpp
-     src/EdgeLinearInterpolation.cpp
-     src/TriangleAABBDecorator.cpp
-     src/TriangleLinearInterpolation.cpp
-     src/BezierTriangleNonLinearInterpolation.cpp
+     src/PointGeometry.cpp
+     src/EdgeGeometry.cpp
+     src/TriangleGeometry.cpp
+     src/BezierTriangleGeometry.cpp
 #     src/QuadraticTriangleNonLinearInterpolation.cpp
 )
 
