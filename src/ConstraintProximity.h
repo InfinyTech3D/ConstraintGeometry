@@ -60,6 +60,36 @@ public :
         return m_cg->getNormal(*this);
     }
 
+    bool operator ==(const ConstraintProximity & b) const {
+        if (! (m_eid == b.m_eid && size() == b.size())) return false;
+
+        for (unsigned i=0;i<size();i++) {
+            bool find = false;
+            unsigned j=0;
+            while (j<size() && !find) {
+                find = m_pid[i] == b.m_pid[j] && m_fact[i] == b.m_fact[j];
+                j++;
+            }
+            if (!find) return false;
+        }
+
+        return true;
+    }
+
+    bool operator !=(const ConstraintProximity & b) const {
+        return ! (*this == b);
+    }
+
+    inline friend std::ostream& operator << ( std::ostream& out, const ConstraintProximity& c )
+    {
+        out << c.m_eid << ":" ;
+        for (unsigned i=0;i<c.m_fact.size();i++) {
+            out << "[" << c.m_pid[i] << "," << c.m_fact[i] << "]";
+        }
+        return out;
+    }
+
+
     helper::vector<unsigned> m_pid;
     helper::vector<double> m_fact;
     unsigned m_eid;

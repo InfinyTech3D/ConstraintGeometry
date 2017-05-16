@@ -53,11 +53,21 @@ ConstraintProximity EdgeGeometry::getEdgeProximity(unsigned eid, double fact_u,d
 defaulttype::Vector3 EdgeGeometry::getNormal(const ConstraintProximity & pinfo) {
     const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::position());
 
-    topology::Edge edge = this->getTopology()->getEdge(pinfo.getEid());
+    const core::topology::BaseMeshTopology::EdgesAroundVertex& eav = this->getTopology()->getEdgesAroundVertex(pinfo.getEid());
 
-    Vector3 v = x[edge[1]] - x[edge[0]];
+    for (unsigned i=0;i<eav.size();i++) {
+        topology::Edge edge = this->getTopology()->getEdge(eav[i]);
 
-    return v.normalized();
+        if (edge[0]>pinfo.getEid()) {
+            Vector3 v = x[edge[0]] - x[edge[1]];
+            return v.normalized();
+        } else if (edge[1]>pinfo.getEid()) {
+            Vector3 v = x[edge[1]] - x[edge[0]];
+            return v.normalized();
+        }
+    }
+
+    return Vector3();
 }
 
 
