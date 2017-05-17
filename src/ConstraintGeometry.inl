@@ -53,6 +53,17 @@ defaulttype::Vector3 BaseGeometry::getFreePosition(const ConstraintProximity & p
     return P;
 }
 
+//void BaseGeometry::createAlgorithm(CollisionAlgorithm * alg) {
+//    this->getContext()->addObject(alg);
+//}
+
+//BaseGeometry * CollisionAlgorithm::getGeometry() {
+//    BaseGeometry * geo = NULL;
+//    this->getContext()->get(geo);
+//    return geo;
+//}
+
+
 } // namespace controller
 
 } // namespace component

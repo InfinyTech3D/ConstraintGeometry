@@ -50,7 +50,7 @@ public:
 
     ConstraintProximity getEdgeProximity(unsigned eid, double fact_u,double fact_v);
 
-    virtual ConstraintProximity projectPoint(unsigned eid,const defaulttype::Vector3 & /*T*/);
+    double projectPoint(unsigned eid,const defaulttype::Vector3 & /*T*/,ConstraintProximity & pinfo);
 
     unsigned getNbElements();
 

@@ -53,7 +53,7 @@ public:
 
     typedef defaulttype::Vector3 Coord;
 
-    ConstraintProximity projectPoint(unsigned tid, const defaulttype::Vector3 & s);
+    double projectPoint(unsigned tid, const defaulttype::Vector3 & s,ConstraintProximity & pinfo);
 
     defaulttype::Vector3 getNormal(const ConstraintProximity & pinfo);
 

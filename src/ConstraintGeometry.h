@@ -20,6 +20,7 @@ namespace core {
 namespace behavior {
 
 class ConstraintProximity;
+class CollisionAlgorithm;
 
 class BaseConstraintGeometry : public core::BehaviorModel {
 public:
@@ -67,12 +68,21 @@ public :
 
     virtual defaulttype::Vector3 getNormal(const ConstraintProximity & pinfo) = 0;
 
-    virtual ConstraintProximity projectPoint(unsigned eid,const defaulttype::Vector3 & T) = 0;
+    virtual double projectPoint(unsigned eid,const defaulttype::Vector3 & T, ConstraintProximity & pinfo) = 0;
 
     virtual unsigned getNbElements() = 0;
 
+//    void getAlgorithm(CollisionAlgorithm * algo);
+
+//    void createAlgorithm(CollisionAlgorithm * alg);
 };
 
+//class CollisionAlgorithm : public BaseConstraintGeometry {
+//public:
+
+//    BaseGeometry * getGeometry();
+
+//};
 
 
 } // namespace controller

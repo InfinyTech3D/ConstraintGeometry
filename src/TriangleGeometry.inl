@@ -94,7 +94,7 @@ unsigned TriangleGeometry::getNbElements() {
 //Barycentric coordinates are computed according to
 //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 
-ConstraintProximity TriangleGeometry::projectPoint(unsigned tid,const defaulttype::Vector3 & s) {
+double TriangleGeometry::projectPoint(unsigned tid,const defaulttype::Vector3 & s,ConstraintProximity & pinfo) {
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
     const topology::Triangle tri = this->getTopology()->getTriangle(tid);
 
@@ -153,7 +153,9 @@ ConstraintProximity TriangleGeometry::projectPoint(unsigned tid,const defaulttyp
         fact_w = 0;
     }
 
-    return this->getTriangleProximity(tid,fact_u,fact_v,fact_w);
+    pinfo = getTriangleProximity(tid,fact_u,fact_v,fact_w);
+
+    return (pinfo.getPosition() - s).norm();
 }
 
 

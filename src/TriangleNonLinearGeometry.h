@@ -205,10 +205,10 @@ protected:
     }
 #endif
 
-    ConstraintProximity projectPoint(unsigned tid,const defaulttype::Vector3 & s) {
-        ConstraintProximity pinfo = Inherit::projectPoint(tid,s);
+    double projectPoint(unsigned tid,const defaulttype::Vector3 & s, ConstraintProximity & pinfo) {
+        Inherit::projectPoint(tid,s, pinfo);
         newtonIterations(s,pinfo);
-        return pinfo;
+        return (s-pinfo.getPosition()).norm();
     }
 
     virtual defaulttype::Vector3 getPosition(const ConstraintProximity & pinfo) = 0;

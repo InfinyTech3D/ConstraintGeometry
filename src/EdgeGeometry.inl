@@ -21,7 +21,7 @@ unsigned EdgeGeometry::getNbElements() {
     return this->getTopology()->getNbEdges();
 }
 
-ConstraintProximity EdgeGeometry::projectPoint(unsigned eid,const defaulttype::Vector3 & P) {
+double EdgeGeometry::projectPoint(unsigned eid,const defaulttype::Vector3 & P,ConstraintProximity & pinfo) {
     const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::position());
 
     double fact_u;
@@ -37,7 +37,9 @@ ConstraintProximity EdgeGeometry::projectPoint(unsigned eid,const defaulttype::V
 
     fact_u = 1.0-fact_v;
 
-    return this->getEdgeProximity(eid,fact_u,fact_v);
+    pinfo = getEdgeProximity(eid,fact_u,fact_v);
+
+    return (pinfo.getPosition() - P).norm();
 }
 
 ConstraintProximity EdgeGeometry::getEdgeProximity(unsigned eid, double fact_u,double fact_v) {
