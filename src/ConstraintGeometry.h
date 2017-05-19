@@ -72,7 +72,7 @@ public :
 
     virtual double projectPoint(unsigned eid,const defaulttype::Vector3 & T, ConstraintProximity & pinfo) = 0;
 
-    virtual unsigned getNbElements() = 0;
+    virtual int getNbElements() = 0;
 
 //    void getAlgorithm(CollisionAlgorithm * algo);
 

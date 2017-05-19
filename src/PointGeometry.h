@@ -49,7 +49,7 @@ public:
 
     double projectPoint(unsigned eid,const defaulttype::Vector3 & T,ConstraintProximity & pinfo);
 
-    unsigned getNbElements();
+    int getNbElements();
 
     void draw(const core::visual::VisualParams * vparams);
 

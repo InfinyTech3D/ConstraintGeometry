@@ -87,7 +87,7 @@ void TriangleGeometry::computeBaryCoords(const defaulttype::Vector3 & proj_P,con
     fact_u = 1.0 - fact_v  - fact_w;
 }
 
-unsigned TriangleGeometry::getNbElements() {
+int TriangleGeometry::getNbElements() {
     return this->getTopology()->getNbTriangles();
 }
 

@@ -17,7 +17,7 @@ namespace core {
 namespace behavior {
 
 
-unsigned EdgeGeometry::getNbElements() {
+int EdgeGeometry::getNbElements() {
     return this->getTopology()->getNbEdges();
 }
 

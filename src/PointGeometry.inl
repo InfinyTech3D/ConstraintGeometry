@@ -32,7 +32,7 @@ double PointGeometry::projectPoint(unsigned eid,const defaulttype::Vector3 & T,C
     return (pinfo.getPosition() - T).norm();
 }
 
-unsigned PointGeometry::getNbElements() {
+int PointGeometry::getNbElements() {
     return this->getTopology()->getNbPoints();
 }
 
