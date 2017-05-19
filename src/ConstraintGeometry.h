@@ -66,6 +66,8 @@ public :
 
     virtual defaulttype::Vector3 getFreePosition(const ConstraintProximity & pinfo);
 
+    virtual defaulttype::Vector3 getRestPosition(const ConstraintProximity & pinfo);
+
     virtual defaulttype::Vector3 getNormal(const ConstraintProximity & pinfo) = 0;
 
     virtual double projectPoint(unsigned eid,const defaulttype::Vector3 & T, ConstraintProximity & pinfo) = 0;

@@ -51,6 +51,8 @@ public:
 
     unsigned getNbElements();
 
+    void draw(const core::visual::VisualParams * vparams);
+
 };
 
 } // namespace forcefield

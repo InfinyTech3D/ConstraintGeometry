@@ -36,6 +36,17 @@ unsigned PointGeometry::getNbElements() {
     return this->getTopology()->getNbPoints();
 }
 
+void PointGeometry::draw(const core::visual::VisualParams * vparams) {
+    if (! vparams->displayFlags().getShowCollisionModels()) return;
+
+    helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
+
+    glColor3f(0.9,0.46,0);
+    for (int i=0;i<this->getTopology()->getNbPoints();i++) {
+        vparams->drawTool()->drawSphere(x[i],0.001);
+    }
+}
+
 } //controller
 
 } //component

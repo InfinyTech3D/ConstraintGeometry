@@ -55,6 +55,11 @@ public :
         return m_cg->getFreePosition(*this);
     }
 
+    defaulttype::Vector3 getRestPosition() const {
+        if (m_cg == NULL) return defaulttype::Vector3();
+        return m_cg->getRestPosition(*this);
+    }
+
     defaulttype::Vector3 getNormal() const {
         if (m_cg == NULL) return defaulttype::Vector3();
         return m_cg->getNormal(*this);

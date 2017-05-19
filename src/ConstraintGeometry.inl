@@ -53,6 +53,16 @@ defaulttype::Vector3 BaseGeometry::getFreePosition(const ConstraintProximity & p
     return P;
 }
 
+defaulttype::Vector3 BaseGeometry::getRestPosition(const ConstraintProximity & pinfo) {
+    const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::restPosition());
+
+    defaulttype::Vector3 P;
+    for (unsigned i=0;i<pinfo.size();i++) {
+        P += x[pinfo.m_pid[i]] * pinfo.m_fact[i];
+    }
+    return P;
+}
+
 //void BaseGeometry::createAlgorithm(CollisionAlgorithm * alg) {
 //    this->getContext()->addObject(alg);
 //}
