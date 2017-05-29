@@ -26,7 +26,6 @@
 #include "TriangleGeometry.inl"
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <SofaOpenglVisual/OglModel.h>
 #include <math.h>
 #include <assert.h>     /* assert */
 

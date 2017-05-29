@@ -5,12 +5,11 @@
 #include "TriangleGeometry.h"
 #include <sofa/helper/Quater.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <SofaOpenglVisual/OglModel.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
-#include <SofaConstraint/BilateralInteractionConstraint.h>
 #include <SofaBaseMechanics/MechanicalObject.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <SofaOpenglVisual/OglModel.h>
+#include <sofa/helper/system/gl.h>
+#include <sofa/helper/gl/template.h>
 
 namespace sofa {
 
@@ -20,7 +19,7 @@ namespace behavior {
 
 ConstraintProximity TriangleGeometry::getTriangleProximity(unsigned eid,double fact_w,double fact_u,double fact_v) {
     ConstraintProximity res(this,eid);
-    const topology::Triangle tri = this->getTopology()->getTriangle(eid);
+    const sofa::core::topology::BaseMeshTopology::Triangle tri = this->getTopology()->getTriangle(eid);
 
     res.push(tri[0],fact_w);
     res.push(tri[1],fact_u);
@@ -38,7 +37,7 @@ void TriangleGeometry::prepareDetection() {
     for (int t=0;t<this->getTopology()->getNbTriangles();t++) {
         TriangleInfo & tinfo = m_triangle_info[t];
 
-        const topology::Triangle tri = this->getTopology()->getTriangle(t);
+        const sofa::core::topology::BaseMeshTopology::Triangle tri = this->getTopology()->getTriangle(t);
 
         //Compute Bezier Positions
         defaulttype::Vector3 p0 = x[tri[0]];
@@ -96,7 +95,7 @@ int TriangleGeometry::getNbElements() {
 
 double TriangleGeometry::projectPoint(unsigned tid,const defaulttype::Vector3 & s,ConstraintProximity & pinfo) {
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
-    const topology::Triangle tri = this->getTopology()->getTriangle(tid);
+    const sofa::core::topology::BaseMeshTopology::Triangle tri = this->getTopology()->getTriangle(tid);
 
     //Compute Bezier Positions
     defaulttype::Vector3 p0 = x[tri[0]];
@@ -197,7 +196,7 @@ void TriangleGeometry::draw(const core::visual::VisualParams * vparams) {
     }
 
     for(int t=0;t<this->getTopology()->getNbTriangles();t++) {
-        const topology::Triangle tri = this->getTopology()->getTriangle(t);
+        const sofa::core::topology::BaseMeshTopology::Triangle tri = this->getTopology()->getTriangle(t);
 
         //Compute Bezier Positions
         defaulttype::Vector3 p0 = x[tri[0]];

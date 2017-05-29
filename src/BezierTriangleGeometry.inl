@@ -22,7 +22,7 @@ void BezierTriangleGeometry::prepareDetection() {
     m_beziertriangle_info.resize(this->getTopology()->getNbTriangles());
     for (int t=0;t<this->getTopology()->getNbTriangles();t++) {
         BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[t];
-        const topology::Triangle trpids = this->getTopology()->getTriangle(t);
+        const sofa::core::topology::BaseMeshTopology::Triangle trpids = this->getTopology()->getTriangle(t);
 
         const Vector3 & p300 = x[trpids[2]];
         const Vector3 & p030 = x[trpids[1]];

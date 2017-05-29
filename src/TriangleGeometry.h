@@ -30,15 +30,11 @@
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
 #include <sofa/defaulttype/VecTypes.h>
-#include <SofaConstraint/BilateralInteractionConstraint.h>
 #include <sofa/helper/Quater.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <SofaOpenglVisual/OglModel.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
-#include <SofaConstraint/BilateralInteractionConstraint.h>
 #include <SofaBaseMechanics/MechanicalObject.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <SofaOpenglVisual/OglModel.h>
 
 namespace sofa {
 

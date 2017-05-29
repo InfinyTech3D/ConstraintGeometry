@@ -30,7 +30,6 @@
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
 #include <sofa/defaulttype/VecTypes.h>
-#include <SofaConstraint/BilateralInteractionConstraint.h>
 
 
 namespace sofa {

@@ -4,11 +4,10 @@
 #include "EdgeGeometry.h"
 #include <sofa/helper/Quater.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <SofaOpenglVisual/OglModel.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
-#include <SofaConstraint/BilateralInteractionConstraint.h>
 #include <SofaBaseMechanics/MechanicalObject.h>
 #include "ConstraintProximity.h"
+#include <sofa/helper/gl/template.h>
 
 namespace sofa {
 
@@ -27,7 +26,7 @@ double EdgeGeometry::projectPoint(unsigned eid,const defaulttype::Vector3 & P,Co
     double fact_u;
     double fact_v;
 
-    topology::Edge edge = this->getTopology()->getEdge(eid);
+    sofa::core::topology::BaseMeshTopology::Edge edge = this->getTopology()->getEdge(eid);
 
     Coord v = x[edge[1]] - x[edge[0]];
     fact_v = dot (P - x[edge[0]],v) / dot (v,v);
@@ -44,7 +43,7 @@ double EdgeGeometry::projectPoint(unsigned eid,const defaulttype::Vector3 & P,Co
 
 ConstraintProximity EdgeGeometry::getEdgeProximity(unsigned eid, double fact_u,double fact_v) {
     ConstraintProximity res(this,eid);
-    topology::Edge edge = this->getTopology()->getEdge(eid);
+    sofa::core::topology::BaseMeshTopology::Edge edge = this->getTopology()->getEdge(eid);
 
     res.push(edge[0],fact_u);
     res.push(edge[1],fact_v);
@@ -58,7 +57,7 @@ defaulttype::Vector3 EdgeGeometry::getNormal(const ConstraintProximity & pinfo) 
     const core::topology::BaseMeshTopology::EdgesAroundVertex& eav = this->getTopology()->getEdgesAroundVertex(pinfo.getEid());
 
     for (unsigned i=0;i<eav.size();i++) {
-        topology::Edge edge = this->getTopology()->getEdge(eav[i]);
+        sofa::core::topology::BaseMeshTopology::Edge edge = this->getTopology()->getEdge(eav[i]);
 
         if (edge[0]>pinfo.getEid()) {
             Vector3 v = x[edge[0]] - x[edge[1]];
@@ -82,7 +81,7 @@ void EdgeGeometry::draw(const core::visual::VisualParams * /*vparams*/) {
     glBegin(GL_LINES);
     glColor3f(1,0.5,0);
     for(int e=0;e<this->getTopology()->getNbEdges();e++) {
-        const topology::Edge edge= this->getTopology()->getEdge(e);
+        const sofa::core::topology::BaseMeshTopology::Edge edge= this->getTopology()->getEdge(e);
 
         //Compute Bezier Positions
         Vector3 p0 = x[edge[0]];
