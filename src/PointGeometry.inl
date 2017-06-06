@@ -25,8 +25,8 @@ ConstraintProximity PointGeometry::getPointProximity(unsigned eid) {
     return res;
 }
 
-double PointGeometry::projectPoint(unsigned eid,const defaulttype::Vector3 & T,ConstraintProximity & pinfo) {
-    pinfo = getPointProximity(eid);
+double PointGeometry::projectPoint(const defaulttype::Vector3 & T,ConstraintProximity & pinfo) {
+    pinfo.push(pinfo.getEid(),1.0);
     return (pinfo.getPosition() - T).norm();
 }
 

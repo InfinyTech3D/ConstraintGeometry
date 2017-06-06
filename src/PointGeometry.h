@@ -47,7 +47,7 @@ public:
 
     ConstraintProximity getPointProximity(unsigned eid);
 
-    double projectPoint(unsigned eid,const defaulttype::Vector3 & T,ConstraintProximity & pinfo);
+    double projectPoint(const defaulttype::Vector3 & T,ConstraintProximity & pinfo);
 
     int getNbElements();
 

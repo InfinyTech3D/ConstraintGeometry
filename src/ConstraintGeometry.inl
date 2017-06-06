@@ -17,6 +17,18 @@ void BaseGeometry::init() {
     prepareDetection();
 }
 
+std::unique_ptr<BaseConstraintIterator> BaseGeometry::getIterator(const ConstraintProximity & /*P*/) {
+//    BaseConstraintDecorator * decorator;
+//    this->getContext()->get(decorator);
+
+//    if (decorator == NULL)
+//    DefaultConstraintIterator res(this);
+//    return &res;
+//    else return decorator->getIterator(P);
+    std::unique_ptr<BaseConstraintIterator> foo (new DefaultConstraintIterator(this));
+    return foo;
+}
+
 void BaseGeometry::addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const ConstraintProximity & pinfo,const defaulttype::Vector3 & normal) {
     DataMatrixDeriv & c_d = *cId[getMstate()].write();
 

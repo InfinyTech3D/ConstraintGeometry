@@ -20,13 +20,13 @@ int EdgeGeometry::getNbElements() {
     return this->getTopology()->getNbEdges();
 }
 
-double EdgeGeometry::projectPoint(unsigned eid,const defaulttype::Vector3 & P,ConstraintProximity & pinfo) {
+double EdgeGeometry::projectPoint(const defaulttype::Vector3 & P,ConstraintProximity & pinfo) {
     const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::position());
 
     double fact_u;
     double fact_v;
 
-    sofa::core::topology::BaseMeshTopology::Edge edge = this->getTopology()->getEdge(eid);
+    sofa::core::topology::BaseMeshTopology::Edge edge = this->getTopology()->getEdge(pinfo.getEid());
 
     Coord v = x[edge[1]] - x[edge[0]];
     fact_v = dot (P - x[edge[0]],v) / dot (v,v);
@@ -36,7 +36,8 @@ double EdgeGeometry::projectPoint(unsigned eid,const defaulttype::Vector3 & P,Co
 
     fact_u = 1.0-fact_v;
 
-    pinfo = getEdgeProximity(eid,fact_u,fact_v);
+    pinfo.push(edge[0],fact_u);
+    pinfo.push(edge[1],fact_v);
 
     return (pinfo.getPosition() - P).norm();
 }

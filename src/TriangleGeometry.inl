@@ -93,9 +93,9 @@ int TriangleGeometry::getNbElements() {
 //Barycentric coordinates are computed according to
 //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 
-double TriangleGeometry::projectPoint(unsigned tid,const defaulttype::Vector3 & s,ConstraintProximity & pinfo) {
+double TriangleGeometry::projectPoint(const defaulttype::Vector3 & s,ConstraintProximity & pinfo) {
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
-    const sofa::core::topology::BaseMeshTopology::Triangle tri = this->getTopology()->getTriangle(tid);
+    const sofa::core::topology::BaseMeshTopology::Triangle tri = this->getTopology()->getTriangle(pinfo.getEid());
 
     //Compute Bezier Positions
     defaulttype::Vector3 p0 = x[tri[0]];
@@ -104,7 +104,7 @@ double TriangleGeometry::projectPoint(unsigned tid,const defaulttype::Vector3 & 
 
     defaulttype::Vector3 x1x2 = s - p0;
 
-    const TriangleInfo & tinfo = m_triangle_info[tid];
+    const TriangleInfo & tinfo = m_triangle_info[pinfo.getEid()];
 
     //corrdinate on the plane
     double c0 = dot(x1x2,tinfo.ax1);
@@ -152,7 +152,7 @@ double TriangleGeometry::projectPoint(unsigned tid,const defaulttype::Vector3 & 
         fact_w = 0;
     }
 
-    pinfo = getTriangleProximity(tid,fact_u,fact_v,fact_w);
+    pinfo = getTriangleProximity(pinfo.getEid(),fact_u,fact_v,fact_w);
 
     return (pinfo.getPosition() - s).norm();
 }

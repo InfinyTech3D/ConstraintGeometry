@@ -22,6 +22,16 @@ namespace behavior {
 class ConstraintProximity;
 class CollisionAlgorithm;
 
+class BaseConstraintIterator {
+public:
+
+    virtual bool end(const ConstraintProximity & /*E*/) = 0;
+
+    virtual int getElement() = 0;
+
+    virtual void next() = 0;
+};
+
 class BaseConstraintGeometry : public core::BehaviorModel {
 public:
 
@@ -47,12 +57,52 @@ public:
 
     virtual void prepareDetection() {}
 
+    virtual int getNbElements() = 0;
+
+    virtual std::unique_ptr<BaseConstraintIterator> getIterator(const ConstraintProximity & P) = 0;
+
 private :
     void updatePosition(SReal /*dt*/) {
         prepareDetection();
     }
 
 };
+
+class DefaultConstraintIterator : public BaseConstraintIterator {
+public:
+    DefaultConstraintIterator(BaseConstraintGeometry * geo) {
+        m_i = 0;
+        m_geometry = geo;
+    }
+
+    virtual bool end(const ConstraintProximity & /*E*/) {
+        return m_i>=m_geometry->getNbElements();
+    }
+
+    int getElement() {
+        return m_i;
+    }
+
+    void next() {
+        m_i++;
+    }
+
+private :
+    BaseConstraintGeometry * m_geometry;
+    int m_i;
+};
+
+//class BaseConstraintDecorator : public BaseConstraintGeometry {
+//public:
+//    virtual bool getIterator(const ConstraintProximity & P) = 0;
+
+//};
+
+//class BaseConstraintFilter {
+//public:
+//    virtual bool valid(const ConstraintProximity & P) = 0;
+
+//};
 
 class BaseGeometry : public BaseConstraintGeometry {
 public :
@@ -70,9 +120,9 @@ public :
 
     virtual defaulttype::Vector3 getNormal(const ConstraintProximity & pinfo) = 0;
 
-    virtual double projectPoint(unsigned eid,const defaulttype::Vector3 & T, ConstraintProximity & pinfo) = 0;
+    virtual double projectPoint(const defaulttype::Vector3 & T, ConstraintProximity & pinfo) = 0;
 
-    virtual int getNbElements() = 0;
+    std::unique_ptr<BaseConstraintIterator> getIterator(const ConstraintProximity & P);
 
 //    void getAlgorithm(CollisionAlgorithm * algo);
 

@@ -205,8 +205,8 @@ protected:
     }
 #endif
 
-    double projectPoint(unsigned tid,const defaulttype::Vector3 & s, ConstraintProximity & pinfo) {
-        Inherit::projectPoint(tid,s, pinfo);
+    double projectPoint(const defaulttype::Vector3 & s, ConstraintProximity & pinfo) {
+        Inherit::projectPoint(s, pinfo);
         newtonIterations(s,pinfo);
         return (s-pinfo.getPosition()).norm();
     }
