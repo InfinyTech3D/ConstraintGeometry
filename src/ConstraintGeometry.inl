@@ -10,21 +10,29 @@ namespace core {
 
 namespace behavior {
 
-void BaseGeometry::init() {
-    if (getTopology() == NULL) serr << "Error cannot find the topology" << sendl;
-    if (getMstate() == NULL) serr << "Error cannot find the topology" << sendl;
+BaseGeometry * BaseDecorator::getGeometry() {
+    BaseGeometry * geo = NULL;
 
-    prepareDetection();
+    this->getContext()->get(geo, core::objectmodel::BaseContext::Local);
+
+    if (geo == NULL) serr << "Error cannot find the geometry" << sendl;
+
+    return geo;
 }
 
-std::unique_ptr<BaseConstraintIterator> BaseGeometry::getIterator(const ConstraintProximity & /*P*/) {
-//    BaseConstraintDecorator * decorator;
-//    this->getContext()->get(decorator);
+void BaseGeometry::init() {
+    this->getContext()->get(m_topology);
+    this->getContext()->get(m_state);
 
-//    if (decorator == NULL)
-//    DefaultConstraintIterator res(this);
-//    return &res;
-//    else return decorator->getIterator(P);
+    if (getTopology() == NULL) serr << "Error cannot find the topology" << sendl;
+    if (getMstate() == NULL) serr << "Error cannot find the topology" << sendl;
+}
+
+std::unique_ptr<BaseConstraintIterator> BaseGeometry::getIterator(const ConstraintProximity & P) {
+    BaseDecorator * decorator;
+    this->getContext()->get(decorator);
+
+    if (decorator != NULL) return decorator->getIterator(P);
     std::unique_ptr<BaseConstraintIterator> foo (new DefaultConstraintIterator(this));
     return foo;
 }
@@ -74,16 +82,6 @@ defaulttype::Vector3 BaseGeometry::getRestPosition(const ConstraintProximity & p
     }
     return P;
 }
-
-//void BaseGeometry::createAlgorithm(CollisionAlgorithm * alg) {
-//    this->getContext()->addObject(alg);
-//}
-
-//BaseGeometry * CollisionAlgorithm::getGeometry() {
-//    BaseGeometry * geo = NULL;
-//    this->getContext()->get(geo);
-//    return geo;
-//}
 
 
 } // namespace controller

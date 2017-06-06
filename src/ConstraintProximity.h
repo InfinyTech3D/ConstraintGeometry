@@ -16,6 +16,7 @@ class ConstraintProximity {
 public :
     ConstraintProximity() {
         m_cg = NULL;
+        m_eid = -1;
     }
 
     ConstraintProximity(BaseGeometry * cg,unsigned eid) {
@@ -31,13 +32,23 @@ public :
         return m_pid.size();
     }
 
+    void clear() {
+        m_pid.clear();
+        m_fact.clear();
+        m_eid = -1;
+    }
+
     void push(unsigned id, double f) {
         m_pid.push_back(id);
         m_fact.push_back(f);
     }
 
-    BaseGeometry * getGeometry() {
+    const BaseGeometry * getGeometry() const {
         return m_cg;
+    }
+
+    void setGeometry(BaseGeometry * geo) {
+        m_cg = geo;
     }
 
     void addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const defaulttype::Vector3 & normal) const {
