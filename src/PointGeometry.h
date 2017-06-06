@@ -49,9 +49,14 @@ public:
 
     double projectPoint(const defaulttype::Vector3 & T,ConstraintProximity & pinfo);
 
+    void prepareDetection();
+
     int getNbElements();
 
     void draw(const core::visual::VisualParams * vparams);
+
+protected :
+    Vector3 m_g;
 
 };
 
