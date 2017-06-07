@@ -47,11 +47,13 @@ public:
 
     virtual defaulttype::Vector3 getNormal(const ConstraintProximity & /*pinfo*/);
 
-    ConstraintProximity getEdgeProximity(unsigned eid, double fact_u,double fact_v);
+    virtual ConstraintProximity getEdgeProximity(unsigned eid, double fact_u,double fact_v);
 
     double projectPoint(const defaulttype::Vector3 & /*T*/,ConstraintProximity & pinfo);
 
-    int getNbElements();
+    virtual int getNbEdges();
+
+    virtual int size();
 
     void draw(const core::visual::VisualParams * /*vparams*/);
 };

@@ -55,7 +55,9 @@ public:
 
     void draw(const core::visual::VisualParams */*vparams*/);
 
-    int getNbElements();
+    int getNbTriangles();
+
+    int size();
 
     ConstraintProximity getTriangleProximity(unsigned eid,double fact_w,double fact_u,double fact_v);
 

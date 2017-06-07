@@ -25,42 +25,28 @@ ConstraintProximity PointGeometry::getPointProximity(unsigned eid) {
     return res;
 }
 
-void PointGeometry::prepareDetection() {
-    m_g = Vector3(0,0,0);
-
-    helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
-    for (unsigned i=0;i<x.size();i++) {
-        m_g += x[i];
-    }
-
-    m_g *= 1.0/x.size();
-}
-
-
 double PointGeometry::projectPoint(const defaulttype::Vector3 & T,ConstraintProximity & pinfo) {
     pinfo.push(pinfo.getEid(),1.0);
     return (pinfo.getPosition() - T).norm();
 }
 
-int PointGeometry::getNbElements() {
+int PointGeometry::getNbPoints() {
     return this->getTopology()->getNbPoints();
+}
+
+int PointGeometry::size() {
+    return getNbPoints();
 }
 
 void PointGeometry::draw(const core::visual::VisualParams * vparams) {
     if (! vparams->displayFlags().getShowCollisionModels()) return;
 
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
-
-    double norm = 0.0;
-    for (unsigned i=0;i<x.size();i++) {
-        norm += (m_g - x[i]).norm();
-    }
-    norm*=1.0/x.size();
-
-    glColor3f(0.9,0.46,0);
+    glDisable(GL_LIGHTING);
+    glColor4f(d_color.getValue()[0],d_color.getValue()[1],d_color.getValue()[2],d_color.getValue()[3]);
     for (int i=0;i<this->getTopology()->getNbPoints();i++) {
-        vparams->drawTool()->drawSphere(x[i],norm*0.05);
-        vparams->drawTool()->drawArrow(x[i],x[i]+getNormal(getPointProximity(i))*norm*0.5,norm*0.01,defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
+        vparams->drawTool()->drawSphere(x[i],getNorm()*0.01);
+//        vparams->drawTool()->drawArrow(x[i],x[i]+getNormal(getPointProximity(i))*norm*0.5,norm*0.01,defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
     }
 }
 

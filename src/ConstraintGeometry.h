@@ -74,6 +74,8 @@ public :
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef MatrixDeriv::RowIterator MatrixDerivRowIterator;
 
+    Data<defaulttype::Vec4f> d_color;
+
     topology::TopologyContainer * getTopology() {
         return m_topology;
     }
@@ -90,7 +92,7 @@ public :
         }
 
         virtual bool end(const ConstraintProximity & /*E*/) {
-            return m_i>=m_geometry->getNbElements();
+            return m_i>=m_geometry->size();
         }
 
         int getElement() {
@@ -106,6 +108,8 @@ public :
         int m_i;
     };
 
+    BaseGeometry();
+
     void init();
 
     virtual void addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const ConstraintProximity & pinfo,const defaulttype::Vector3 & normal);
@@ -120,7 +124,11 @@ public :
 
     virtual double projectPoint(const defaulttype::Vector3 & T, ConstraintProximity & pinfo) = 0;
 
-    virtual int getNbElements() = 0;
+    virtual int size() = 0;
+
+    double getNorm();
+
+    void computeBBox(const core::ExecParams* params, bool /*onlyVisible*/);
 
     std::unique_ptr<BaseConstraintIterator> getIterator(const ConstraintProximity & P);
 
@@ -133,6 +141,10 @@ private :
 
     sofa::core::behavior::MechanicalState<DataTypes> * m_state;
     topology::TopologyContainer * m_topology;
+
+protected:
+    defaulttype::Vector3 m_g;
+    double m_norm;
 
 };
 

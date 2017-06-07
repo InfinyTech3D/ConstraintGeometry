@@ -45,18 +45,15 @@ public:
 
     virtual defaulttype::Vector3 getNormal(const ConstraintProximity & /*pinfo*/);
 
-    ConstraintProximity getPointProximity(unsigned eid);
+    virtual ConstraintProximity getPointProximity(unsigned eid);
 
-    double projectPoint(const defaulttype::Vector3 & T,ConstraintProximity & pinfo);
+    virtual double projectPoint(const defaulttype::Vector3 & T,ConstraintProximity & pinfo);
 
-    void prepareDetection();
+    virtual int getNbPoints();
 
-    int getNbElements();
+    virtual int size();
 
     void draw(const core::visual::VisualParams * vparams);
-
-protected :
-    Vector3 m_g;
 
 };
 

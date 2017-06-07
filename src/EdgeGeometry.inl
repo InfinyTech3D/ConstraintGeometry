@@ -16,8 +16,12 @@ namespace core {
 namespace behavior {
 
 
-int EdgeGeometry::getNbElements() {
+int EdgeGeometry::getNbEdges() {
     return this->getTopology()->getNbEdges();
+}
+
+int EdgeGeometry::size() {
+    return getNbEdges();
 }
 
 double EdgeGeometry::projectPoint(const defaulttype::Vector3 & P,ConstraintProximity & pinfo) {
@@ -80,7 +84,7 @@ void EdgeGeometry::draw(const core::visual::VisualParams * /*vparams*/) {
     glDisable(GL_LIGHTING);
 
     glBegin(GL_LINES);
-    glColor3f(1,0.5,0);
+    glColor4f(d_color.getValue()[0],d_color.getValue()[1],d_color.getValue()[2],d_color.getValue()[3]);
     for(int e=0;e<this->getTopology()->getNbEdges();e++) {
         const sofa::core::topology::BaseMeshTopology::Edge edge= this->getTopology()->getEdge(e);
 

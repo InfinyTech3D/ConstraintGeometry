@@ -86,8 +86,12 @@ void TriangleGeometry::computeBaryCoords(const defaulttype::Vector3 & proj_P,con
     fact_u = 1.0 - fact_v  - fact_w;
 }
 
-int TriangleGeometry::getNbElements() {
+int TriangleGeometry::getNbTriangles() {
     return this->getTopology()->getNbTriangles();
+}
+
+int TriangleGeometry::size() {
+    return getNbTriangles();
 }
 
 //Barycentric coordinates are computed according to
@@ -170,14 +174,22 @@ defaulttype::Vector3 TriangleGeometry::getNormal(const ConstraintProximity & pin
 
 
 void TriangleGeometry::drawTriangle(const core::visual::VisualParams * vparams,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C) {
-    glColor3f(1,0.45,0);helper::gl::glVertexT(A);
-    glColor3f(1,0.40,0);helper::gl::glVertexT(B); // A<->B
+    double delta = 0.05;
+    glColor4f(d_color.getValue()[0],d_color.getValue()[1]-delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(A);
+    glColor4f(d_color.getValue()[0],d_color.getValue()[1]-2*delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(B); // A<->B
 
-    if (vparams->displayFlags().getShowWireFrame()) {glColor3f(1,0.40,0);helper::gl::glVertexT(B);} //A<->B
-    glColor3f(1,0.48,0);helper::gl::glVertexT(C);
+    if (vparams->displayFlags().getShowWireFrame()) {
+        glColor4f(d_color.getValue()[0],d_color.getValue()[1]-2*delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(B);
+    } //A<->B
 
-    if (vparams->displayFlags().getShowWireFrame()) {glColor3f(1,0.48,0);helper::gl::glVertexT(C);} // C<->A
-    if (vparams->displayFlags().getShowWireFrame()) {glColor3f(1,0.45,0);helper::gl::glVertexT(A);}// C<->A
+    glColor4f(d_color.getValue()[0],d_color.getValue()[1]-0.5*delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(C);
+
+    if (vparams->displayFlags().getShowWireFrame()) {
+        glColor4f(d_color.getValue()[0],d_color.getValue()[1]-0.5*delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(C);
+    } // C<->A
+    if (vparams->displayFlags().getShowWireFrame()) {
+        glColor4f(d_color.getValue()[0],d_color.getValue()[1]-delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(A);
+    }// C<->A
 }
 
 
