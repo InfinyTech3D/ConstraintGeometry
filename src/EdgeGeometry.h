@@ -43,17 +43,27 @@ class EdgeGeometry : public PointGeometry
 public:
     SOFA_CLASS(EdgeGeometry , BaseGeometry );
 
-    typedef defaulttype::Vector3 Vector3;
+    class EdgeConstraintProximity : public PointConstraintProximity {
+    public:
 
-    virtual defaulttype::Vector3 getNormal(const ConstraintProximity & /*pinfo*/);
+        EdgeConstraintProximity(const EdgeGeometry * geo, unsigned p1, double f1,unsigned p2, double f2)
+        : PointConstraintProximity(geo,p1,f1) {
+            m_pid.push_back(p2);
+            m_fact.push_back(f2);
+        }
 
-    virtual ConstraintProximity getEdgeProximity(unsigned eid, double fact_u,double fact_v);
+        defaulttype::Vector3 getNormal() const {
+            const helper::ReadAccessor<Data <VecCoord> >& x = *m_cg->getMstate()->read(core::VecCoordId::position());
 
-    double projectPoint(const defaulttype::Vector3 & /*T*/,ConstraintProximity & pinfo);
+            return (x[m_pid[1]] - x[m_pid[0]]).normalized();
+        }
+    };
 
-    virtual int getNbEdges();
+    ConstraintProximityPtr projectPoint(const defaulttype::Vector3 & T,unsigned eid) const;
 
-    virtual int size();
+    virtual int getNbEdges() const;
+
+    virtual int getNbElements() const ;
 
     void draw(const core::visual::VisualParams * /*vparams*/);
 };

@@ -16,21 +16,21 @@ namespace core {
 namespace behavior {
 
 
-int EdgeGeometry::getNbEdges() {
+int EdgeGeometry::getNbEdges() const {
     return this->getTopology()->getNbEdges();
 }
 
-int EdgeGeometry::size() {
+int EdgeGeometry::getNbElements() const{
     return getNbEdges();
 }
 
-double EdgeGeometry::projectPoint(const defaulttype::Vector3 & P,ConstraintProximity & pinfo) {
+ConstraintProximityPtr EdgeGeometry::projectPoint(const defaulttype::Vector3 & P,unsigned eid) const {
     const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::position());
 
     double fact_u;
     double fact_v;
 
-    sofa::core::topology::BaseMeshTopology::Edge edge = this->getTopology()->getEdge(pinfo.getEid());
+    sofa::core::topology::BaseMeshTopology::Edge edge = this->getTopology()->getEdge(eid);
 
     Coord v = x[edge[1]] - x[edge[0]];
     fact_v = dot (P - x[edge[0]],v) / dot (v,v);
@@ -40,42 +40,8 @@ double EdgeGeometry::projectPoint(const defaulttype::Vector3 & P,ConstraintProxi
 
     fact_u = 1.0-fact_v;
 
-    pinfo.push(edge[0],fact_u);
-    pinfo.push(edge[1],fact_v);
-
-    return (pinfo.getPosition() - P).norm();
+    return ConstraintProximityPtr(new EdgeConstraintProximity(this, edge[0],fact_u,edge[1],fact_v));
 }
-
-ConstraintProximity EdgeGeometry::getEdgeProximity(unsigned eid, double fact_u,double fact_v) {
-    ConstraintProximity res(this,eid);
-    sofa::core::topology::BaseMeshTopology::Edge edge = this->getTopology()->getEdge(eid);
-
-    res.push(edge[0],fact_u);
-    res.push(edge[1],fact_v);
-
-    return res;
-}
-
-defaulttype::Vector3 EdgeGeometry::getNormal(const ConstraintProximity & pinfo) {
-    const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::position());
-
-    const core::topology::BaseMeshTopology::EdgesAroundVertex& eav = this->getTopology()->getEdgesAroundVertex(pinfo.getEid());
-
-    for (unsigned i=0;i<eav.size();i++) {
-        sofa::core::topology::BaseMeshTopology::Edge edge = this->getTopology()->getEdge(eav[i]);
-
-        if (edge[0]>pinfo.getEid()) {
-            Vector3 v = x[edge[0]] - x[edge[1]];
-            return v.normalized();
-        } else if (edge[1]>pinfo.getEid()) {
-            Vector3 v = x[edge[1]] - x[edge[0]];
-            return v.normalized();
-        }
-    }
-
-    return Vector3();
-}
-
 
 void EdgeGeometry::draw(const core::visual::VisualParams * /*vparams*/) {
 
@@ -89,8 +55,8 @@ void EdgeGeometry::draw(const core::visual::VisualParams * /*vparams*/) {
         const sofa::core::topology::BaseMeshTopology::Edge edge= this->getTopology()->getEdge(e);
 
         //Compute Bezier Positions
-        Vector3 p0 = x[edge[0]];
-        Vector3 p1 = x[edge[1]];
+        defaulttype::Vector3 p0 = x[edge[0]];
+        defaulttype::Vector3 p1 = x[edge[1]];
 
         helper::gl::glVertexT(p0);
         helper::gl::glVertexT(p1);

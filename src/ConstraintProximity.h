@@ -11,73 +11,46 @@ namespace core {
 
 namespace behavior {
 
+class CollisionAlgorithm;
+class ConstraintNormal;
 
 class ConstraintProximity {
+    friend class BaseGeometry;
+    friend class CollisionAlgorithm;
+    friend class ConstraintNormal;
+
 public :
-    ConstraintProximity() {
-        m_cg = NULL;
-        m_eid = -1;
+    typedef sofa::defaulttype::Vec3dTypes DataTypes;
+    typedef DataTypes::VecCoord VecCoord;
+
+    ConstraintProximity(const BaseGeometry * geo) {
+        m_cg = geo;
     }
 
-    ConstraintProximity(BaseGeometry * cg,unsigned eid) {
-        m_cg = cg;
-        m_eid = eid;
-    }
-
-    unsigned getEid() const {
-        return m_eid;
+    virtual void addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const defaulttype::Vector3 & normal) const {
+        m_cg->addConstraint(cId,cline,*this,normal);
     }
 
     unsigned size() const {
         return m_pid.size();
     }
 
-    void clear() {
-        m_pid.clear();
-        m_fact.clear();
-        m_eid = -1;
+    virtual defaulttype::Vector3 getPosition() const {
+        return getPosition(*m_cg->getMstate()->read(core::VecCoordId::position()));
     }
 
-    void push(unsigned id, double f) {
-        m_pid.push_back(id);
-        m_fact.push_back(f);
+    virtual defaulttype::Vector3 getFreePosition() const {
+        return getPosition(*m_cg->getMstate()->read(core::VecCoordId::freePosition()));
     }
 
-    const BaseGeometry * getGeometry() const {
-        return m_cg;
+    virtual defaulttype::Vector3 getRestPosition() const {
+        return getPosition(*m_cg->getMstate()->read(core::VecCoordId::restPosition()));
     }
 
-    void setGeometry(BaseGeometry * geo) {
-        m_cg = geo;
-    }
-
-    void addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const defaulttype::Vector3 & normal) const {
-        if (m_cg == NULL) return;
-        m_cg->addConstraint(cId,cline,*this,normal);
-    }
-
-    defaulttype::Vector3 getPosition() const {
-        if (m_cg == NULL) return defaulttype::Vector3();
-        return m_cg->getPosition(*this);
-    }
-
-    defaulttype::Vector3 getFreePosition() const {
-        if (m_cg == NULL) return defaulttype::Vector3();
-        return m_cg->getFreePosition(*this);
-    }
-
-    defaulttype::Vector3 getRestPosition() const {
-        if (m_cg == NULL) return defaulttype::Vector3();
-        return m_cg->getRestPosition(*this);
-    }
-
-    defaulttype::Vector3 getNormal() const {
-        if (m_cg == NULL) return defaulttype::Vector3();
-        return m_cg->getNormal(*this);
-    }
+    virtual defaulttype::Vector3 getNormal() const = 0;
 
     bool operator ==(const ConstraintProximity & b) const {
-        if (! (m_eid == b.m_eid && size() == b.size())) return false;
+        if (size() != b.size()) return false;
 
         for (unsigned i=0;i<size();i++) {
             bool find = false;
@@ -98,21 +71,25 @@ public :
 
     inline friend std::ostream& operator << ( std::ostream& out, const ConstraintProximity& c )
     {
-        out << c.m_eid << ":" ;
+        out << c.m_cg->getName() << ":" ;
         for (unsigned i=0;i<c.m_fact.size();i++) {
             out << "[" << c.m_pid[i] << "," << c.m_fact[i] << "]";
         }
         return out;
     }
 
-
-    helper::vector<unsigned> m_pid;
-    helper::vector<double> m_fact;
-    unsigned m_eid;
-
 protected:
-    BaseGeometry * m_cg;
+    const BaseGeometry * m_cg;
+    helper::vector<int> m_pid;
+    helper::vector<double> m_fact;
 
+    virtual defaulttype::Vector3 getPosition(const helper::ReadAccessor<Data <VecCoord> >& x) const {
+        defaulttype::Vector3 P;
+        for (unsigned i=0;i<m_pid.size();i++) {
+            P += x[m_pid[i]] * m_fact[i];
+        }
+        return P;
+    }
 };
 
 class ConstraintNormal {
@@ -138,11 +115,11 @@ public :
     static ConstraintNormal createFrameConstraint(defaulttype::Vector3 N1) {
         ConstraintNormal res;
 
-        if (N1.norm() == 0) return res;
+        if (N1.norm() == 0) N1 = defaulttype::Vector3(1,0,0);
 
         N1.normalize();
 
-        defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(1,0,0)))>0.99) ? defaulttype::Vector3(0,1,0) : defaulttype::Vector3(1,0,0)));
+        defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(0,1,0)))>0.99) ? defaulttype::Vector3(0,0,1) : defaulttype::Vector3(0,1,0)));
         N2.normalize();
 
         defaulttype::Vector3 N3 = cross(N1,N2);
@@ -155,32 +132,32 @@ public :
         return res;
     }
 
-    void addConstraint(core::MultiMatrixDerivId cId, unsigned & cline, const ConstraintProximity & pinfo) {
+    void addConstraint(core::MultiMatrixDerivId cId, unsigned & cline, const ConstraintProximityPtr & pinfo) {
         if (empty()) return;
 
         for (unsigned i=0;i<m_normals.size();i++) {
-            pinfo.addConstraint(cId,cline+i,m_normals[i]);
+            pinfo->addConstraint(cId,cline+i,m_normals[i]);
         }
 
         cline += m_normals.size();
     }
 
-    void addConstraint(core::MultiMatrixDerivId cId, unsigned & cline, const ConstraintProximity & pinfo1, const ConstraintProximity & pinfo2) {
+    void addConstraint(core::MultiMatrixDerivId cId, unsigned & cline, const ConstraintProximityPtr & pinfo1, const ConstraintProximityPtr & pinfo2) {
         if (empty()) return;
 
         for (unsigned i=0;i<m_normals.size();i++) {
-            pinfo1.addConstraint(cId,cline+i,m_normals[i]);
-            pinfo2.addConstraint(cId,cline+i,-m_normals[i]);
+            pinfo1->addConstraint(cId,cline+i,m_normals[i]);
+            pinfo2->addConstraint(cId,cline+i,-m_normals[i]);
         }
 
         cline += m_normals.size();
     }
 
-    void addViolation(defaulttype::BaseVector *v,unsigned & cid, const ConstraintProximity & pinfo1, const ConstraintProximity & pinfo2) {
+    void addViolation(defaulttype::BaseVector *v,unsigned & cid, const ConstraintProximityPtr & pinfo1, const ConstraintProximityPtr & pinfo2) {
         if (empty()) return;
 
-        defaulttype::Vector3 PFree = pinfo1.getFreePosition();
-        defaulttype::Vector3 QFree = pinfo2.getFreePosition();
+        defaulttype::Vector3 PFree = pinfo1->getFreePosition();
+        defaulttype::Vector3 QFree = pinfo2->getFreePosition();
         defaulttype::Vector3 PQFree = PFree - QFree;
 
         for (unsigned i=0;i<m_normals.size();i++) {

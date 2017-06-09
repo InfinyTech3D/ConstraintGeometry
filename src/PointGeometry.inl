@@ -15,26 +15,19 @@ namespace core {
 
 namespace behavior {
 
-defaulttype::Vector3 PointGeometry::getNormal(const ConstraintProximity & pinfo) {
-    return (pinfo.getPosition() - m_g).normalized();
+ConstraintProximityPtr PointGeometry::getPointProximity(unsigned eid) const {
+    return ConstraintProximityPtr(new PointConstraintProximity(this,eid));
 }
 
-ConstraintProximity PointGeometry::getPointProximity(unsigned eid) {
-    ConstraintProximity res(this,eid);
-    res.push(eid,1.0);
-    return res;
+ConstraintProximityPtr PointGeometry::projectPoint(const defaulttype::Vector3 & /*T*/,unsigned eid) const {
+    return getPointProximity(eid);
 }
 
-double PointGeometry::projectPoint(const defaulttype::Vector3 & T,ConstraintProximity & pinfo) {
-    pinfo.push(pinfo.getEid(),1.0);
-    return (pinfo.getPosition() - T).norm();
-}
-
-int PointGeometry::getNbPoints() {
+int PointGeometry::getNbPoints() const {
     return this->getTopology()->getNbPoints();
 }
 
-int PointGeometry::size() {
+int PointGeometry::getNbElements() const {
     return getNbPoints();
 }
 

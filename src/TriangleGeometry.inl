@@ -17,17 +17,10 @@ namespace core {
 
 namespace behavior {
 
-ConstraintProximity TriangleGeometry::getTriangleProximity(unsigned eid,double fact_w,double fact_u,double fact_v) {
-    ConstraintProximity res(this,eid);
-    const sofa::core::topology::BaseMeshTopology::Triangle tri = this->getTopology()->getTriangle(eid);
+TriangleGeometry::TriangleGeometry()
+: d_phong(initData(&d_phong, false, "phong", "Phong interpolation of the normal")) {
 
-    res.push(tri[0],fact_w);
-    res.push(tri[1],fact_u);
-    res.push(tri[2],fact_v);
-
-    return res;
 }
-
 
 void TriangleGeometry::prepareDetection() {
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
@@ -75,7 +68,7 @@ void TriangleGeometry::prepareDetection() {
 
 //proj_P must be on the plane
 
-void TriangleGeometry::computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) {
+void TriangleGeometry::computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const {
     defaulttype::Vector3 v2 = proj_P - p0;
 
     double d20 = dot(v2, tinfo.v0);
@@ -86,20 +79,20 @@ void TriangleGeometry::computeBaryCoords(const defaulttype::Vector3 & proj_P,con
     fact_u = 1.0 - fact_v  - fact_w;
 }
 
-int TriangleGeometry::getNbTriangles() {
+int TriangleGeometry::getNbTriangles() const {
     return this->getTopology()->getNbTriangles();
 }
 
-int TriangleGeometry::size() {
+int TriangleGeometry::getNbElements() const {
     return getNbTriangles();
 }
 
 //Barycentric coordinates are computed according to
 //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 
-double TriangleGeometry::projectPoint(const defaulttype::Vector3 & s,ConstraintProximity & pinfo) {
+ConstraintProximityPtr TriangleGeometry::projectPoint(const defaulttype::Vector3 & s,unsigned eid) const {
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
-    const sofa::core::topology::BaseMeshTopology::Triangle tri = this->getTopology()->getTriangle(pinfo.getEid());
+    const sofa::core::topology::BaseMeshTopology::Triangle tri = this->getTopology()->getTriangle(eid);
 
     //Compute Bezier Positions
     defaulttype::Vector3 p0 = x[tri[0]];
@@ -108,7 +101,7 @@ double TriangleGeometry::projectPoint(const defaulttype::Vector3 & s,ConstraintP
 
     defaulttype::Vector3 x1x2 = s - p0;
 
-    const TriangleInfo & tinfo = m_triangle_info[pinfo.getEid()];
+    const TriangleInfo & tinfo = m_triangle_info[eid];
 
     //corrdinate on the plane
     double c0 = dot(x1x2,tinfo.ax1);
@@ -156,22 +149,13 @@ double TriangleGeometry::projectPoint(const defaulttype::Vector3 & s,ConstraintP
         fact_w = 0;
     }
 
-    pinfo = getTriangleProximity(pinfo.getEid(),fact_u,fact_v,fact_w);
-
-    return (pinfo.getPosition() - s).norm();
+    return getTriangleProximity(eid, tri[0],fact_u,tri[1],fact_v,tri[2],fact_w);
 }
 
-
-defaulttype::Vector3 TriangleGeometry::getNormal(const ConstraintProximity & pinfo) {
-//    if (pinfo.m_fact[0] <= 0 || pinfo.m_fact[1] <= 0 || pinfo.m_fact[2] <= 0 || pinfo.m_fact[0] >= 1 || pinfo.m_fact[1] >= 1 || pinfo.m_fact[2] >= 0) {
-//        return m_pointNormal[pinfo.m_pid[0]] * pinfo.m_fact[0] +
-//               m_pointNormal[pinfo.m_pid[1]] * pinfo.m_fact[1] +
-//               m_pointNormal[pinfo.m_pid[2]] * pinfo.m_fact[2];
-//    } else {
-      return m_triangle_info[pinfo.getEid()].tn;
-//    }
+ConstraintProximityPtr TriangleGeometry::getTriangleProximity(unsigned eid, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3) const {
+    if (d_phong.getValue()) return ConstraintProximityPtr (new TrianglePhongConstraintProximity(this, p1,f1,p2,f2,p3,f3));
+    else return ConstraintProximityPtr (new TriangleConstraintProximity(this, eid, p1,f1,p2,f2,p3,f3));
 }
-
 
 void TriangleGeometry::drawTriangle(const core::visual::VisualParams * vparams,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C) {
     double delta = 0.05;

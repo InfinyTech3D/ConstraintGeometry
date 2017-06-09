@@ -23,42 +23,23 @@ class ConstraintProximity;
 class CollisionAlgorithm;
 class BaseGeometry;
 
+typedef std::shared_ptr<ConstraintProximity> ConstraintProximityPtr;
+
 class BaseConstraintIterator {
 public:
 
-    virtual bool end(const ConstraintProximity & /*E*/) = 0;
+    virtual bool end(const ConstraintProximityPtr & E = NULL) = 0;
 
     virtual int getElement() = 0;
 
     virtual void next() = 0;
 };
 
-class BaseDecorator : public core::BehaviorModel {
-public:
-    typedef sofa::defaulttype::Vec3dTypes DataTypes;
-    typedef DataTypes::VecCoord VecCoord;
-    typedef DataTypes::Coord Coord;
-    typedef DataTypes::Real Real;
-    typedef DataTypes::VecDeriv VecDeriv;
-    typedef DataTypes::MatrixDeriv MatrixDeriv;
-    typedef DataTypes::Deriv Deriv1;
-    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
-    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-
-    virtual std::unique_ptr<BaseConstraintIterator> getIterator(const ConstraintProximity & P) = 0;
-
-    virtual void prepareDetection() {}
-
-    BaseGeometry * getGeometry();
-
-protected :
-    void updatePosition(SReal /*dt*/) {
-        prepareDetection();
-    }
-};
+typedef std::unique_ptr<BaseConstraintIterator> BaseConstraintIteratorPtr;
 
 class BaseGeometry : public core::BehaviorModel {
+    friend class ConstraintProximity;
+
 public :
     SOFA_CLASS(BaseGeometry, core::BehaviorModel);
 
@@ -74,25 +55,15 @@ public :
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef MatrixDeriv::RowIterator MatrixDerivRowIterator;
 
-    Data<defaulttype::Vec4f> d_color;
-
-    topology::TopologyContainer * getTopology() {
-        return m_topology;
-    }
-
-    sofa::core::behavior::MechanicalState<DataTypes> * getMstate() {
-        return m_state;
-    }
-
     class DefaultConstraintIterator : public BaseConstraintIterator {
     public:
-        DefaultConstraintIterator(BaseGeometry * geo) {
+        DefaultConstraintIterator(const BaseGeometry * geo) {
             m_i = 0;
             m_geometry = geo;
         }
 
-        virtual bool end(const ConstraintProximity & /*E*/) {
-            return m_i>=m_geometry->size();
+        virtual bool end(const ConstraintProximityPtr & /*E*/ = NULL) {
+            return m_i>=m_geometry->getNbElements();
         }
 
         int getElement() {
@@ -104,35 +75,35 @@ public :
         }
 
     private :
-        BaseGeometry * m_geometry;
+        const BaseGeometry * m_geometry;
         int m_i;
     };
+
+    Data<defaulttype::Vec4f> d_color;
+
+    topology::TopologyContainer * getTopology() const {
+        return m_topology;
+    }
+
+    sofa::core::behavior::MechanicalState<DataTypes> * getMstate() const {
+        return m_state;
+    }
 
     BaseGeometry();
 
     void init();
 
-    virtual void addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const ConstraintProximity & pinfo,const defaulttype::Vector3 & normal);
+    virtual ConstraintProximityPtr projectPoint(const defaulttype::Vector3 & T, unsigned eid) const = 0;
 
-    virtual defaulttype::Vector3 getPosition(const ConstraintProximity & pinfo);
+    virtual int getNbElements() const = 0;
 
-    virtual defaulttype::Vector3 getFreePosition(const ConstraintProximity & pinfo);
-
-    virtual defaulttype::Vector3 getRestPosition(const ConstraintProximity & pinfo);
-
-    virtual defaulttype::Vector3 getNormal(const ConstraintProximity & pinfo) = 0;
-
-    virtual double projectPoint(const defaulttype::Vector3 & T, ConstraintProximity & pinfo) = 0;
-
-    virtual int size() = 0;
-
-    double getNorm();
+    double getNorm() const;
 
     void computeBBox(const core::ExecParams* params, bool /*onlyVisible*/);
 
-    std::unique_ptr<BaseConstraintIterator> getIterator(const ConstraintProximity & P);
+    BaseConstraintIteratorPtr getIterator(const ConstraintProximityPtr & E = NULL) const;
 
-    virtual void prepareDetection() {}
+    virtual double getDistance(const ConstraintProximityPtr & T, const ConstraintProximityPtr & pinfo) const;
 
 private :
     void updatePosition(SReal /*dt*/) {
@@ -143,6 +114,11 @@ private :
     topology::TopologyContainer * m_topology;
 
 protected:
+
+    virtual void addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const ConstraintProximity & pinfo,const defaulttype::Vector3 & normal) const;
+
+    virtual void prepareDetection();
+
     defaulttype::Vector3 m_g;
     double m_norm;
 

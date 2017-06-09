@@ -13,16 +13,6 @@ namespace behavior {
 BaseGeometry::BaseGeometry()
 : d_color(initData(&d_color, defaulttype::Vec4f(1,0.5,0,1), "color", "Color of the collision model")) {}
 
-BaseGeometry * BaseDecorator::getGeometry() {
-    BaseGeometry * geo = NULL;
-
-    this->getContext()->get(geo, core::objectmodel::BaseContext::Local);
-
-    if (geo == NULL) serr << "Error cannot find the geometry" << sendl;
-
-    return geo;
-}
-
 void BaseGeometry::init() {
     this->getContext()->get(m_topology);
     this->getContext()->get(m_state);
@@ -31,23 +21,18 @@ void BaseGeometry::init() {
     if (getMstate() == NULL) serr << "Error cannot find the topology" << sendl;
 }
 
-std::unique_ptr<BaseConstraintIterator> BaseGeometry::getIterator(const ConstraintProximity & P) {
-    BaseDecorator * decorator;
-    this->getContext()->get(decorator);
-
-    if (decorator != NULL) return decorator->getIterator(P);
-    std::unique_ptr<BaseConstraintIterator> foo (new DefaultConstraintIterator(this));
-    return foo;
+BaseConstraintIteratorPtr BaseGeometry::getIterator(const ConstraintProximityPtr & /*E*/) const {
+    return std::unique_ptr<BaseConstraintIterator>(new DefaultConstraintIterator(this));
 }
 
-void BaseGeometry::addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const ConstraintProximity & pinfo,const defaulttype::Vector3 & normal) {
+void BaseGeometry::addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const ConstraintProximity & pinfo,const defaulttype::Vector3 & normal) const {
     DataMatrixDeriv & c_d = *cId[getMstate()].write();
 
     MatrixDeriv & c = *c_d.beginEdit();
 
     MatrixDerivRowIterator c_it1 = c.writeLine(cline);
 
-    for (unsigned p=0;p<pinfo.size();p++) {
+    for (unsigned p=0;p<pinfo.m_pid.size();p++) {
         if (pinfo.m_fact[p] == 0.0) continue;
         c_it1.addCol(pinfo.m_pid[p], normal * pinfo.m_fact[p]);
     }
@@ -55,35 +40,8 @@ void BaseGeometry::addConstraint(core::MultiMatrixDerivId cId,unsigned cline,con
     c_d.endEdit();
 }
 
-//linear version of getPosition
-defaulttype::Vector3 BaseGeometry::getPosition(const ConstraintProximity & pinfo) {
-    const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::position());
-
-    defaulttype::Vector3 P;
-    for (unsigned i=0;i<pinfo.size();i++) {
-        P += x[pinfo.m_pid[i]] * pinfo.m_fact[i];
-    }
-    return P;
-}
-
-defaulttype::Vector3 BaseGeometry::getFreePosition(const ConstraintProximity & pinfo) {
-    const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::freePosition());
-
-    defaulttype::Vector3 P;
-    for (unsigned i=0;i<pinfo.size();i++) {
-        P += x[pinfo.m_pid[i]] * pinfo.m_fact[i];
-    }
-    return P;
-}
-
-defaulttype::Vector3 BaseGeometry::getRestPosition(const ConstraintProximity & pinfo) {
-    const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::restPosition());
-
-    defaulttype::Vector3 P;
-    for (unsigned i=0;i<pinfo.size();i++) {
-        P += x[pinfo.m_pid[i]] * pinfo.m_fact[i];
-    }
-    return P;
+double BaseGeometry::getDistance(const ConstraintProximityPtr & T, const ConstraintProximityPtr & pinfo) const {
+    return (pinfo->getPosition() - T->getPosition()).norm();
 }
 
 void BaseGeometry::computeBBox(const core::ExecParams* params, bool /*onlyVisible*/) {
@@ -109,9 +67,11 @@ void BaseGeometry::computeBBox(const core::ExecParams* params, bool /*onlyVisibl
     this->f_bbox.setValue(params,sofa::defaulttype::TBoundingBox<SReal>(minBBox,maxBBox));
 }
 
-double BaseGeometry::getNorm() {
+double BaseGeometry::getNorm() const {
     return m_norm;
 }
+
+void BaseGeometry::prepareDetection() {}
 
 } // namespace controller
 

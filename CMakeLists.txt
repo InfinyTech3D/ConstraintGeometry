@@ -19,9 +19,7 @@ set(HEADER_FILES
      src/EdgeGeometry.inl
      src/TriangleGeometry.h
      src/TriangleGeometry.inl
-     src/TriangleNonLinearGeometry.h
-     src/BezierTriangleGeometry.h
-     src/BezierTriangleGeometry.inl
+
 #     src/QuadraticTriangleNonLinearInterpolation.h
 #     src/QuadraticTriangleNonLinearInterpolation.inl
 )
@@ -31,7 +29,7 @@ set(SOURCE_FILES
      src/PointGeometry.cpp
      src/EdgeGeometry.cpp
      src/TriangleGeometry.cpp
-     src/BezierTriangleGeometry.cpp
+
 #     src/QuadraticTriangleNonLinearInterpolation.cpp
 )
 

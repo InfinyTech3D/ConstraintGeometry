@@ -47,19 +47,52 @@ class TriangleGeometry : public EdgeGeometry
 public:
     SOFA_CLASS(TriangleGeometry , BaseGeometry );
 
-    typedef defaulttype::Vector3 Coord;
+    class TriangleConstraintProximity : public EdgeConstraintProximity {
+    public:
+        TriangleConstraintProximity(const TriangleGeometry * geo, unsigned eid, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3)
+        : EdgeConstraintProximity(geo,p1,f1,p2,f2) {
+            m_eid = eid;
+            m_pid.push_back(p3);
+            m_fact.push_back(f3);
+        }
 
-    double projectPoint(const defaulttype::Vector3 & s,ConstraintProximity & pinfo);
+        defaulttype::Vector3 getNormal() const {
+            return ((TriangleGeometry *) m_cg)->m_triangle_info[m_eid].tn;
+        }
 
-    defaulttype::Vector3 getNormal(const ConstraintProximity & pinfo);
+    protected:
+        unsigned m_eid;
+    };
+
+    class TrianglePhongConstraintProximity : public EdgeConstraintProximity {
+    public:
+
+        TrianglePhongConstraintProximity(const TriangleGeometry * geo, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3)
+        : EdgeConstraintProximity(geo,p1,f1,p2,f2) {
+            m_pid.push_back(p3);
+            m_fact.push_back(f3);
+        }
+
+        defaulttype::Vector3 getNormal() const {
+            return ((TriangleGeometry *) m_cg)->m_pointNormal[m_pid[0]] * m_fact[0] +
+                   ((TriangleGeometry *) m_cg)->m_pointNormal[m_pid[1]] * m_fact[1] +
+                   ((TriangleGeometry *) m_cg)->m_pointNormal[m_pid[2]] * m_fact[2];
+        }
+    };
+
+    Data<bool> d_phong;
+
+    TriangleGeometry();
+
+    ConstraintProximityPtr getTriangleProximity(unsigned eid, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3) const;
+
+    ConstraintProximityPtr projectPoint(const defaulttype::Vector3 & s,unsigned eid) const;
 
     void draw(const core::visual::VisualParams */*vparams*/);
 
-    int getNbTriangles();
+    int getNbTriangles() const;
 
-    int size();
-
-    ConstraintProximity getTriangleProximity(unsigned eid,double fact_w,double fact_u,double fact_v);
+    int getNbElements() const;
 
 protected:
 
@@ -75,7 +108,7 @@ protected:
 
     virtual void prepareDetection();
 
-    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_w,double & fact_u, double & fact_v);
+    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_w,double & fact_u, double & fact_v) const;
 
     helper::vector<TriangleInfo> m_triangle_info;
     helper::vector<defaulttype::Vector3> m_pointNormal;
