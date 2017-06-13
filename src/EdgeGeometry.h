@@ -61,8 +61,6 @@ public:
 
     ConstraintProximityPtr projectPoint(const defaulttype::Vector3 & T,unsigned eid) const;
 
-    virtual int getNbEdges() const;
-
     virtual int getNbElements() const ;
 
     void draw(const core::visual::VisualParams * /*vparams*/);

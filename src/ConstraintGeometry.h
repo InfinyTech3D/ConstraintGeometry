@@ -33,6 +33,7 @@ public:
     virtual int getElement() = 0;
 
     virtual void next() = 0;
+
 };
 
 typedef std::unique_ptr<BaseConstraintIterator> BaseConstraintIteratorPtr;
@@ -97,13 +98,9 @@ public :
 
     virtual int getNbElements() const = 0;
 
-    double getNorm() const;
-
     void computeBBox(const core::ExecParams* params, bool /*onlyVisible*/);
 
     BaseConstraintIteratorPtr getIterator(const ConstraintProximityPtr & E = NULL) const;
-
-    virtual double getDistance(const ConstraintProximityPtr & T, const ConstraintProximityPtr & pinfo) const;
 
 private :
     void updatePosition(SReal /*dt*/) {
@@ -118,9 +115,6 @@ protected:
     virtual void addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const ConstraintProximity & pinfo,const defaulttype::Vector3 & normal) const;
 
     virtual void prepareDetection();
-
-    defaulttype::Vector3 m_g;
-    double m_norm;
 
 };
 

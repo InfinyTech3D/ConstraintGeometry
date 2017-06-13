@@ -90,8 +90,6 @@ public:
 
     void draw(const core::visual::VisualParams */*vparams*/);
 
-    int getNbTriangles() const;
-
     int getNbElements() const;
 
 protected:

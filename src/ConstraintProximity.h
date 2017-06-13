@@ -47,7 +47,13 @@ public :
         return getPosition(*m_cg->getMstate()->read(core::VecCoordId::restPosition()));
     }
 
-    virtual defaulttype::Vector3 getNormal() const = 0;
+    virtual defaulttype::Vector3 getNormal() const {
+        return defaulttype::Vector3();
+    }
+
+    virtual double distance(const ConstraintProximityPtr & D) const {
+        return (D->getPosition() - this->getPosition()).norm();
+    }
 
     bool operator ==(const ConstraintProximity & b) const {
         if (size() != b.size()) return false;

@@ -49,17 +49,11 @@ public:
             m_pid.push_back(pid);
             m_fact.push_back(fact);
         }
-
-        defaulttype::Vector3 getNormal() const {
-            return defaulttype::Vector3();
-        }
     };
 
     virtual ConstraintProximityPtr getPointProximity(unsigned eid) const;
 
     virtual ConstraintProximityPtr projectPoint(const defaulttype::Vector3 & T,unsigned eid) const;
-
-    virtual int getNbPoints() const;
 
     virtual int getNbElements() const;
 

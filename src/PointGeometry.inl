@@ -23,22 +23,20 @@ ConstraintProximityPtr PointGeometry::projectPoint(const defaulttype::Vector3 & 
     return getPointProximity(eid);
 }
 
-int PointGeometry::getNbPoints() const {
-    return this->getTopology()->getNbPoints();
-}
-
 int PointGeometry::getNbElements() const {
-    return getNbPoints();
+    return this->getTopology()->getNbPoints();
 }
 
 void PointGeometry::draw(const core::visual::VisualParams * vparams) {
     if (! vparams->displayFlags().getShowCollisionModels()) return;
 
+    double norm = (this->f_bbox.getValue().maxBBox() - this->f_bbox.getValue().minBBox()).norm();
+
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
     glDisable(GL_LIGHTING);
     glColor4f(d_color.getValue()[0],d_color.getValue()[1],d_color.getValue()[2],d_color.getValue()[3]);
     for (int i=0;i<this->getTopology()->getNbPoints();i++) {
-        vparams->drawTool()->drawSphere(x[i],getNorm()*0.01);
+        vparams->drawTool()->drawSphere(x[i],norm*0.01);
 //        vparams->drawTool()->drawArrow(x[i],x[i]+getNormal(getPointProximity(i))*norm*0.5,norm*0.01,defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
     }
 }

@@ -15,13 +15,8 @@ namespace core {
 
 namespace behavior {
 
-
-int EdgeGeometry::getNbEdges() const {
-    return this->getTopology()->getNbEdges();
-}
-
 int EdgeGeometry::getNbElements() const{
-    return getNbEdges();
+    return this->getTopology()->getNbEdges();
 }
 
 ConstraintProximityPtr EdgeGeometry::projectPoint(const defaulttype::Vector3 & P,unsigned eid) const {
