@@ -84,6 +84,18 @@ public :
         return out;
     }
 
+    const BaseGeometry * getGeometry() const {
+        return m_cg;
+    }
+
+    const helper::vector<int> & getPid() const {
+        return m_pid;
+    }
+
+    const helper::vector<double> & getFact() const {
+        return m_fact;
+    }
+
 protected:
     const BaseGeometry * m_cg;
     helper::vector<int> m_pid;

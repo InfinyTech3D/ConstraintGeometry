@@ -25,7 +25,8 @@
 #ifndef SOFA_COMPONENT_TRIANGLEGEOMETRY_H
 #define SOFA_COMPONENT_TRIANGLEGEOMETRY_H
 
-#include "EdgeGeometry.h"
+#include "ConstraintGeometry.h"
+#include "ConstraintProximity.h"
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
@@ -35,6 +36,7 @@
 #include <sofa/simulation/AnimateBeginEvent.h>
 #include <SofaBaseMechanics/MechanicalObject.h>
 #include <sofa/core/visual/VisualParams.h>
+#include "EdgeGeometry.h"
 
 namespace sofa {
 
@@ -45,13 +47,20 @@ namespace behavior {
 class TriangleGeometry : public EdgeGeometry
 {
 public:
-    SOFA_CLASS(TriangleGeometry , BaseGeometry );
+    SOFA_CLASS(TriangleGeometry , EdgeGeometry );
 
-    class TriangleConstraintProximity : public EdgeConstraintProximity {
+    class TriangleConstraintProximity : public ConstraintProximity {
     public:
         TriangleConstraintProximity(const TriangleGeometry * geo, unsigned eid, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3)
-        : EdgeConstraintProximity(geo,p1,f1,p2,f2) {
+        : ConstraintProximity(geo) {
             m_eid = eid;
+
+            m_pid.push_back(p1);
+            m_fact.push_back(f1);
+
+            m_pid.push_back(p2);
+            m_fact.push_back(f2);
+
             m_pid.push_back(p3);
             m_fact.push_back(f3);
         }
@@ -64,11 +73,20 @@ public:
         unsigned m_eid;
     };
 
-    class TrianglePhongConstraintProximity : public EdgeConstraintProximity {
+    class TrianglePhongConstraintProximity : public ConstraintProximity {
     public:
 
         TrianglePhongConstraintProximity(const TriangleGeometry * geo, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3)
-        : EdgeConstraintProximity(geo,p1,f1,p2,f2) {
+        : ConstraintProximity(geo) {
+            m_pid.push_back(p1);
+            m_fact.push_back(f1);
+
+            m_pid.push_back(p2);
+            m_fact.push_back(f2);
+
+            m_pid.push_back(p3);
+            m_fact.push_back(f3);
+
             m_pid.push_back(p3);
             m_fact.push_back(f3);
         }

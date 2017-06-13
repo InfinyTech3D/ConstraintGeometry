@@ -25,12 +25,13 @@
 #ifndef SOFA_COMPONENT_EDGEGEOMETRY_H
 #define SOFA_COMPONENT_EDGEGEOMETRY_H
 
-#include "PointGeometry.h"
+#include "ConstraintGeometry.h"
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
 #include <sofa/defaulttype/VecTypes.h>
-
+#include "ConstraintProximity.h"
+#include "PointGeometry.h"
 
 namespace sofa {
 
@@ -41,13 +42,16 @@ namespace behavior {
 class EdgeGeometry : public PointGeometry
 {
 public:
-    SOFA_CLASS(EdgeGeometry , BaseGeometry );
+    SOFA_CLASS(EdgeGeometry , PointGeometry );
 
-    class EdgeConstraintProximity : public PointConstraintProximity {
+    class EdgeConstraintProximity : public ConstraintProximity {
     public:
 
         EdgeConstraintProximity(const EdgeGeometry * geo, unsigned p1, double f1,unsigned p2, double f2)
-        : PointConstraintProximity(geo,p1,f1) {
+        : ConstraintProximity(geo) {
+            m_pid.push_back(p1);
+            m_fact.push_back(f1);
+
             m_pid.push_back(p2);
             m_fact.push_back(f2);
         }
