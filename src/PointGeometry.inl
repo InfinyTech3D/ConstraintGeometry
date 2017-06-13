@@ -35,7 +35,7 @@ void PointGeometry::draw(const core::visual::VisualParams * vparams) {
     glDisable(GL_LIGHTING);
     glColor4f(d_color.getValue()[0],d_color.getValue()[1],d_color.getValue()[2],d_color.getValue()[3]);
     for (int i=0;i<this->getNbElements();i++) {
-        vparams->drawTool()->drawSphere(this->getPointProximity(i)->getPosition(),norm*0.001);
+        vparams->drawTool()->drawSphere(this->getPointProximity(i)->getPosition(),norm*0.01);
     }
 }
 
