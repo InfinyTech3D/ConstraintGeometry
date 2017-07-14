@@ -45,7 +45,7 @@ public:
 
     virtual defaulttype::Vector3 getNormal(const ConstraintProximity & /*pinfo*/);
 
-    ConstraintProximity getPointProximity(unsigned eid);
+    virtual ConstraintProximity getPointProximity(unsigned eid);
 
     double projectPoint(unsigned eid,const defaulttype::Vector3 & T,ConstraintProximity & pinfo);
 
