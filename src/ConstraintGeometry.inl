@@ -63,6 +63,12 @@ defaulttype::Vector3 BaseGeometry::getRestPosition(const ConstraintProximity & p
     return P;
 }
 
+BaseDecorator * BaseGeometry::getDecorator() {
+    BaseDecorator * decorator;
+    this->getContext()->get(decorator);
+    return decorator;
+}
+
 //void BaseGeometry::createAlgorithm(CollisionAlgorithm * alg) {
 //    this->getContext()->addObject(alg);
 //}

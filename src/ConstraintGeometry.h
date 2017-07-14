@@ -54,6 +54,11 @@ private :
 
 };
 
+class BaseDecorator : public BaseConstraintGeometry {
+
+};
+
+
 class BaseGeometry : public BaseConstraintGeometry {
 public :
     SOFA_CLASS(BaseGeometry, BaseConstraintGeometry);
@@ -73,6 +78,8 @@ public :
     virtual double projectPoint(unsigned eid,const defaulttype::Vector3 & T, ConstraintProximity & pinfo) = 0;
 
     virtual int getNbElements() = 0;
+
+    virtual BaseDecorator * getDecorator();
 
 //    void getAlgorithm(CollisionAlgorithm * algo);
 
