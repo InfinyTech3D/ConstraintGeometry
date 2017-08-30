@@ -179,6 +179,19 @@ public :
         cid += m_normals.size();
     }
 
+    void addViolation(defaulttype::BaseVector *v,unsigned & cid, const ConstraintProximity & pinfo1, const defaulttype::Vector3 & QFree) {
+        if (empty()) return;
+
+        defaulttype::Vector3 PFree = pinfo1.getFreePosition();
+        defaulttype::Vector3 PQFree = PFree - QFree;
+
+        for (unsigned i=0;i<m_normals.size();i++) {
+            v->set(cid+i,dot(m_normals[i],PQFree));
+        }
+
+        cid += m_normals.size();
+    }
+
     void addConstraintResolution(std::vector<core::behavior::ConstraintResolution*>& resTab, unsigned int& offset, core::behavior::ConstraintResolution* cr) {
         if (empty()) return;
 
