@@ -7,6 +7,11 @@
 #include <sofa/core/behavior/PairInteractionConstraint.h>
 #include <math.h>
 #include <sofa/defaulttype/Vec.h>
+#include <sofa/core/topology/BaseTopology.h>
+#include <sofa/core/collision/Pipeline.h>
+#include <SofaBaseTopology/PointSetTopologyContainer.h>
+#include <SofaBaseTopology/EdgeSetTopologyContainer.h>
+#include <SofaBaseTopology/TriangleSetTopologyContainer.h>
 
 namespace sofa {
 
@@ -14,120 +19,80 @@ namespace core {
 
 namespace behavior {
 
-class ConstraintProximity {
-public :
+class ConstraintProximity;
+class CollisionAlgorithm;
 
-    void clear() {
-        pid.clear();
-        fact.clear();
-    }
-
-    unsigned size() const {
-        return pid.size();
-    }
-
-    void add(unsigned id,double f) {
-        pid.push_back(id);
-        fact.push_back(f);
-    }
-
-    helper::vector<unsigned> pid;
-    helper::vector<double> fact;
-};
-
-class ConstraintNormal {
+class BaseConstraintGeometry : public core::BehaviorModel {
 public:
 
-    void clear() {
-        normals.clear();
-    }
-
-    void add(const defaulttype::Vector3 & P) {
-        normals.push_back(P);
-    }
-
-    unsigned size() const {
-        return normals.size();
-    }
-
-    helper::vector<defaulttype::Vector3> normals;
-};
-
-template<class DataTypes>
-class ConstraintGeometry : public sofa::core::objectmodel::BaseObject {
-public :
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::Real Real;
-    typedef typename DataTypes::VecDeriv VecDeriv;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename DataTypes::Deriv Deriv1;
+    typedef sofa::defaulttype::Vec3dTypes DataTypes;
+    typedef DataTypes::VecCoord VecCoord;
+    typedef DataTypes::Coord Coord;
+    typedef DataTypes::Real Real;
+    typedef DataTypes::VecDeriv VecDeriv;
+    typedef DataTypes::MatrixDeriv MatrixDeriv;
+    typedef DataTypes::Deriv Deriv1;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    typedef MatrixDeriv::RowIterator MatrixDerivRowIterator;
 
-    SOFA_CLASS(ConstraintGeometry, sofa::core::objectmodel::BaseObject);
-
-    virtual sofa::core::behavior::MechanicalState<DataTypes> * getMstate() = 0 ;
-
-    virtual Coord getContactPosition(const ConstraintProximity & sinfo) {
-        Coord res;
-
-        const helper::ReadAccessor<Data <VecCoord> >& x = *getMstate()->read(core::VecCoordId::position());
-
-        for (unsigned p=0;p<sinfo.pid.size();p++) {
-            if (sinfo.fact[p]!=0.0) res+=x[sinfo.pid[p]] * sinfo.fact[p];
-        }
-
-        return res;
+    topology::TopologyContainer * getTopology() {
+        return dynamic_cast<topology::TopologyContainer *>(getContext()->getTopology());
     }
 
-    virtual Coord getContactFreePosition(const ConstraintProximity & sinfo) {
-        Coord res;
-
-        const helper::ReadAccessor<Data <VecCoord> >& xfree = *getMstate()->read(core::VecCoordId::freePosition());
-
-        for (unsigned p=0;p<sinfo.pid.size();p++) {
-            if (sinfo.fact[p]!=0.0) res+=xfree[sinfo.pid[p]] * sinfo.fact[p];
-        }
-
-        return res;
+    sofa::core::behavior::MechanicalState<DataTypes> * getMstate() {
+        return dynamic_cast<sofa::core::behavior::MechanicalState<DataTypes> * >(getContext()->getMechanicalState());
     }
 
-    void addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const ConstraintProximity & pinfo,const ConstraintNormal & ninfo,bool direct) {
-        DataMatrixDeriv & c_d = *cId[getMstate()].write();
+    virtual void prepareDetection() {}
 
-        MatrixDeriv & c = *c_d.beginEdit();
-
-        double coeff = (direct) ? 1.0 : -1.0;
-
-        for (unsigned i=0;i<ninfo.normals.size();i++) {
-            MatrixDerivRowIterator c_it1 = c.writeLine(cline+i);
-
-            for (unsigned p=0;p<pinfo.pid.size();p++) {
-                if (pinfo.fact[p] == 0.0) continue;
-                c_it1.addCol(pinfo.pid[p], ninfo.normals[i] * pinfo.fact[p] * coeff);
-            }
-        }
-
-        c_d.endEdit();
+private :
+    void updatePosition(SReal /*dt*/) {
+        prepareDetection();
     }
 
 };
 
-template<class DataType1,class DataType2>
-static void addConstraint(core::MultiMatrixDerivId cId,unsigned & cline,ConstraintGeometry<DataType1> * cg1,const ConstraintProximity & pinfo1,ConstraintGeometry<DataType2> * cg2,const ConstraintProximity & pinfo2,const ConstraintNormal & ninfo) {
-    cg1->addConstraint(cId,cline,pinfo1,ninfo,false);
-    cg2->addConstraint(cId,cline,pinfo2,ninfo,true);
-    cline += ninfo.size();
-}
+class BaseDecorator : public BaseConstraintGeometry {
 
-template<class DataType1>
-static void addConstraint(core::MultiMatrixDerivId cId,unsigned & cline,ConstraintGeometry<DataType1> * cg,const ConstraintProximity & pinfo,const ConstraintNormal & ninfo) {
-    cg->addConstraint(cId,cline,pinfo,ninfo,false);
-    cline += ninfo.size();
-}
+};
+
+
+class BaseGeometry : public BaseConstraintGeometry {
+public :
+    SOFA_CLASS(BaseGeometry, BaseConstraintGeometry);
+
+    virtual void init();
+
+    virtual void addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const ConstraintProximity & pinfo,const defaulttype::Vector3 & normal);
+
+    virtual defaulttype::Vector3 getPosition(const ConstraintProximity & pinfo);
+
+    virtual defaulttype::Vector3 getFreePosition(const ConstraintProximity & pinfo);
+
+    virtual defaulttype::Vector3 getRestPosition(const ConstraintProximity & pinfo);
+
+    virtual defaulttype::Vector3 getNormal(const ConstraintProximity & pinfo) = 0;
+
+    virtual double projectPoint(unsigned eid,const defaulttype::Vector3 & T, ConstraintProximity & pinfo) = 0;
+
+    virtual int getNbElements() = 0;
+
+    virtual BaseDecorator * getDecorator();
+
+//    void getAlgorithm(CollisionAlgorithm * algo);
+
+//    void createAlgorithm(CollisionAlgorithm * alg);
+};
+
+//class CollisionAlgorithm : public BaseConstraintGeometry {
+//public:
+
+//    BaseGeometry * getGeometry();
+
+//};
+
 
 } // namespace controller
 

@@ -22,14 +22,13 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_SURFACEINTERPOLATION_H
-#define SOFA_COMPONENT_SURFACEINTERPOLATION_H
+#ifndef SOFA_COMPONENT_POINTGEOMETRY_H
+#define SOFA_COMPONENT_POINTGEOMETRY_H
 
 #include "ConstraintGeometry.h"
-#include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
 #include <sofa/defaulttype/VecTypes.h>
-#include <SofaBaseTopology/TriangleSetTopologyContainer.h>
+
 
 namespace sofa {
 
@@ -37,50 +36,24 @@ namespace core {
 
 namespace behavior {
 
-template<class DataTypes>
-class TriangleInterpolation : public ConstraintGeometry<DataTypes>
+class PointGeometry : public BaseGeometry
 {
 public:
-    SOFA_CLASS(SOFA_TEMPLATE(TriangleInterpolation,DataTypes), SOFA_TEMPLATE(ConstraintGeometry,DataTypes));
+    SOFA_CLASS(PointGeometry , BaseGeometry );
 
-    typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef typename defaulttype::Vector3 Vector3;
+    typedef defaulttype::Vector3 Vector3;
 
-    Data<bool> d_flipNormals;
-    Data<bool> d_draw;
+    virtual defaulttype::Vector3 getNormal(const ConstraintProximity & /*pinfo*/);
 
-    TriangleInterpolation()
-    : d_flipNormals(initData(&d_flipNormals, false,"flipNormals","Flip normals"))
-    , d_draw(initData(&d_draw, false,"draw","Draw")){}
+    virtual ConstraintProximity getPointProximity(unsigned eid);
 
-    void init() {
-        this->getContext()->get(m_state);
-        if (m_state == NULL) {
-            serr << " Error cannot find the mstate" << sendl;
-            return;
-        }
+    double projectPoint(unsigned eid,const defaulttype::Vector3 & T,ConstraintProximity & pinfo);
 
-        this->getContext()->get(m_container);
-        if (m_container == NULL) {
-            serr << " Error cannot find the TriangleSetTopologyContainer" << sendl;
-            return;
-        }
-    }
+    int getNbElements();
 
-    sofa::core::behavior::MechanicalState<DataTypes> * getMstate() {
-        return m_state;
-    }
+    void draw(const core::visual::VisualParams * vparams);
 
-    virtual void fillProximity(const Coord & P,ConstraintProximity & pinfo) = 0;
-
-    virtual void fillConstraintNormal(const ConstraintProximity & pinfo,ConstraintNormal & ninfo) = 0;
-
-protected :
-    sofa::core::behavior::MechanicalState<DataTypes> * m_state;
-    sofa::component::topology::TriangleSetTopologyContainer* m_container;
 };
-
 
 } // namespace forcefield
 
@@ -89,4 +62,4 @@ protected :
 } // namespace sofa
 
 
-#endif // NeedleDescription_H
+#endif // NeedleLinearDescription_H

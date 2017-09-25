@@ -16,61 +16,38 @@
 * along with this library; if not, write to the Free Software Foundation,     *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.          *
 *******************************************************************************
-*                               SOFA :: Modules                               *
+*                               SOFA :: Plugins                               *
 *                                                                             *
 * Authors: The SOFA Team and external contributors (see Authors.txt)          *
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_EDGELINEARINTERPOLATION_H
-#define SOFA_COMPONENT_EDGELINEARINTERPOLATION_H
 
-#include "EdgeInterpolation.h"
-#include <sofa/core/behavior/ForceField.h>
-#include <sofa/core/behavior/MechanicalState.h>
-#include <sofa/core/objectmodel/Data.h>
-#include <sofa/defaulttype/VecTypes.h>
-#include <SofaConstraint/BilateralInteractionConstraint.h>
+#include "TriangleGeometry.inl"
+#include <sofa/core/ObjectFactory.h>
+#include <sofa/core/visual/VisualParams.h>
+#include <math.h>
+#include <assert.h>     /* assert */
 
 
-namespace sofa {
-
-namespace core {
-
-namespace behavior {
-
-template<class DataTypes>
-class EdgeLinearInterpolation : public EdgeInterpolation<DataTypes>
+namespace sofa
 {
-public:
-    SOFA_CLASS(SOFA_TEMPLATE(EdgeLinearInterpolation,DataTypes) , SOFA_TEMPLATE(EdgeInterpolation,DataTypes) );
 
-    typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::Real Real;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef typename DataTypes::VecDeriv VecDeriv;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename DataTypes::Deriv Deriv1;
-    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
-    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
-    typedef defaulttype::Vector3 Vector3;
+namespace core
+{
 
-    virtual void fillProximity(unsigned id,ConstraintProximity & pinfo);
+namespace behavior
+{
 
-    virtual void fillProximity(const Coord & P,ConstraintProximity & pinfo);
+using namespace sofa::defaulttype;
 
-    virtual void fillConstraintNormal(const ConstraintProximity & pinfo, ConstraintNormal & ninfo);
+SOFA_DECL_CLASS(TriangleGeometry)
 
-};
-
-
-} // namespace forcefield
+int TriangleGeometryClass = core::RegisterObject("Triangle liear interpolation")
+.add<TriangleGeometry >();
+} // namespace controller
 
 } // namespace component
 
 } // namespace sofa
 
-
-#endif // NeedleLinearDescription_H

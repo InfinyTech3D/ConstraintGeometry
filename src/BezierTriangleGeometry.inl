@@ -1,7 +1,8 @@
-﻿#ifndef SOFA_COMPONENT_BEZIERTRIANGLENONLINEARINTERPOLATION_INL
-#define SOFA_COMPONENT_BEZIERTRIANGLENONLINEARINTERPOLATION_INL
+﻿#ifndef SOFA_COMPONENT_BEZIERTRIANGLEGEOMETRY_INL
+#define SOFA_COMPONENT_BEZIERTRIANGLEGEOMETRY_INL
 
-#include "BezierTriangleNonLinearInterpolation.h"
+#include "BezierTriangleGeometry.h"
+#include "ConstraintProximity.h"
 
 namespace sofa {
 
@@ -9,31 +10,27 @@ namespace core {
 
 namespace behavior {
 
-
-template<class DataTypes>
-BezierTriangleNonLinearInterpolation<DataTypes>::BezierTriangleNonLinearInterpolation()
+BezierTriangleGeometry::BezierTriangleGeometry()
 : Inherit()
-, f_draw_bezier_inc(initData(&f_draw_bezier_inc, (double) 0.0,"draw_bezier_inc","Draw bezier triangle"))
 {}
 
-template<class DataTypes>
-void BezierTriangleNonLinearInterpolation<DataTypes>::prepareDetection() {
+void BezierTriangleGeometry::prepareDetection() {
     Inherit::prepareDetection();
 
-    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
+    const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::position());
 
-    m_beziertriangle_info.resize(this->m_container->getNbTriangles());
-    for (int t=0;t<this->m_container->getNbTriangles();t++) {
+    m_beziertriangle_info.resize(this->getTopology()->getNbTriangles());
+    for (int t=0;t<this->getTopology()->getNbTriangles();t++) {
         BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[t];
-        const topology::Triangle trpids = this->m_container->getTriangle(t);
+        const sofa::core::topology::BaseMeshTopology::Triangle trpids = this->getTopology()->getTriangle(t);
 
         const Vector3 & p300 = x[trpids[2]];
         const Vector3 & p030 = x[trpids[1]];
         const Vector3 & p003 = x[trpids[0]];
 
-        const Vector3 & n200 = this->m_point_normal[trpids[2]];
-        const Vector3 & n020 = this->m_point_normal[trpids[1]];
-        const Vector3 & n002 = this->m_point_normal[trpids[0]];
+        const Vector3 & n200 = this->m_pointNormal[trpids[2]];
+        const Vector3 & n020 = this->m_pointNormal[trpids[1]];
+        const Vector3 & n002 = this->m_pointNormal[trpids[0]];
 
         double w12 = dot(p030 - p300,n200);
         double w21 = dot(p300 - p030,n020);
@@ -73,21 +70,20 @@ void BezierTriangleNonLinearInterpolation<DataTypes>::prepareDetection() {
 
 ////Bezier triangle are computed according to :
 ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
-template<class DataTypes>
-typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
-BezierTriangleNonLinearInterpolation<DataTypes>::getContactPosition(const ConstraintProximity & pinfo) {
-    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
-    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[trid];
 
-    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
+typename BezierTriangleGeometry::Vector3
+BezierTriangleGeometry::getPosition(const ConstraintProximity & pinfo) {
+    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[pinfo.getEid()];
 
-    const Vector3 & p300 = x[pinfo.pid[2]];
-    const Vector3 & p030 = x[pinfo.pid[1]];
-    const Vector3 & p003 = x[pinfo.pid[0]];
+    const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::position());
 
-    double fact_w = pinfo.fact[2];
-    double fact_u = pinfo.fact[1];
-    double fact_v = pinfo.fact[0];
+    const Vector3 & p300 = x[pinfo.m_pid[2]];
+    const Vector3 & p030 = x[pinfo.m_pid[1]];
+    const Vector3 & p003 = x[pinfo.m_pid[0]];
+
+    double fact_w = pinfo.m_fact[2];
+    double fact_u = pinfo.m_fact[1];
+    double fact_v = pinfo.m_fact[0];
 
     return p300 *   fact_w*fact_w*fact_w +
            p030 *   fact_u*fact_u*fact_u +
@@ -102,23 +98,22 @@ BezierTriangleNonLinearInterpolation<DataTypes>::getContactPosition(const Constr
 }
 
 
-template<class DataTypes>
-typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
-BezierTriangleNonLinearInterpolation<DataTypes>::getContactFreePosition(const ConstraintProximity & pinfo) {
-    double fact_w = pinfo.fact[2];
-    double fact_u = pinfo.fact[1];
-    double fact_v = pinfo.fact[0];
 
-    const helper::ReadAccessor<Data <VecCoord> >& xfree = *this->m_state->read(core::VecCoordId::freePosition());
-//    const TriangleInfo & tinfo = this->m_triangle_info[pinfo.eid];
+typename BezierTriangleGeometry::Vector3
+BezierTriangleGeometry::getFreePosition(const ConstraintProximity & pinfo) {
+    double fact_w = pinfo.m_fact[2];
+    double fact_u = pinfo.m_fact[1];
+    double fact_v = pinfo.m_fact[0];
 
-    const Vector3 & p300_Free = xfree[pinfo.pid[2]];
-    const Vector3 & p030_Free = xfree[pinfo.pid[1]];
-    const Vector3 & p003_Free = xfree[pinfo.pid[0]];
+    const helper::ReadAccessor<Data <VecCoord> >& xfree = *this->getMstate()->read(core::VecCoordId::freePosition());
 
-    const Vector3 & n200_Free = this->m_point_normal[pinfo.pid[2]];
-    const Vector3 & n020_Free = this->m_point_normal[pinfo.pid[1]];
-    const Vector3 & n002_Free = this->m_point_normal[pinfo.pid[0]];
+    const Vector3 & p300_Free = xfree[pinfo.m_pid[2]];
+    const Vector3 & p030_Free = xfree[pinfo.m_pid[1]];
+    const Vector3 & p003_Free = xfree[pinfo.m_pid[0]];
+
+    const Vector3 & n200_Free = this->m_pointNormal[pinfo.m_pid[2]];
+    const Vector3 & n020_Free = this->m_pointNormal[pinfo.m_pid[1]];
+    const Vector3 & n002_Free = this->m_pointNormal[pinfo.m_pid[0]];
 
     double w12_free = dot(p030_Free - p300_Free,n200_Free);
     double w21_free = dot(p300_Free - p030_Free,n020_Free);
@@ -152,18 +147,17 @@ BezierTriangleNonLinearInterpolation<DataTypes>::getContactFreePosition(const Co
            p111_Free * 6*fact_w*fact_u*fact_v;
 }
 
-template<class DataTypes>
-void BezierTriangleNonLinearInterpolation<DataTypes>::fillConstraintNormal(const ConstraintProximity & pinfo,ConstraintNormal & ninfo) {
-    const unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
-    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[trid];
 
-    const Vector3 &n200 = this->m_point_normal[pinfo.pid[2]];
-    const Vector3 &n020 = this->m_point_normal[pinfo.pid[1]];
-    const Vector3 &n002 = this->m_point_normal[pinfo.pid[0]];
+defaulttype::Vector3 BezierTriangleGeometry::getNormal(const ConstraintProximity & pinfo) {
+    const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[pinfo.getEid()];
 
-    double fact_w = pinfo.fact[2];
-    double fact_u = pinfo.fact[1];
-    double fact_v = pinfo.fact[0];
+    const Vector3 &n200 = this->m_pointNormal[pinfo.m_pid[2]];
+    const Vector3 &n020 = this->m_pointNormal[pinfo.m_pid[1]];
+    const Vector3 &n002 = this->m_pointNormal[pinfo.m_pid[0]];
+
+    double fact_w = pinfo.m_fact[2];
+    double fact_u = pinfo.m_fact[1];
+    double fact_v = pinfo.m_fact[0];
 
     Vector3 normal = n200 * fact_w*fact_w +
                      n020 * fact_u*fact_u +
@@ -175,22 +169,13 @@ void BezierTriangleNonLinearInterpolation<DataTypes>::fillConstraintNormal(const
     Vector3 N1 = normal;
     N1.normalize();
 
-    Vector3 N2 = cross(N1,((fabs(dot(N1,Vector3(1,0,0)))>0.99) ? Vector3(0,1,0) : Vector3(1,0,0)));
-    N2.normalize();
-
-    Vector3 N3 = cross(N1,N2);
-    N3.normalize();
-
-    ninfo.clear();
-    ninfo.add(N1);
-    ninfo.add(N2);
-    ninfo.add(N3);
+    return N1;
 }
 
 
-//template<class DataTypes>
-//typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
-//BezierTriangleNonLinearInterpolation<DataTypes>::getdpdu(const ConstraintProximity & pinfo) {
+//
+//typename BezierTriangleGeometry::Vector3
+//BezierTriangleGeometry::getdpdu(const ConstraintProximity & pinfo) {
 //    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
 
 //    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
@@ -223,9 +208,9 @@ void BezierTriangleNonLinearInterpolation<DataTypes>::fillConstraintNormal(const
 //           -6.0 * pointsP111 * (fact_u * fact_v - fact_v * (-fact_u - fact_v + 1));
 //}
 
-//template<class DataTypes>
-//typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
-//BezierTriangleNonLinearInterpolation<DataTypes>::getdpdv(const ConstraintProximity & pinfo) {
+//
+//typename BezierTriangleGeometry::Vector3
+//BezierTriangleGeometry::getdpdv(const ConstraintProximity & pinfo) {
 //    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
 
 //    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
@@ -260,9 +245,9 @@ void BezierTriangleNonLinearInterpolation<DataTypes>::fillConstraintNormal(const
 //           -6.0 * pointsP111 * (fact_u * fact_v - fact_u * (-fact_u - fact_v + 1));
 //}
 
-//template<class DataTypes>
-//typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
-//BezierTriangleNonLinearInterpolation<DataTypes>::getd2pdu2(const ConstraintProximity & pinfo) {
+//
+//typename BezierTriangleGeometry::Vector3
+//BezierTriangleGeometry::getd2pdu2(const ConstraintProximity & pinfo) {
 //    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
 
 //    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
@@ -286,9 +271,9 @@ void BezierTriangleNonLinearInterpolation<DataTypes>::fillConstraintNormal(const
 //           -12.0 * tbinfo.p111 * fact_v;
 //}
 
-//template<class DataTypes>
-//typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
-//BezierTriangleNonLinearInterpolation<DataTypes>::getd2pdv2(const ConstraintProximity & pinfo) {
+//
+//typename BezierTriangleGeometry::Vector3
+//BezierTriangleGeometry::getd2pdv2(const ConstraintProximity & pinfo) {
 //    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
 
 //    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
@@ -313,9 +298,9 @@ void BezierTriangleNonLinearInterpolation<DataTypes>::fillConstraintNormal(const
 //           -12.0 * tbinfo.p111 * fact_u;
 //}
 
-//template<class DataTypes>
-//typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
-//BezierTriangleNonLinearInterpolation<DataTypes>::getd2pduv(const ConstraintProximity & pinfo) {
+//
+//typename BezierTriangleGeometry::Vector3
+//BezierTriangleGeometry::getd2pduv(const ConstraintProximity & pinfo) {
 //    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
 
 //    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
@@ -338,9 +323,9 @@ void BezierTriangleNonLinearInterpolation<DataTypes>::fillConstraintNormal(const
 //           -6.0 * tbinfo.p111 * (2.0*fact_u + 2.0*fact_v - 1.0);
 //}
 
-//template<class DataTypes>
-//typename BezierTriangleNonLinearInterpolation<DataTypes>::Vector3
-//BezierTriangleNonLinearInterpolation<DataTypes>::getd2pdvu(const ConstraintProximity & pinfo) {
+//
+//typename BezierTriangleGeometry::Vector3
+//BezierTriangleGeometry::getd2pdvu(const ConstraintProximity & pinfo) {
 //    const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
 
 //    unsigned trid = this->m_container->getTriangleIndex(pinfo.pid[0],pinfo.pid[1],pinfo.pid[2]);
@@ -364,61 +349,7 @@ void BezierTriangleNonLinearInterpolation<DataTypes>::fillConstraintNormal(const
 //}
 
 
-template<class DataTypes>
-void BezierTriangleNonLinearInterpolation<DataTypes>::draw(const core::visual::VisualParams * vparams) {
-    if (!this->d_draw.getValue()) return;
 
-    //build edges
-    if (f_draw_bezier_inc.getValue()>0.0) {
-        glColor4f(0.0f,0.0f,1.0f,1.0f);
-        glBegin(GL_POINTS);
-
-        const helper::ReadAccessor<Data <VecCoord> >& x = *this->m_state->read(core::VecCoordId::position());
-        for(int t=0;t<this->m_container->getNbTriangles();t++) {
-            const BezierTriangleInfo & tbinfo = m_beziertriangle_info[t];
-            const topology::Triangle trpids = this->m_container->getTriangle(t);
-
-            const Vector3 & p300 = x[trpids[2]];
-            const Vector3 & p030 = x[trpids[1]];
-            const Vector3 & p003 = x[trpids[0]];
-
-
-            double inc = f_draw_bezier_inc.getValue();
-            for (double fact_u=0.0;fact_u<1.0;fact_u+=inc) {
-                for (double fact_v=0.0;fact_v<1.0;fact_v+=inc) {
-                    if (fact_u+fact_v>1.0) continue;
-                    double fact_w=1.0-(fact_u+fact_v);
-
-                    Vector3 Q = p300 *   fact_w*fact_w*fact_w +
-                                p030 *   fact_u*fact_u*fact_u +
-                                p003 *   fact_v*fact_v*fact_v +
-                                tbinfo.p210 * 3*fact_w*fact_w*fact_u +
-                                tbinfo.p120 * 3*fact_w*fact_u*fact_u +
-                                tbinfo.p201 * 3*fact_w*fact_w*fact_v +
-                                tbinfo.p021 * 3*fact_u*fact_u*fact_v +
-                                tbinfo.p102 * 3*fact_w*fact_v*fact_v +
-                                tbinfo.p012 * 3*fact_u*fact_v*fact_v +
-                                tbinfo.p111 * 6*fact_w*fact_u*fact_v;
-
-                    helper::gl::glVertexT(Q);
-                }
-            }
-        }
-        glEnd();
-        for(unsigned t=0;t<this->m_triangle_info.size();t++) {
-            const topology::Triangle trpids = this->m_container->getTriangle(t);
-            const Vector3 & p300 = x[trpids[2]];
-            const Vector3 & p030 = x[trpids[1]];
-            const Vector3 & p003 = x[trpids[0]];
-            const Vector3 & n200 = this->m_point_normal[trpids[2]]*0.01;
-            const Vector3 & n020 = this->m_point_normal[trpids[1]]*0.01;
-            const Vector3 & n002 = this->m_point_normal[trpids[0]]*0.01;
-            vparams->drawTool()->drawArrow(p300,p300 + n200,0.0001, defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
-            vparams->drawTool()->drawArrow(p030,p030 + n020,0.0001, defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
-            vparams->drawTool()->drawArrow(p003,p003 + n002,0.0001, defaulttype::Vec<4,float>(1.0f,0.0f,0.0f,1.0f));
-        }
-    }
-}
 
 } //behavior
 

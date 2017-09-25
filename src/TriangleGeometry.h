@@ -22,15 +22,19 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_FULLTRIANGLELINEARINTERPOLATION_H
-#define SOFA_COMPONENT_FULLTRIANGLELINEARINTERPOLATION_H
+#ifndef SOFA_COMPONENT_TRIANGLEGEOMETRY_H
+#define SOFA_COMPONENT_TRIANGLEGEOMETRY_H
 
-#include "TriangleInterpolation.h"
+#include "EdgeGeometry.h"
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
 #include <sofa/defaulttype/VecTypes.h>
-#include <SofaConstraint/BilateralInteractionConstraint.h>
+#include <sofa/helper/Quater.h>
+#include <sofa/core/visual/VisualParams.h>
+#include <sofa/simulation/AnimateBeginEvent.h>
+#include <SofaBaseMechanics/MechanicalObject.h>
+#include <sofa/core/visual/VisualParams.h>
 
 namespace sofa {
 
@@ -38,56 +42,43 @@ namespace core {
 
 namespace behavior {
 
-template<class DataTypes>
-class FullTriangleLinearInterpolation : public TriangleInterpolation<DataTypes>
+class TriangleGeometry : public EdgeGeometry
 {
 public:
-    SOFA_CLASS(SOFA_TEMPLATE(FullTriangleLinearInterpolation,DataTypes) , SOFA_TEMPLATE(TriangleInterpolation,DataTypes) );
+    SOFA_CLASS(TriangleGeometry , BaseGeometry );
 
-    typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::Real Real;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef typename DataTypes::VecDeriv VecDeriv;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename DataTypes::Deriv Deriv1;
-    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
-    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
-    typedef defaulttype::Vector3 Vector3;
+    typedef defaulttype::Vector3 Coord;
 
-    FullTriangleLinearInterpolation();
+    double projectPoint(unsigned tid, const defaulttype::Vector3 & s,ConstraintProximity & pinfo);
 
-    virtual void fillProximity(const Coord & P,ConstraintProximity & pinfo);
-
-    virtual void fillConstraintNormal(const ConstraintProximity & pinfo,ConstraintNormal & ninfo);
+    defaulttype::Vector3 getNormal(const ConstraintProximity & pinfo);
 
     void draw(const core::visual::VisualParams */*vparams*/);
 
-    void handleEvent(sofa::core::objectmodel::Event* event);
+    int getNbElements();
 
-
+    ConstraintProximity getTriangleProximity(unsigned eid,double fact_w,double fact_u,double fact_v);
 
 protected:
 
     typedef struct {
-        Vector3 v0,v1;
+        defaulttype::Vector3 v0,v1;
         double d00;
         double d01;
         double d11;
         double invDenom;
 
-        Vector3 tn,ax1,ax2;
+        defaulttype::Vector3 tn,ax1,ax2;
     } TriangleInfo;
 
     virtual void prepareDetection();
 
-    void projectPointOnTriangle(const Vector3 & s,const TriangleInfo & tinfo, const Vector3 & p0, const Vector3 & p1,const Vector3 & p2, double & fact_w,double & fact_u, double & fact_v);
-
-    void computeBaryCoords(const Vector3 & proj_P,const TriangleInfo & tinfo, const Vector3 & p0, double & fact_w,double & fact_u, double & fact_v);
+    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_w,double & fact_u, double & fact_v);
 
     helper::vector<TriangleInfo> m_triangle_info;
-    helper::vector<Vector3> m_point_normal;
+    helper::vector<defaulttype::Vector3> m_pointNormal;
+
+    void drawTriangle(const core::visual::VisualParams * vparams,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C);
 };
 
 

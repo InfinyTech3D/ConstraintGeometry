@@ -2,9 +2,7 @@ cmake_minimum_required(VERSION 2.8.12)
 project(ConstraintGeometryPlugin)
 
 find_package(SofaFramework REQUIRED)
-find_package(SofaBase REQUIRED)
 find_package(SofaSimulation REQUIRED)
-find_package(SofaGeneral REQUIRED)
 
 #find_package(TRI6FEM REQUIRED)
 
@@ -13,35 +11,27 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(HEADER_FILES      
      src/initConstraintGeometryPlugin.h
      src/ConstraintGeometry.h
-     src/EdgeInterpolation.h
-     src/EdgeLinearInterpolation.h
-     src/EdgeLinearInterpolation.inl
-     src/TriangleInterpolation.h
-     src/TriangleLinearInterpolation.h
-     src/TriangleLinearInterpolation.inl
-     src/FullTriangleLinearInterpolation.h
-     src/FullTriangleLinearInterpolation.inl
-     src/TetrahedronCutting.h
-     src/TetrahedronCutting.inl
-     src/PlaneCutting.h
-     src/PlaneCutting.inl
-
-     src/TriangleNonLinearInterpolation.h
-     src/BezierTriangleNonLinearInterpolation.h
-     src/BezierTriangleNonLinearInterpolation.inl
+     src/ConstraintGeometry.inl
+     src/ConstraintProximity.h
+     src/PointGeometry.h
+     src/PointGeometry.inl
+     src/EdgeGeometry.h
+     src/EdgeGeometry.inl
+     src/TriangleGeometry.h
+     src/TriangleGeometry.inl
+     src/TriangleNonLinearGeometry.h
+     src/BezierTriangleGeometry.h
+     src/BezierTriangleGeometry.inl
 #     src/QuadraticTriangleNonLinearInterpolation.h
 #     src/QuadraticTriangleNonLinearInterpolation.inl
 )
 
 set(SOURCE_FILES
      src/initConstraintGeometryPlugin.cpp
-     src/EdgeLinearInterpolation.cpp
-     src/TriangleLinearInterpolation.cpp
-     src/FullTriangleLinearInterpolation.cpp
-     src/TetrahedronCutting.cpp
-     src/PlaneCutting.cpp
-
-     src/BezierTriangleNonLinearInterpolation.cpp
+     src/PointGeometry.cpp
+     src/EdgeGeometry.cpp
+     src/TriangleGeometry.cpp
+     src/BezierTriangleGeometry.cpp
 #     src/QuadraticTriangleNonLinearInterpolation.cpp
 )
 
@@ -59,7 +49,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "$<INSTALL_INTERFACE:include/$
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DPLUGIN_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\"")
 #target_link_libraries(${PROJECT_NAME} SofaCore SofaComponentBase SofaSimulationTree SofaUserInteraction SofaConstraint TRI6FEM)
-target_link_libraries(${PROJECT_NAME} SofaCore SofaComponentBase SofaSimulationTree SofaUserInteraction SofaConstraint)
+target_link_libraries(${PROJECT_NAME} SofaCore SofaSimulationTree)
 
 ## Install rules for the library and headers; CMake package configurations files
 sofa_create_package(${PROJECT_NAME} 0.1 ${PROJECT_NAME} ${PROJECT_NAME})

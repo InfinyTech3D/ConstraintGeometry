@@ -22,35 +22,46 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#include "PlaneCutting.inl"
-#include <sofa/core/ObjectFactory.h>
+#ifndef SOFA_COMPONENT_EDGEGEOMETRY_H
+#define SOFA_COMPONENT_EDGEGEOMETRY_H
+
+#include "PointGeometry.h"
+#include <sofa/core/behavior/ForceField.h>
+#include <sofa/core/behavior/MechanicalState.h>
+#include <sofa/core/objectmodel/Data.h>
+#include <sofa/defaulttype/VecTypes.h>
+
 
 namespace sofa {
 
-namespace component {
+namespace core {
 
-namespace collision {
+namespace behavior {
 
-SOFA_DECL_CLASS(PlaneCutting)
+class EdgeGeometry : public PointGeometry
+{
+public:
+    SOFA_CLASS(EdgeGeometry , BaseGeometry );
 
-int PlaneCuttingClass = core::RegisterObject("Manager handling cutting operations between a SharpLineModel and a TetrahedronSetModel")
-#ifndef SOFA_FLOAT
-.add< PlaneCutting<sofa::defaulttype::Vec3dTypes> >()
-#endif
-#ifndef SOFA_DOUBLE
-//.add< PlaneCutting<sofa::defaulttype::Vec3fTypes> >()
-#endif
-;
+    typedef defaulttype::Vector3 Vector3;
 
-#ifndef SOFA_FLOAT
-template class PlaneCutting<sofa::defaulttype::Vec3dTypes>;
-#endif
-#ifndef SOFA_DOUBLE
-//template class SOFA_ADVANCED_INTERACTION_API PlaneCutting<sofa::defaulttype::Vec3fTypes>;
-#endif
+    virtual defaulttype::Vector3 getNormal(const ConstraintProximity & /*pinfo*/);
 
-} // namespace collision
+    ConstraintProximity getEdgeProximity(unsigned eid, double fact_u,double fact_v);
+
+    double projectPoint(unsigned eid,const defaulttype::Vector3 & /*T*/,ConstraintProximity & pinfo);
+
+    int getNbElements();
+
+    void draw(const core::visual::VisualParams * /*vparams*/);
+};
+
+
+} // namespace forcefield
 
 } // namespace component
 
 } // namespace sofa
+
+
+#endif // NeedleLinearDescription_H
