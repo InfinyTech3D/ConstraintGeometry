@@ -21,9 +21,28 @@ namespace behavior {
 
 class ConstraintProximity;
 class CollisionAlgorithm;
+class BaseGeometry;
 
-class BaseConstraintGeometry : public core::BehaviorModel {
+typedef std::shared_ptr<ConstraintProximity> ConstraintProximityPtr;
+
+class BaseConstraintIterator {
 public:
+
+    virtual bool end(const ConstraintProximityPtr & E = NULL) = 0;
+
+    virtual int getElement() = 0;
+
+    virtual void next() = 0;
+
+};
+
+typedef std::unique_ptr<BaseConstraintIterator> BaseConstraintIteratorPtr;
+
+class BaseGeometry : public core::BehaviorModel {
+    friend class ConstraintProximity;
+
+public :
+    SOFA_CLASS(BaseGeometry, core::BehaviorModel);
 
     typedef sofa::defaulttype::Vec3dTypes DataTypes;
     typedef DataTypes::VecCoord VecCoord;
@@ -37,62 +56,67 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef MatrixDeriv::RowIterator MatrixDerivRowIterator;
 
-    topology::TopologyContainer * getTopology() {
-        return dynamic_cast<topology::TopologyContainer *>(getContext()->getTopology());
+    class DefaultConstraintIterator : public BaseConstraintIterator {
+    public:
+        DefaultConstraintIterator(const BaseGeometry * geo) {
+            m_i = 0;
+            m_geometry = geo;
+        }
+
+        virtual bool end(const ConstraintProximityPtr & /*E*/ = NULL) {
+            return m_i>=m_geometry->getNbElements();
+        }
+
+        int getElement() {
+            return m_i;
+        }
+
+        void next() {
+            m_i++;
+        }
+
+    private :
+        const BaseGeometry * m_geometry;
+        int m_i;
+    };
+
+    Data<defaulttype::Vec4f> d_color;
+
+    topology::TopologyContainer * getTopology() const {
+        return m_topology;
     }
 
-    sofa::core::behavior::MechanicalState<DataTypes> * getMstate() {
-        return dynamic_cast<sofa::core::behavior::MechanicalState<DataTypes> * >(getContext()->getMechanicalState());
+    sofa::core::behavior::MechanicalState<DataTypes> * getMstate() const {
+        return m_state;
     }
 
-    virtual void prepareDetection() {}
+    BaseGeometry();
+
+    void init();
+
+    virtual ConstraintProximityPtr projectPoint(const defaulttype::Vector3 & T, unsigned eid) const = 0;
+
+    virtual int getNbElements() const = 0;
+
+    void computeBBox(const core::ExecParams* params, bool /*onlyVisible*/);
+
+    BaseConstraintIteratorPtr getIterator(const ConstraintProximityPtr & E = NULL) const;
 
 private :
     void updatePosition(SReal /*dt*/) {
         prepareDetection();
     }
 
+    sofa::core::behavior::MechanicalState<DataTypes> * m_state;
+    topology::TopologyContainer * m_topology;
+
+protected:
+
+    virtual void addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const ConstraintProximity & pinfo,const defaulttype::Vector3 & normal) const;
+
+    virtual void prepareDetection();
+
 };
-
-class BaseDecorator : public BaseConstraintGeometry {
-
-};
-
-
-class BaseGeometry : public BaseConstraintGeometry {
-public :
-    SOFA_CLASS(BaseGeometry, BaseConstraintGeometry);
-
-    virtual void init();
-
-    virtual void addConstraint(core::MultiMatrixDerivId cId,unsigned cline,const ConstraintProximity & pinfo,const defaulttype::Vector3 & normal);
-
-    virtual defaulttype::Vector3 getPosition(const ConstraintProximity & pinfo);
-
-    virtual defaulttype::Vector3 getFreePosition(const ConstraintProximity & pinfo);
-
-    virtual defaulttype::Vector3 getRestPosition(const ConstraintProximity & pinfo);
-
-    virtual defaulttype::Vector3 getNormal(const ConstraintProximity & pinfo) = 0;
-
-    virtual double projectPoint(unsigned eid,const defaulttype::Vector3 & T, ConstraintProximity & pinfo) = 0;
-
-    virtual int getNbElements() = 0;
-
-    virtual BaseDecorator * getDecorator();
-
-//    void getAlgorithm(CollisionAlgorithm * algo);
-
-//    void createAlgorithm(CollisionAlgorithm * alg);
-};
-
-//class CollisionAlgorithm : public BaseConstraintGeometry {
-//public:
-
-//    BaseGeometry * getGeometry();
-
-//};
-
 
 } // namespace controller
 

@@ -15,33 +15,27 @@ namespace core {
 
 namespace behavior {
 
-defaulttype::Vector3 PointGeometry::getNormal(const ConstraintProximity & /*pinfo*/) {
-    return defaulttype::Vector3();
+ConstraintProximityPtr PointGeometry::getPointProximity(unsigned eid) const {
+    return ConstraintProximityPtr(new PointConstraintProximity(this,eid));
 }
 
-ConstraintProximity PointGeometry::getPointProximity(unsigned eid) {
-    ConstraintProximity res(this,eid);
-    res.push(eid,1.0);
-    return res;
+ConstraintProximityPtr PointGeometry::projectPoint(const defaulttype::Vector3 & /*T*/,unsigned eid) const {
+    return getPointProximity(eid);
 }
 
-double PointGeometry::projectPoint(unsigned eid,const defaulttype::Vector3 & T,ConstraintProximity & pinfo) {
-    pinfo = getPointProximity(eid);
-    return (pinfo.getPosition() - T).norm();
-}
-
-int PointGeometry::getNbElements() {
+int PointGeometry::getNbElements() const {
     return this->getTopology()->getNbPoints();
 }
 
 void PointGeometry::draw(const core::visual::VisualParams * vparams) {
-    if (! vparams->displayFlags().getShowCollisionModels()) return;
+    if (!vparams->displayFlags().getShowCollisionModels()) return;
 
-    helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
+    double norm = (this->f_bbox.getValue().maxBBox() - this->f_bbox.getValue().minBBox()).norm();
 
-    glColor3f(0.9,0.46,0);
-    for (int i=0;i<this->getTopology()->getNbPoints();i++) {
-        vparams->drawTool()->drawSphere(x[i],0.001);
+    glDisable(GL_LIGHTING);
+    glColor4f(d_color.getValue()[0],d_color.getValue()[1],d_color.getValue()[2],d_color.getValue()[3]);
+    for (int i=0;i<this->getNbElements();i++) {
+        vparams->drawTool()->drawSphere(this->getPointProximity(i)->getPosition(),norm*0.01);
     }
 }
 

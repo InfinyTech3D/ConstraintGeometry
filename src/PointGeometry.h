@@ -28,7 +28,7 @@
 #include "ConstraintGeometry.h"
 #include <sofa/core/objectmodel/Data.h>
 #include <sofa/defaulttype/VecTypes.h>
-
+#include "ConstraintProximity.h"
 
 namespace sofa {
 
@@ -41,15 +41,21 @@ class PointGeometry : public BaseGeometry
 public:
     SOFA_CLASS(PointGeometry , BaseGeometry );
 
-    typedef defaulttype::Vector3 Vector3;
+    class PointConstraintProximity : public ConstraintProximity {
+    public:
 
-    virtual defaulttype::Vector3 getNormal(const ConstraintProximity & /*pinfo*/);
+        PointConstraintProximity(const PointGeometry * geo, unsigned pid,double fact = 1.0)
+        : ConstraintProximity(geo) {
+            m_pid.push_back(pid);
+            m_fact.push_back(fact);
+        }
+    };
 
-    virtual ConstraintProximity getPointProximity(unsigned eid);
+    virtual ConstraintProximityPtr getPointProximity(unsigned eid) const;
 
-    double projectPoint(unsigned eid,const defaulttype::Vector3 & T,ConstraintProximity & pinfo);
+    virtual ConstraintProximityPtr projectPoint(const defaulttype::Vector3 & T,unsigned eid) const;
 
-    int getNbElements();
+    virtual int getNbElements() const;
 
     void draw(const core::visual::VisualParams * vparams);
 

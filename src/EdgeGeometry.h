@@ -25,12 +25,13 @@
 #ifndef SOFA_COMPONENT_EDGEGEOMETRY_H
 #define SOFA_COMPONENT_EDGEGEOMETRY_H
 
-#include "PointGeometry.h"
+#include "ConstraintGeometry.h"
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
 #include <sofa/defaulttype/VecTypes.h>
-
+#include "ConstraintProximity.h"
+#include "PointGeometry.h"
 
 namespace sofa {
 
@@ -41,17 +42,30 @@ namespace behavior {
 class EdgeGeometry : public PointGeometry
 {
 public:
-    SOFA_CLASS(EdgeGeometry , BaseGeometry );
+    SOFA_CLASS(EdgeGeometry , PointGeometry );
 
-    typedef defaulttype::Vector3 Vector3;
+    class EdgeConstraintProximity : public ConstraintProximity {
+    public:
 
-    virtual defaulttype::Vector3 getNormal(const ConstraintProximity & /*pinfo*/);
+        EdgeConstraintProximity(const EdgeGeometry * geo, unsigned p1, double f1,unsigned p2, double f2)
+        : ConstraintProximity(geo) {
+            m_pid.push_back(p1);
+            m_fact.push_back(f1);
 
-    ConstraintProximity getEdgeProximity(unsigned eid, double fact_u,double fact_v);
+            m_pid.push_back(p2);
+            m_fact.push_back(f2);
+        }
 
-    double projectPoint(unsigned eid,const defaulttype::Vector3 & /*T*/,ConstraintProximity & pinfo);
+        defaulttype::Vector3 getNormal() const {
+            const helper::ReadAccessor<Data <VecCoord> >& x = *m_cg->getMstate()->read(core::VecCoordId::position());
 
-    int getNbElements();
+            return (x[m_pid[1]] - x[m_pid[0]]).normalized();
+        }
+    };
+
+    ConstraintProximityPtr projectPoint(const defaulttype::Vector3 & T,unsigned eid) const;
+
+    virtual int getNbElements() const ;
 
     void draw(const core::visual::VisualParams * /*vparams*/);
 };
