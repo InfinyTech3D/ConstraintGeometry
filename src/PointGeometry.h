@@ -25,16 +25,17 @@
 #ifndef SOFA_COMPONENT_POINTGEOMETRY_H
 #define SOFA_COMPONENT_POINTGEOMETRY_H
 
-#include "ConstraintGeometry.h"
+#include "BaseGeometry.h"
+#include "ConstraintProximity.h"
 #include <sofa/core/objectmodel/Data.h>
 #include <sofa/defaulttype/VecTypes.h>
-#include "ConstraintProximity.h"
 
 namespace sofa {
 
 namespace core {
 
 namespace behavior {
+
 
 class PointGeometry : public BaseGeometry
 {
@@ -44,22 +45,57 @@ public:
     class PointConstraintProximity : public ConstraintProximity {
     public:
 
-        PointConstraintProximity(const PointGeometry * geo, unsigned pid,double fact = 1.0)
-        : ConstraintProximity(geo) {
-            m_pid.push_back(pid);
-            m_fact.push_back(fact);
+        PointConstraintProximity(const PointGeometry * geo, unsigned pid) : ConstraintProximity (geo) {
+            m_pid.resize(1);
+            m_fact.resize(1);
+
+            m_pid[0] = pid;
+            m_fact[0] = 1.0;
+        }
+
+        defaulttype::Vector3 getPosition() const {
+            const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getMstate()->read(core::VecCoordId::position());
+            return x[m_pid[0]];
+        }
+
+        defaulttype::Vector3 getFreePosition() const {
+            const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getMstate()->read(core::VecCoordId::freePosition());
+            return x[m_pid[0]];
+        }
+
+        defaulttype::Vector3 getNormal() {
+            return defaulttype::Vector3();
+        }
+
+        void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) {
+            DataMatrixDeriv & c_d = *cId[m_geo->getMstate()].write();
+            MatrixDeriv & c = *c_d.beginEdit();
+            MatrixDerivRowIterator c_it1 = c.writeLine(cline);
+            c_it1.addCol(m_pid[0],N);
+            c_d.endEdit();
+        }
+
+        void refineToClosestPoint(const Coord & /*P*/) {}
+
+        void getControlPoints(helper::vector<defaulttype::Vector3> & controlPoints) {
+            const helper::ReadAccessor<Data <VecCoord> > & x = m_geo->getMstate()->read(core::VecCoordId::position());
+            controlPoints.push_back(x[m_pid[0]]);
         }
     };
 
+
     virtual ConstraintProximityPtr getPointProximity(unsigned eid) const;
 
-    virtual ConstraintProximityPtr projectPoint(const defaulttype::Vector3 & T,unsigned eid) const;
-
-    virtual int getNbElements() const;
+    virtual int getNbPoints() const;
 
     void draw(const core::visual::VisualParams * vparams);
 
+    int getNbElements() const;
+
+    ConstraintProximityPtr getElementProximity(unsigned eid) const;
+
 };
+
 
 } // namespace forcefield
 

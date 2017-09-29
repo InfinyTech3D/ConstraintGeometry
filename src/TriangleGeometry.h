@@ -25,7 +25,6 @@
 #ifndef SOFA_COMPONENT_TRIANGLEGEOMETRY_H
 #define SOFA_COMPONENT_TRIANGLEGEOMETRY_H
 
-#include "ConstraintGeometry.h"
 #include "ConstraintProximity.h"
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
@@ -51,64 +50,73 @@ public:
 
     class TriangleConstraintProximity : public ConstraintProximity {
     public:
-        TriangleConstraintProximity(const TriangleGeometry * geo, unsigned eid, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3)
-        : ConstraintProximity(geo) {
+        friend class TriangleGeometry;
+
+        TriangleConstraintProximity(const TriangleGeometry * geo,unsigned eid, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3) : ConstraintProximity(geo) {
             m_eid = eid;
 
-            m_pid.push_back(p1);
-            m_fact.push_back(f1);
+            m_pid.resize(3);
+            m_fact.resize(3);
 
-            m_pid.push_back(p2);
-            m_fact.push_back(f2);
+            m_pid[0] = p1;
+            m_fact[0] = f1;
 
-            m_pid.push_back(p3);
-            m_fact.push_back(f3);
+            m_pid[1] = p2;
+            m_fact[1] = f2;
+
+            m_pid[2] = p3;
+            m_fact[2] = f3;
         }
 
-        defaulttype::Vector3 getNormal() const {
-            return ((TriangleGeometry *) m_cg)->m_triangle_info[m_eid].tn;
+        defaulttype::Vector3 getPosition() const {
+            const helper::ReadAccessor<Data <VecCoord> > & x = m_geo->getMstate()->read(core::VecCoordId::position());
+            return x[m_pid[0]] * m_fact[0] + x[m_pid[1]] * m_fact[1] + x[m_pid[2]] * m_fact[2];
         }
 
-    protected:
+        defaulttype::Vector3 getFreePosition() const {
+            const helper::ReadAccessor<Data <VecCoord> > & x = m_geo->getMstate()->read(core::VecCoordId::freePosition());
+            return x[m_pid[0]] * m_fact[0] + x[m_pid[1]] * m_fact[1] + x[m_pid[2]] * m_fact[2];
+        }
+
+        defaulttype::Vector3 getNormal() {
+            return ((const TriangleGeometry *)m_geo)->m_triangle_info[m_eid].tn;
+        }
+
+        void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) {
+            DataMatrixDeriv & c_d = *cId[m_geo->getMstate()].write();
+            MatrixDeriv & c = *c_d.beginEdit();
+            MatrixDerivRowIterator c_it1 = c.writeLine(cline);
+            c_it1.addCol(m_pid[0],N*m_fact[0]);
+            c_it1.addCol(m_pid[1],N*m_fact[1]);
+            c_it1.addCol(m_pid[2],N*m_fact[2]);
+            c_d.endEdit();
+        }
+
+        void getControlPoints(helper::vector<defaulttype::Vector3> & controlPoints) {
+            const helper::ReadAccessor<Data <VecCoord> > & x = m_geo->getMstate()->read(core::VecCoordId::position());
+            controlPoints.push_back(x[m_pid[0]]);
+            controlPoints.push_back(x[m_pid[1]]);
+            controlPoints.push_back(x[m_pid[2]]);
+        }
+
         unsigned m_eid;
-    };
-
-    class TrianglePhongConstraintProximity : public ConstraintProximity {
-    public:
-
-        TrianglePhongConstraintProximity(const TriangleGeometry * geo, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3)
-        : ConstraintProximity(geo) {
-            m_pid.push_back(p1);
-            m_fact.push_back(f1);
-
-            m_pid.push_back(p2);
-            m_fact.push_back(f2);
-
-            m_pid.push_back(p3);
-            m_fact.push_back(f3);
-
-            m_pid.push_back(p3);
-            m_fact.push_back(f3);
-        }
-
-        defaulttype::Vector3 getNormal() const {
-            return ((TriangleGeometry *) m_cg)->m_pointNormal[m_pid[0]] * m_fact[0] +
-                   ((TriangleGeometry *) m_cg)->m_pointNormal[m_pid[1]] * m_fact[1] +
-                   ((TriangleGeometry *) m_cg)->m_pointNormal[m_pid[2]] * m_fact[2];
-        }
     };
 
     Data<bool> d_phong;
 
     TriangleGeometry();
 
-    ConstraintProximityPtr getTriangleProximity(unsigned eid, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3) const;
+    ConstraintProximityPtr getTriangleProximity(unsigned eid, unsigned p1, double f1, unsigned p2, double f2, unsigned p3, double f3) const;
 
-    ConstraintProximityPtr projectPoint(const defaulttype::Vector3 & s,unsigned eid) const;
+    void projectPoint(const defaulttype::Vector3 & s,TriangleConstraintProximity * pinfo) const;
 
     void draw(const core::visual::VisualParams */*vparams*/);
 
+    int getNbTriangles() const;
+
     int getNbElements() const;
+
+    ConstraintProximityPtr getElementProximity(unsigned eid) const;
 
 protected:
 

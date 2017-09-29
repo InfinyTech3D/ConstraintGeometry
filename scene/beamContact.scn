@@ -1,0 +1,158 @@
+<Node name="root" dt="0.01" gravity="0 0 0" >	
+        <RequiredPlugin pluginName="ConstraintGeometryPlugin" />
+        <RequiredPlugin pluginName="CollisionAlgorithmPlugin" />
+<!--         <RequiredPlugin pluginName="NeedleConstraintPlugin" /> -->
+	<RequiredPlugin pluginName="GeomagicDriverPlugin" />
+<!--        <RequiredPlugin pluginName="ConectPlugin" />-->
+
+        <VisualStyle displayFlags="showVisualModels hideBehaviorModels showCollisionModels hideMappings hideForceFields hideWireframe showForceFields" />
+
+        <FreeMotionAnimationLoop />
+        <GenericConstraintSolver maxIt="1000" tolerance="0.000000001" printLog="false" />
+
+        <Node name="Topology" >
+                    <Node name="GelVolume" >
+<!--                            <SparseGrid name="HexaTop" cellWidth="1.2" fileTopology="mesh/Armadillo_simplified.obj" />-->
+<!--                             <RegularGrid name="HexaTop" n="8 8 8	" min="-10 -6 -10" max="10 14 10" /> -->
+                           <RegularGrid name="HexaTop" n="2 2 2" min="-10 -6 -10" max="10 14 10" />
+
+                            <TetrahedronSetTopologyContainer name="Container" position="@HexaTop.position" />
+                            <TetrahedronSetTopologyModifier name="Modifier"/>
+                            <Hexa2TetraTopologicalMapping input="@HexaTop" output="@Container" swapping="false" />
+                    </Node>
+
+                    <Node name="GelSurface" >
+<!--                            <Mesh   name="Container" cellWidth="2.0" filename="mesh/Armadillo_simplified.obj" />-->
+
+                            <TriangleSetTopologyContainer name="Container" position="@../GelVolume/HexaTop.position" />
+                            <TriangleSetTopologyModifier name="Modifier"/>
+                            <Tetra2TriangleTopologicalMapping input="@../GelVolume/Container" output="@Container" flipNormals="true"/>
+
+<!--                            <CubeTopology name="cubeTop" nx="20" ny="5" nz="5" min="@../GelVolume/HexaTop.min" max="@../GelVolume/HexaTop.max" />-->
+<!--                            <TriangleSetTopologyContainer name="Container" position="@cubeTop.position" />-->
+<!--                            <TriangleSetTopologyModifier name="Modifier"/>-->
+<!--                            <Quad2TriangleTopologicalMapping input="@cubeTop" output="@Container" />-->
+                    </Node>
+        </Node>
+
+        <Node name="OmniControler">
+                <GeomagicDriver name="omni" tags="sensable" scale="3" omniVisu="0" positionBase="0 0 0" orientationBase="0 1 0 0" orientationTool="0 0.707107 0 0.707107"/>
+                <MechanicalObject name="ms" template="Rigid" position="@omni.posDevice" free_position="@omni.posDevice" showObject="true" showObjectScale="0" />
+<!--                <MechanicalObject name="ms" template="Rigid" position="-20 0 -8  0 0 0 1" showObject="true" showObjectScale="0" />-->
+<!--                <MechanicalObject name="ms" template="Rigid" position="-50 -30 -50  0 0 0 1" showObject="true" showObjectScale="0" />-->
+<!--                <MechanicalObject name="ms" template="Rigid" position="0.55 22 -12.6 0 1" showObject="true" showObjectScale="0" />-->
+
+<!--                 <WriteState filename="posNeedle" /> -->
+<!--                <ReadState filename="posNeedle" />-->
+        </Node>
+
+<!--        <Node name="Needle">
+                <EulerImplicitSolver rayleighMass="0" rayleighStiffness="0" />
+                <SparseLUSolver />
+
+                <EdgeSetTopologyContainer name="Container" position="0 0 0   2 0 0    4 0 0    6 0 0    8 0 0   10 0 0   12 0 0    14 0 0   16 0 0" edges="0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8"/>
+
+                <MechanicalObject name="ms" template="Rigid" />
+                <BeamFEMForceField name="FEM" radius="0.8" youngModulus="1e7" poissonRatio="0.45"/>
+                <RestShapeSpringsForceField external_rest_shape="@../OmniControler/ms" stiffness="5000"  angularStiffness="500000" points="0" external_points="0" />
+                
+
+                <Node name="Collision">
+                        <EdgeSetTopologyContainer name="Container" src="@../Container" />
+                        <MechanicalObject name="ms" />
+
+                        <EdgeGeometry name="needle" />
+                        <Sphere radius="0.1" />
+                        <BeamLinearMapping localCoord="false" />
+                </Node>
+
+                <Node name="Base">
+                        <MechanicalObject name="ms" template="Rigid" position="0 0 0  0 0 0 1"   />
+                        <RigidRigidMapping />
+                </Node>
+
+                <LinearSolverConstraintCorrection />
+        </Node>-->
+
+        <Node name="Needle">
+                <EulerImplicitSolver rayleighMass="0" rayleighStiffness="0" />
+                <SparseLUSolver />
+
+                <MechanicalObject name="ms" template="Rigid" dy="20" />
+                <RestShapeSpringsForceField external_rest_shape="@../OmniControler/ms" stiffness="500000"  angularStiffness="500000" points="0" external_points="0" />
+
+                <Node name="Collision">
+                        <EdgeSetTopologyContainer name="Container" position="0 0 0   2 0 0    4 0 0    6 0 0    8 0 0   10 0 0   12 0 0    14 0 0   16 0 0" edges="0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8"/>
+<!--                         <EdgeSetTopologyContainer name="Container" position="0 0 0   16 0 0" edges="0 1 "/> -->
+			<MechanicalObject name="ms" />
+
+                        <PointGeometry name="needle" />
+<!--                         <EdgeGeometry name="needle" /> -->
+			<RigidMapping />
+                </Node>
+                
+                <Node name="Base">
+                        <MechanicalObject name="ms" template="Rigid" position="0 0 0  0 0 0 1"   />
+                        <RigidRigidMapping />
+                </Node>
+
+                <LinearSolverConstraintCorrection />
+        </Node>
+
+        <Node name="ForceFeedback" >
+                <MechanicalObject name="ms" template="Rigid" showObject="true" src="@../Needle/Base/ms" />
+
+                <Node name="Collision">
+                        <EdgeSetTopologyContainer name="Container" src="@../../Needle/Collision/Container" />
+                        <MechanicalObject name="ms" constraint="@../../Needle/Collision/ms.constraint" />
+
+                        <Line color="1 0 0 1" />
+                        <Point color="1 0 0 1"  />
+
+                        <RigidMapping />
+                </Node>
+
+                <LCPForceFeedback tags="sensable"  activate="true" printLog="false" forceCoef="0.05" solverTimeout="0.0001" />
+        </Node>
+
+        <Node name="GEL">
+                <EulerImplicitSolver rayleighMass="0.1" rayleighStiffness="0.1" />
+                <SparseLDLSolver name="precond" />
+
+                <TetrahedronSetTopologyContainer name="Container" src="@../Topology/GelVolume/Container" />
+
+                <MechanicalObject name="ms" />
+                <UniformMass totalmass="1" />
+
+                <TetrahedronFEMForceField youngModulus="1000" poissonRatio="0.45" />
+                <BoxROI name="box" box="-10 -6 -10 10 -4 10" drawBoxes="true" />
+<!--                 <RestShapeSpringsForceField external_rest_shape="@./ms" points="@box.indices" stiffness="500" angularStiffness="500"  /> -->
+                <FixedConstraint indices="@box.indices"  />
+
+                <Node name="Surface">
+			<TriangleSetTopologyContainer name="Container" src="@../../Topology/GelSurface/Container"/>
+			<MechanicalObject name="ms" />
+<!--                         <BezierTriangleGeometry name="surface" /> -->
+                        <TriangleGeometry name="surface" phong="false" />
+<!--                        <EdgeLinearInterpolation name="surface" />-->
+                        <AABBGeometry name="AABB" geometry="surface" />
+			<BarycentricMapping />
+                </Node>
+
+<!--                <Node name="Trajectory">
+                        <EdgeSetTopologyContainer name="Container" />
+                        <EdgeSetTopologyModifier name="Modifier" />
+                        <MechanicalObject name="ms" />
+                        <NeedleTrajectoryGeometry name="trajectory" entryDist="1" constraintDist="2" clearTrajectory="false" />
+                        <BarycentricMapping listening="true" useRestPosition="false" />
+                </Node>-->
+                
+                <LinearSolverConstraintCorrection solverName="precond"/>
+	</Node>	
+
+	<CollisionDetectionAlgorithm name="contactAlgo" />
+<!-- 	<CollisionDetectionAlgorithm name="contactAlgo2" from="Needle/Collision2/needle" to="GEL/Surface/surface" broadPhase="GEL/Surface/AABB" /> -->
+	
+	<ConstraintResponse algorithm="contactAlgo" template="U" from="Needle/Collision/needle" to="GEL/Surface/AABB" />	
+<!-- 	<ConstraintResponse algorithm="contactAlgo2" template="U" /> -->
+</Node>

@@ -6,7 +6,7 @@
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
 #include <SofaBaseMechanics/MechanicalObject.h>
-#include "ConstraintProximity.h"
+#include "ConstraintProximity.inl"
 #include <sofa/helper/gl/template.h>
 
 namespace sofa {
@@ -15,30 +15,41 @@ namespace core {
 
 namespace behavior {
 
-int EdgeGeometry::getNbElements() const{
+int EdgeGeometry::getNbEdges() const {
     return this->getTopology()->getNbEdges();
 }
 
-ConstraintProximityPtr EdgeGeometry::projectPoint(const defaulttype::Vector3 & P,unsigned eid) const {
-    const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::position());
+ConstraintProximityPtr EdgeGeometry::getEdgeProximity(unsigned eid, unsigned p1,double f1,unsigned p2, double f2) const {
+    return ConstraintProximityPtr(new EdgeConstraintProximity(this, eid, p1,f1,p2,f2));
+}
 
-    double fact_u;
-    double fact_v;
+int EdgeGeometry::getNbElements() const {
+    return getNbEdges();
+}
 
-    sofa::core::topology::BaseMeshTopology::Edge edge = this->getTopology()->getEdge(eid);
+ConstraintProximityPtr EdgeGeometry::getElementProximity(unsigned eid) const {
+    const sofa::core::topology::BaseMeshTopology::Edge edge = getTopology()->getEdge(eid);
+    return getEdgeProximity(eid, edge[0],0.5,edge[1],0.5);
+}
 
-    Coord v = x[edge[1]] - x[edge[0]];
-    fact_v = dot (P - x[edge[0]],v) / dot (v,v);
+void EdgeGeometry::projectPoint(const defaulttype::Vector3 & P, EdgeConstraintProximity *pinfo) const {
+    helper::vector<defaulttype::Vector3> pos;
+    pinfo->getControlPoints(pos);
+
+    double & fact_u = pinfo->m_fact[0];
+    double & fact_v = pinfo->m_fact[1];
+
+    Coord v = pos[1] - pos[0];
+    fact_v = dot (P - pos[0],v) / dot (v,v);
 
     if (fact_v<0.0) fact_v = 0.0;
     else if (fact_v>1.0) fact_v = 1.0;
 
     fact_u = 1.0-fact_v;
-
-    return ConstraintProximityPtr(new EdgeConstraintProximity(this, edge[0],fact_u,edge[1],fact_v));
 }
 
-void EdgeGeometry::draw(const core::visual::VisualParams * /*vparams*/) {
+void EdgeGeometry::draw(const core::visual::VisualParams * vparams) {
+    if (! vparams->displayFlags().getShowCollisionModels()) return;
 
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
 

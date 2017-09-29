@@ -1,7 +1,6 @@
 ﻿#ifndef SOFA_COMPONENT_TRIANGLEGEOMETRY_INL
 #define SOFA_COMPONENT_TRIANGLEGEOMETRY_INL
 
-#include "ConstraintProximity.h"
 #include "TriangleGeometry.h"
 #include <sofa/helper/Quater.h>
 #include <sofa/core/visual/VisualParams.h>
@@ -20,6 +19,19 @@ namespace behavior {
 TriangleGeometry::TriangleGeometry()
 : d_phong(initData(&d_phong, false, "phong", "Phong interpolation of the normal")) {
 
+}
+
+ConstraintProximityPtr TriangleGeometry::getTriangleProximity(unsigned eid, unsigned p1, double f1, unsigned p2, double f2, unsigned p3, double f3) const {
+    return ConstraintProximityPtr(new TriangleConstraintProximity(this, eid, p1,f1,p2,f2,p3,f3));
+}
+
+int TriangleGeometry::getNbElements() const {
+    return getNbTriangles();
+}
+
+ConstraintProximityPtr TriangleGeometry::getElementProximity(unsigned eid) const {
+    const sofa::core::topology::BaseMeshTopology::Triangle tri = getTopology()->getTriangle(eid);
+    return getTriangleProximity(eid, tri[0],0.3333,tri[1],0.3333,tri[2],0.3333);
 }
 
 void TriangleGeometry::prepareDetection() {
@@ -79,40 +91,35 @@ void TriangleGeometry::computeBaryCoords(const defaulttype::Vector3 & proj_P,con
     fact_u = 1.0 - fact_v  - fact_w;
 }
 
-int TriangleGeometry::getNbElements() const {
+int TriangleGeometry::getNbTriangles() const {
     return this->getTopology()->getNbTriangles();
 }
 
 //Barycentric coordinates are computed according to
 //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 
-ConstraintProximityPtr TriangleGeometry::projectPoint(const defaulttype::Vector3 & s,unsigned eid) const {
-    helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
-    const sofa::core::topology::BaseMeshTopology::Triangle tri = this->getTopology()->getTriangle(eid);
+void TriangleGeometry::projectPoint(const defaulttype::Vector3 & s, TriangleConstraintProximity *pinfo) const {
+    helper::vector<defaulttype::Vector3> pos;
+    pinfo->getControlPoints(pos);
 
-    //Compute Bezier Positions
-    defaulttype::Vector3 p0 = x[tri[0]];
-    defaulttype::Vector3 p1 = x[tri[1]];
-    defaulttype::Vector3 p2 = x[tri[2]];
+    defaulttype::Vector3 x1x2 = s - pos[0];
 
-    defaulttype::Vector3 x1x2 = s - p0;
-
-    const TriangleInfo & tinfo = m_triangle_info[eid];
+    const TriangleInfo & tinfo = m_triangle_info[pinfo->m_eid];
 
     //corrdinate on the plane
     double c0 = dot(x1x2,tinfo.ax1);
     double c1 = dot(x1x2,tinfo.ax2);
-    defaulttype::Vector3 proj_P = p0 + c0 * tinfo.ax1 + c1 * tinfo.ax2;
+    defaulttype::Vector3 proj_P = pos[0] + c0 * tinfo.ax1 + c1 * tinfo.ax2;
 
-    double fact_u;
-    double fact_v;
-    double fact_w;
+    double & fact_u = pinfo->m_fact[0];
+    double & fact_v = pinfo->m_fact[1];
+    double & fact_w = pinfo->m_fact[2];
 
-    computeBaryCoords(proj_P, tinfo, p0, fact_u,fact_v,fact_w);
+    computeBaryCoords(proj_P, tinfo, pos[0], fact_u,fact_v,fact_w);
 
     if (fact_u<0) {
-        defaulttype::Vector3 v3 = p1 - p2;
-        defaulttype::Vector3 v4 = proj_P - p2;
+        defaulttype::Vector3 v3 = pos[1] - pos[2];
+        defaulttype::Vector3 v4 = proj_P - pos[2];
         double alpha = dot (v4,v3) / dot(v3,v3);
 
         if (alpha<0) alpha = 0;
@@ -122,8 +129,8 @@ ConstraintProximityPtr TriangleGeometry::projectPoint(const defaulttype::Vector3
         fact_v = alpha;
         fact_w = 1.0 - alpha;
     } else if (fact_v<0) {
-        defaulttype::Vector3 v3 = p0 - p2;
-        defaulttype::Vector3 v4 = proj_P - p2;
+        defaulttype::Vector3 v3 = pos[0] - pos[2];
+        defaulttype::Vector3 v4 = proj_P - pos[2];
         double alpha = dot (v4,v3) / dot(v3,v3);
 
         if (alpha<0) alpha = 0;
@@ -133,8 +140,8 @@ ConstraintProximityPtr TriangleGeometry::projectPoint(const defaulttype::Vector3
         fact_v = 0;
         fact_w = 1.0 - alpha;
     } else if (fact_w<0) {
-        defaulttype::Vector3 v3 = p1 - p0;
-        defaulttype::Vector3 v4 = proj_P - p0;
+        defaulttype::Vector3 v3 = pos[1] - pos[0];
+        defaulttype::Vector3 v4 = proj_P - pos[0];
         double alpha = dot (v4,v3) / dot(v3,v3);
 
         if (alpha<0) alpha = 0;
@@ -144,13 +151,6 @@ ConstraintProximityPtr TriangleGeometry::projectPoint(const defaulttype::Vector3
         fact_v = alpha;
         fact_w = 0;
     }
-
-    return getTriangleProximity(eid, tri[0],fact_u,tri[1],fact_v,tri[2],fact_w);
-}
-
-ConstraintProximityPtr TriangleGeometry::getTriangleProximity(unsigned eid, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3) const {
-    if (d_phong.getValue()) return ConstraintProximityPtr (new TrianglePhongConstraintProximity(this, p1,f1,p2,f2,p3,f3));
-    else return ConstraintProximityPtr (new TriangleConstraintProximity(this, eid, p1,f1,p2,f2,p3,f3));
 }
 
 void TriangleGeometry::drawTriangle(const core::visual::VisualParams * vparams,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C) {

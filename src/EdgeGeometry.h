@@ -25,7 +25,6 @@
 #ifndef SOFA_COMPONENT_EDGEGEOMETRY_H
 #define SOFA_COMPONENT_EDGEGEOMETRY_H
 
-#include "ConstraintGeometry.h"
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
@@ -39,35 +38,85 @@ namespace core {
 
 namespace behavior {
 
+
+
 class EdgeGeometry : public PointGeometry
 {
 public:
     SOFA_CLASS(EdgeGeometry , PointGeometry );
 
+
     class EdgeConstraintProximity : public ConstraintProximity {
     public:
+        friend class EdgeGeometry;
 
-        EdgeConstraintProximity(const EdgeGeometry * geo, unsigned p1, double f1,unsigned p2, double f2)
-        : ConstraintProximity(geo) {
-            m_pid.push_back(p1);
-            m_fact.push_back(f1);
+        EdgeConstraintProximity(const EdgeGeometry * geo, unsigned eid, unsigned p1, double f1,unsigned p2, double f2) : ConstraintProximity(geo) {
+            m_eid = eid;
 
-            m_pid.push_back(p2);
-            m_fact.push_back(f2);
+            m_pid.resize(2);
+            m_fact.resize(2);
+
+            m_pid[0] = p1;
+            m_fact[0] = f1;
+
+            m_pid[1] = p2;
+            m_fact[1] = f2;
         }
 
-        defaulttype::Vector3 getNormal() const {
-            const helper::ReadAccessor<Data <VecCoord> >& x = *m_cg->getMstate()->read(core::VecCoordId::position());
-
-            return (x[m_pid[1]] - x[m_pid[0]]).normalized();
+        defaulttype::Vector3 getPosition() const {
+            const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getMstate()->read(core::VecCoordId::position());
+            return x[m_pid[0]] * m_fact[0] + x[m_pid[1]] * m_fact[1];
         }
+
+        defaulttype::Vector3 getFreePosition() const {
+            const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getMstate()->read(core::VecCoordId::freePosition());
+            return x[m_pid[0]] * m_fact[0] + x[m_pid[1]] * m_fact[1];
+        }
+
+
+        defaulttype::Vector3 getNormal() {
+            const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getMstate()->read(core::VecCoordId::position());
+
+            defaulttype::Vector3 En = x[m_pid[1]] - x[m_pid[0]];
+            defaulttype::Vector3 Z = defaulttype::Vector3(0,0,1);
+
+            En.normalize();
+            if (dot(En,Z) < 0.000000000001) Z=defaulttype::Vector3(0,1,0);
+
+            return cross(En,Z);
+        }
+
+        void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) {
+            DataMatrixDeriv & c_d = *cId[m_geo->getMstate()].write();
+            MatrixDeriv & c = *c_d.beginEdit();
+            MatrixDerivRowIterator c_it1 = c.writeLine(cline);
+            c_it1.addCol(m_pid[0],N*m_fact[0]);
+            c_it1.addCol(m_pid[1],N*m_fact[1]);
+            c_d.endEdit();
+        }
+
+        void getControlPoints(helper::vector<defaulttype::Vector3> & controlPoints) {
+            const helper::ReadAccessor<Data <VecCoord> > & x = m_geo->getMstate()->read(core::VecCoordId::position());
+            controlPoints.push_back(x[m_pid[0]]);
+            controlPoints.push_back(x[m_pid[1]]);
+        }
+
+        unsigned m_eid;
+        const EdgeGeometry * m_geo;
     };
 
-    ConstraintProximityPtr projectPoint(const defaulttype::Vector3 & T,unsigned eid) const;
+    void projectPoint(const defaulttype::Vector3 & T,EdgeConstraintProximity * pinfo) const;
 
-    virtual int getNbElements() const ;
+    virtual int getNbEdges() const ;
+
+    ConstraintProximityPtr getEdgeProximity(unsigned eid, unsigned p1,double f1,unsigned p2, double f2) const;
 
     void draw(const core::visual::VisualParams * /*vparams*/);
+
+    int getNbElements() const;
+
+    ConstraintProximityPtr getElementProximity(unsigned eid) const;
+
 };
 
 

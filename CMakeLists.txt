@@ -8,30 +8,41 @@ find_package(SofaSimulation REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-set(HEADER_FILES      
-     src/initConstraintGeometryPlugin.h
-     src/ConstraintGeometry.h
-     src/ConstraintGeometry.inl
-     src/ConstraintProximity.h
-     src/PointGeometry.h
-     src/PointGeometry.inl
-     src/EdgeGeometry.h
-     src/EdgeGeometry.inl
-     src/TriangleGeometry.h
-     src/TriangleGeometry.inl
+#set(HEADER_FILES
+#     src/initConstraintGeometryPlugin.h
+#     src/ConstraintGeometry.h
+#     src/ConstraintGeometry.inl
+#     src/ConstraintProximity.h
+#     src/PointGeometry.h
+#     src/PointGeometry.inl
+#     src/EdgeGeometry.h
+#     src/EdgeGeometry.inl
+#     src/TriangleGeometry.h
+#     src/TriangleGeometry.inl
 
-#     src/QuadraticTriangleNonLinearInterpolation.h
-#     src/QuadraticTriangleNonLinearInterpolation.inl
+##     src/QuadraticTriangleNonLinearInterpolation.h
+##     src/QuadraticTriangleNonLinearInterpolation.inl
+#)
+
+#set(SOURCE_FILES
+#     src/initConstraintGeometryPlugin.cpp
+#     src/ConstraintGeometry.cpp
+#     src/PointGeometry.cpp
+#     src/EdgeGeometry.cpp
+#     src/TriangleGeometry.cpp
+
+##     src/QuadraticTriangleNonLinearInterpolation.cpp
+#)
+
+file(GLOB_RECURSE HEADER_FILES
+    "src/*.h"
+    "src/*.inl"
 )
 
-set(SOURCE_FILES
-     src/initConstraintGeometryPlugin.cpp
-     src/PointGeometry.cpp
-     src/EdgeGeometry.cpp
-     src/TriangleGeometry.cpp
-
-#     src/QuadraticTriangleNonLinearInterpolation.cpp
+file(GLOB_RECURSE SOURCE_FILES
+    "src/*.cpp"
 )
+
 
 file(GLOB_RECURSE SCENES_FILES
     "scenes/*.scn"
