@@ -22,7 +22,7 @@ TriangleGeometry::TriangleGeometry()
 }
 
 ConstraintProximityPtr TriangleGeometry::getTriangleProximity(unsigned eid, unsigned p1, double f1, unsigned p2, double f2, unsigned p3, double f3) const {
-    return ConstraintProximityPtr(new TriangleConstraintProximity(this, eid, p1,f1,p2,f2,p3,f3));
+    return std::make_shared<TriangleConstraintProximity>(this, eid, p1,f1,p2,f2,p3,f3);
 }
 
 int TriangleGeometry::getNbElements() const {

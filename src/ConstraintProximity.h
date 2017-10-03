@@ -34,10 +34,6 @@ public :
     typedef DataTypes::Coord Coord;
     typedef DataTypes::MatrixDeriv::RowIterator MatrixDerivRowIterator;
 
-    ConstraintProximity(const BaseGeometry * geo) {
-        m_geo = geo;
-    }
-
     virtual defaulttype::Vector3 getPosition() const = 0;
 
     virtual defaulttype::Vector3 getFreePosition() const = 0;
@@ -82,7 +78,6 @@ public :
     }
 
 protected:
-    const BaseGeometry * m_geo;
     helper::vector<unsigned> m_pid;
     helper::vector<double> m_fact;
 

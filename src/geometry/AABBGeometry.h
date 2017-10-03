@@ -22,13 +22,15 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_POINTGEOMETRY_H
-#define SOFA_COMPONENT_POINTGEOMETRY_H
+#ifndef SOFA_COMPONENT_AABBGeometry_H
+#define SOFA_COMPONENT_AABBGeometry_H
 
-#include "BaseGeometry.h"
-#include "ConstraintProximity.h"
+#include "CollisionAlgorithm.h"
+#include <sofa/core/behavior/ForceField.h>
+#include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
 #include <sofa/defaulttype/VecTypes.h>
+#include "ConstraintProximity.h"
 
 namespace sofa {
 
@@ -36,65 +38,77 @@ namespace core {
 
 namespace behavior {
 
-
-class PointGeometry : public BaseGeometry
+class AABBGeometry : public BaseGeometry, public BroadPhase
 {
 public:
-    SOFA_CLASS(PointGeometry , BaseGeometry );
+    SOFA_CLASS(AABBGeometry , BaseGeometry);
 
-    class PointConstraintProximity : public ConstraintProximity {
+    typedef sofa::defaulttype::Vec3dTypes DataTypes;
+    typedef DataTypes::VecCoord VecCoord;
+
+    Data<defaulttype::Vec3i> d_nbox;
+    Data<std::string> d_geometry;
+
+    class ElementAABBIterator : public ElementIterator {
     public:
-
-        PointConstraintProximity(const PointGeometry * geo, unsigned pid) : ConstraintProximity (geo) {
-            m_pid.resize(1);
-            m_fact.resize(1);
-
-            m_pid[0] = pid;
-            m_fact[0] = 1.0;
+        ElementAABBIterator(BaseGeometry * geo,std::set<int> set) {
+            m_selectedElements = set;
+            it = m_selectedElements.begin();
+            m_geo = geo;
         }
 
-        defaulttype::Vector3 getPosition() const {
-            const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getMstate()->read(core::VecCoordId::position());
-            return x[m_pid[0]];
+        bool next() {
+            it++;
+            return it != m_selectedElements.end();
         }
 
-        defaulttype::Vector3 getFreePosition() const {
-            const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getMstate()->read(core::VecCoordId::freePosition());
-            return x[m_pid[0]];
+        unsigned getId() {
+            return *it;
         }
 
-        defaulttype::Vector3 getNormal() {
-            return defaulttype::Vector3();
+        BaseGeometry * getGeometry() {
+            return m_geo;
         }
 
-        void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) {
-            DataMatrixDeriv & c_d = *cId[m_geo->getMstate()].write();
-            MatrixDeriv & c = *c_d.beginEdit();
-            MatrixDerivRowIterator c_it1 = c.writeLine(cline);
-            c_it1.addCol(m_pid[0],N);
-            c_d.endEdit();
+        ConstraintProximityPtr getElementProximity() {
+            return m_geo->getElementProximity(*it);
         }
 
-        void refineToClosestPoint(const Coord & /*P*/) {}
-
-        void getControlPoints(helper::vector<defaulttype::Vector3> & controlPoints) {
-            const helper::ReadAccessor<Data <VecCoord> > & x = m_geo->getMstate()->read(core::VecCoordId::position());
-            controlPoints.push_back(x[m_pid[0]]);
-        }
+    private:
+        std::set<int> m_selectedElements;
+        std::set<int>::iterator it;
+        BaseGeometry * m_geo;
     };
 
+    AABBGeometry();
 
-    virtual ConstraintProximityPtr getPointProximity(unsigned eid) const;
+    void draw(const core::visual::VisualParams */*vparams*/);
 
-    virtual int getNbPoints() const;
+    void init();
 
-    void draw(const core::visual::VisualParams * vparams);
+    void prepareDetection();
 
-    int getNbElements() const;
+    virtual ElementIteratorPtr getBroadPhaseIterator(const ConstraintProximityPtr P);
 
-    ConstraintProximityPtr getElementProximity(unsigned eid) const;
+    virtual int getNbElements() const ;
 
+    virtual ConstraintProximityPtr getElementProximity(unsigned eid) const;
+
+protected:
+    defaulttype::Vector3 m_Bmin,m_Bmax,m_cellSize;
+    helper::vector<helper::vector<helper::vector<helper::vector<unsigned> > > >  m_indexedElement;
+    BaseGeometry * m_geo;
+
+    void fillTriangleSet(int d,defaulttype::Vec3i cbox,std::vector<int> & selectTriangles);
+
+    void getCloseElements(const ConstraintProximityPtr pinfo, std::set<int> & selectElements);
+
+    void getCloseElements(defaulttype::Vec3i cbox, std::vector<int> & selectElements);
 };
+
+
+
+
 
 
 } // namespace forcefield

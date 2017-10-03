@@ -14,7 +14,7 @@ namespace core {
 namespace behavior {
 
 ConstraintProximityPtr PointGeometry::getPointProximity(unsigned eid) const {
-    return ConstraintProximityPtr(new PointConstraintProximity(this,eid));
+    return std::make_shared<PointConstraintProximity>(this,eid);
 }
 
 int PointGeometry::getNbPoints() const {

@@ -20,7 +20,7 @@ int EdgeGeometry::getNbEdges() const {
 }
 
 ConstraintProximityPtr EdgeGeometry::getEdgeProximity(unsigned eid, unsigned p1,double f1,unsigned p2, double f2) const {
-    return ConstraintProximityPtr(new EdgeConstraintProximity(this, eid, p1,f1,p2,f2));
+    return std::make_shared<EdgeConstraintProximity>(this, eid, p1,f1,p2,f2);
 }
 
 int EdgeGeometry::getNbElements() const {

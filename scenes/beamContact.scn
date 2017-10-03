@@ -8,7 +8,7 @@
         <VisualStyle displayFlags="showVisualModels hideBehaviorModels showCollisionModels hideMappings hideForceFields hideWireframe showForceFields" />
 
         <FreeMotionAnimationLoop />
-        <GenericConstraintSolver maxIt="1000" tolerance="0.000000001" printLog="false" />
+        <GenericConstraintSolver maxIt="100" tolerance="0.000000001" printLog="false" />
 
         <Node name="Topology" >
                     <Node name="GelVolume" >
@@ -99,7 +99,7 @@
                 <LinearSolverConstraintCorrection />
         </Node>
 
-        <Node name="ForceFeedback" >
+<!--        <Node name="ForceFeedback" >
                 <MechanicalObject name="ms" template="Rigid" showObject="true" src="@../Needle/Base/ms" />
 
                 <Node name="Collision">
@@ -113,7 +113,7 @@
                 </Node>
 
                 <LCPForceFeedback tags="sensable"  activate="true" printLog="false" forceCoef="0.05" solverTimeout="0.0001" />
-        </Node>
+        </Node>-->
 
         <Node name="GEL">
                 <EulerImplicitSolver rayleighMass="0.1" rayleighStiffness="0.1" />
@@ -132,8 +132,8 @@
                 <Node name="Surface">
 			<TriangleSetTopologyContainer name="Container" src="@../../Topology/GelSurface/Container"/>
 			<MechanicalObject name="ms" />
-<!--                         <BezierTriangleGeometry name="surface" /> -->
-                        <TriangleGeometry name="surface" phong="false" />
+                        <BezierTriangleGeometry name="surface" />
+<!--                         <TriangleGeometry name="surface" phong="false" /> -->
 <!--                        <EdgeLinearInterpolation name="surface" />-->
                         <AABBGeometry name="AABB" geometry="surface" />
 			<BarycentricMapping />
@@ -150,9 +150,11 @@
                 <LinearSolverConstraintCorrection solverName="precond"/>
 	</Node>	
 
-	<CollisionDetectionAlgorithm name="contactAlgo" />
+	<CollisionDetectionAlgorithm name="contactAlgo" from="Needle/Collision/needle" dest="GEL/Surface/surface" />
 <!-- 	<CollisionDetectionAlgorithm name="contactAlgo2" from="Needle/Collision2/needle" to="GEL/Surface/surface" broadPhase="GEL/Surface/AABB" /> -->
 	
-	<ConstraintResponse algorithm="contactAlgo" template="U" from="Needle/Collision/needle" to="GEL/Surface/AABB" />	
+
+
+        <Constraint algorithm="contactAlgo" />
 <!-- 	<ConstraintResponse algorithm="contactAlgo2" template="U" /> -->
 </Node>

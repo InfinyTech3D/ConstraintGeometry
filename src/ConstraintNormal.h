@@ -13,34 +13,182 @@ namespace core {
 
 namespace behavior {
 
-class ConstraintNormal {
-public :
+class UnilateralConstraintResolution1 : public core::behavior::ConstraintResolution {
+public:
+    UnilateralConstraintResolution1(double m,double & f)
+    : m_maxForce(m)
+    , m_force(f)
+    {}
 
-//    ConstraintNormal(ConstraintProximityPtr p1) {
-//        pinfo1 = p1;
-//        pinfo2 = NULL;
+    virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/)
+    {
+        if (w[line][line] == 0.0) force[line] = 0.0;
+        else
+        force[line] -= d[line] / w[line][line];
+
+        if (force[line]*w[line][line]>m_maxForce) force[line] = m_maxForce;
+        else if (force[line]*w[line][line]<0) force[line] = 0.0;
+    }
+
+    void store(int line, double* force, bool /*convergence*/) {
+        m_force = force[line];
+    }
+
+    double m_maxForce;
+    double & m_force;
+};
+
+class ConstraintNormal {
+public:
+
+    ConstraintNormal(std::pair<ConstraintProximityPtr,ConstraintProximityPtr> p)
+    : m_pinfo(p)
+    {}
+
+    void buildConstraintMatrix(const ConstraintParams* cParams, core::MultiMatrixDerivId cId, unsigned cline) {
+        for (unsigned i=0;i<m_normals.size();i++) {
+            m_pinfo.first->buildConstraintMatrix(cParams,cId,cline+i,m_normals[i]);
+            m_pinfo.second->buildConstraintMatrix(cParams,cId,cline+i,-m_normals[i]);
+        }
+    }
+
+    void getConstraintViolation(const ConstraintParams* /*cParams*/, defaulttype::BaseVector *v,unsigned cid) {
+        defaulttype::Vector3 PFree = m_pinfo.first->getFreePosition();
+        defaulttype::Vector3 QFree = m_pinfo.second->getFreePosition();
+        defaulttype::Vector3 PQFree = PFree - QFree;
+
+        for (unsigned i=0;i<m_normals.size();i++) v->set(cid+i,dot(m_normals[i],PQFree));
+    }
+
+    virtual core::behavior::ConstraintResolution * getResolution() = 0;
+
+    unsigned size() {
+        return m_normals.size();
+    }
+
+    ConstraintProximityPtr getP1() {
+        return m_pinfo.first;
+    }
+
+    ConstraintProximityPtr getP2() {
+        return m_pinfo.second;
+    }
+
+    const helper::vector<defaulttype::Vector3> & getNormals() {
+        return m_normals;
+    }
+
+    static helper::fixed_array<defaulttype::Vector3,3> createFrame(defaulttype::Vector3 N1) {
+        if (N1.norm() == 0) N1 = defaulttype::Vector3(1,0,0);
+        N1.normalize();
+        defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(0,1,0)))>0.99) ? defaulttype::Vector3(0,0,1) : defaulttype::Vector3(0,1,0)));
+        N2.normalize();
+        defaulttype::Vector3 N3 = cross(N1,N2);
+        N3.normalize();
+
+        helper::fixed_array<defaulttype::Vector3,3> normals;
+        normals[0] = N1;
+        normals[1] = N2;
+        normals[2] = N3;
+
+        return normals;
+    }
+
+protected:
+    std::pair<ConstraintProximityPtr,ConstraintProximityPtr> m_pinfo;
+    helper::vector<defaulttype::Vector3> m_normals;
+
+};
+
+typedef std::shared_ptr<ConstraintNormal> ConstraintNormalPtr;
+
+class FrictionConstraintNormal : public ConstraintNormal {
+public:
+    FrictionConstraintNormal(std::pair<ConstraintProximityPtr,ConstraintProximityPtr> p,
+                             helper::fixed_array<defaulttype::Vector3,1> N,
+                             double maxF = std::numeric_limits<double>::max())
+    : ConstraintNormal(p) {
+        m_normals.push_back(N[0].normalized());
+        m_maxForce = maxF;
+        m_force = 0.0;
+    }
+
+    FrictionConstraintNormal(std::pair<ConstraintProximityPtr,ConstraintProximityPtr> p,
+                             helper::fixed_array<defaulttype::Vector3,3> N,
+                             double maxF = std::numeric_limits<double>::max())
+    : ConstraintNormal(p) {
+        m_normals.push_back(N[0].normalized());
+        m_normals.push_back(N[1].normalized());
+        m_normals.push_back(N[2].normalized());
+        m_maxForce = maxF;
+        m_force = 0.0;
+    }
+
+    core::behavior::ConstraintResolution * getResolution() {
+        if (size() == 1) return new UnilateralConstraintResolution1(m_maxForce,m_force);
+//        else if (sz == 3) return new UnilateralConstraintResolution3(m_maxForce);
+
+        std::cerr << "Error call of FrictionConstraintNormal::getConstraintResolution with unsuported size" << std::endl;
+        return NULL;
+    }
+
+
+    double m_maxForce;
+    double m_force;
+
+};
+
+
+class BilateralConstraintNormal : public ConstraintNormal {
+public:
+    BilateralConstraintNormal(std::pair<ConstraintProximityPtr,ConstraintProximityPtr> p,
+                              helper::fixed_array<defaulttype::Vector3,1> N,
+                              double maxF = std::numeric_limits<double>::max())
+    : ConstraintNormal(p) {
+        m_normals.push_back(N[0].normalized());
+        m_maxForce = maxF;
+    }
+
+    BilateralConstraintNormal(std::pair<ConstraintProximityPtr,ConstraintProximityPtr> p,
+                              helper::fixed_array<defaulttype::Vector3,3> N,
+                              double maxF = std::numeric_limits<double>::max())
+    : ConstraintNormal(p) {
+        m_normals.push_back(N[0].normalized());
+        m_normals.push_back(N[1].normalized());
+        m_normals.push_back(N[2].normalized());
+        m_maxForce = maxF;
+    }
+
+    core::behavior::ConstraintResolution * getResolution() {
+//        if (size() == 1) return new UnilateralConstraintResolution1(m_maxForce);
+//        else if (sz == 3) return new UnilateralConstraintResolution3(m_maxForce);
+
+        std::cerr << "Error call of BilateralConstraint::getConstraintResolution with unsuported size" << std::endl;
+        return NULL;
+    }
+
+protected:
+    double m_maxForce;
+};
+//class ConstraintNormalPair1 : public ConstraintNormalPair {
+//public :
+
+//    ConstraintNormalPair1(ConstraintResponse r,std::pair<ConstraintProximityPtr,ConstraintProximityPtr> p,defaulttype::Vector3 N1)
+//    : ConstraintNormalPair(r,p) {
+//        m_normals.resize(1);
+//        m_normals[0] = N1;
+//        m_normals[0].normalize();
 //    }
 
-    ConstraintNormal(ConstraintProximityPtr p1,ConstraintProximityPtr p2) {
-        pinfo1 = p1;
-        pinfo2 = p2;
-    }
+//    void setNormal(defaulttype::Vector3 N1,defaulttype::Vector3 N2,defaulttype::Vector3 N3) {
+//        m_normals[0] = N1;
+//        m_normals[1] = N2;
+//        m_normals[2] = N3;
 
-
-    void setNormal(defaulttype::Vector3 N) {
-        m_normals.resize(1);
-        m_normals[0] = N;
-    }
-
-    void setNormal(defaulttype::Vector3 N1,defaulttype::Vector3 N2,defaulttype::Vector3 N3) {
-        m_normals[0] = N1;
-        m_normals[1] = N2;
-        m_normals[2] = N3;
-
-        m_normals[0].normalize();
-        m_normals[1].normalize();
-        m_normals[2].normalize();
-    }
+//        m_normals[0].normalize();
+//        m_normals[1].normalize();
+//        m_normals[2].normalize();
+//    }
 
 //    void createConstraint(defaulttype::Vector3 N1) {
 //        if (N1.norm() == 0) N1 = defaulttype::Vector3(1,0,0);
@@ -62,59 +210,23 @@ public :
 //        m_normals[2] = N3;
 //    }
 
-    void orthogonalize(unsigned i) {
-        if (m_normals.size() != i) {
-            std::cout << "TOTO RESIZE in ConstraintNormal" <<  m_normals.size() << " " << i<< std::endl;
-            return;
-        }
+//    void orthogonalize(unsigned i) {
+//        if (m_normals.size() != i) {
+//            std::cout << "TOTO RESIZE in ConstraintNormal" <<  m_normals.size() << " " << i<< std::endl;
+//            return;
+//        }
 
-        for (unsigned i=0;i<m_normals.size();i++) m_normals[i].normalize();
-    }
+//        for (unsigned i=0;i<m_normals.size();i++) m_normals[i].normalize();
+//    }
+//};
+//class ConstraintNormalFactory {
+//public:
 
-    void buildConstraintMatrix(const ConstraintParams* cParams, core::MultiMatrixDerivId cId, unsigned & cline) {
-        for (unsigned i=0;i<m_normals.size();i++) {
-            pinfo1->buildConstraintMatrix(cParams,cId,cline+i,m_normals[i]);
-            pinfo2->buildConstraintMatrix(cParams,cId,cline+i,-m_normals[i]);
-        }
+//    static ConstraintNormalPtr create(std::pair<ConstraintProximityPtr,ConstraintProximityPtr> p,defaulttype::Vector3 & N,ConstraintResponse r) {
+//        return ConstraintNormalPtr(new ConstraintNormalPair1(p,N,r));
+//    }
 
-        cline += m_normals.size();
-    }
-
-    void getConstraintViolation(const ConstraintParams* /*cParams*/, defaulttype::BaseVector *v,unsigned & cid) {
-        defaulttype::Vector3 PFree = pinfo1->getFreePosition();
-        defaulttype::Vector3 QFree = pinfo2->getFreePosition();
-        defaulttype::Vector3 PQFree = PFree - QFree;
-
-        for (unsigned i=0;i<m_normals.size();i++) v->set(cid+i,dot(m_normals[i],PQFree));
-
-        cid+=m_normals.size();
-    }
-
-    unsigned size() {
-        return m_normals.size();
-    }
-
-    bool empty() {
-        return m_normals.size() == 0;
-    }
-
-    ConstraintProximityPtr getPinfo1() {
-        return pinfo1;
-    }
-
-    ConstraintProximityPtr getPinfo2() {
-        return pinfo2;
-    }
-
-    const helper::vector<defaulttype::Vector3> & getNormals() {
-        return m_normals;
-    }
-
-private:
-    helper::vector<defaulttype::Vector3> m_normals;
-    ConstraintProximityPtr pinfo1;
-    ConstraintProximityPtr pinfo2;
-};
+//};
 
 } // namespace controller
 

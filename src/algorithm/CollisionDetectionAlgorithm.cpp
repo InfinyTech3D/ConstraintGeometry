@@ -23,11 +23,12 @@
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
 
-#include "ConstraintResponse.inl"
+#include "CollisionDetectionAlgorithm.inl"
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <math.h>
 #include <assert.h>     /* assert */
+
 
 namespace sofa
 {
@@ -38,13 +39,10 @@ namespace core
 namespace behavior
 {
 
-SOFA_DECL_CLASS(ConstraintResponse)
+SOFA_DECL_CLASS(CollisionDetectionAlgorithm)
 
-int ConstraintResponseClass = core::RegisterObject("Triangle liear interpolation")
-.add<ConstraintResponse<ResponseGeometryU> >()
-.add<ConstraintResponse<ResponseGeometryB> >()
-//.add<ConstraintResponse<ResponseGeometryUFF> >()
-//.add<ConstraintResponse<ResponseGeometryBBB> >()
+int CollisionDetectionAlgorithmClass = core::RegisterObject("Triangle liear interpolation")
+.add<CollisionDetectionAlgorithm >()
 ;
 } // namespace controller
 

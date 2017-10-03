@@ -23,7 +23,7 @@ namespace behavior {
 class BroadPhase {
 public:
 
-    virtual ElementIteratorPtr getCloseElementsIterator(const ConstraintProximityPtr P) = 0;
+    virtual ElementIteratorPtr getBroadPhaseIterator(const ConstraintProximityPtr P) = 0;
 
 };
 
@@ -33,9 +33,8 @@ public:
     typedef std::pair<ConstraintProximityPtr,ConstraintProximityPtr> PariProximity;
     typedef helper::vector<PariProximity > PariProximityVector;
 
-    virtual void processAlgorithm(BaseGeometry * geoFrom,BaseGeometry * geoTo,helper::vector<PariProximity> & output) = 0;
+    virtual void processAlgorithm(helper::vector<ConstraintNormalPtr> & cn) = 0;
 
-private :
     void updatePosition(SReal /*dt*/) {
         prepareDetection();
     }
