@@ -25,7 +25,7 @@
 #ifndef SOFA_COMPONENT_AABBGeometry_H
 #define SOFA_COMPONENT_AABBGeometry_H
 
-#include "CollisionAlgorithm.h"
+#include "algorithm/CollisionDetectionAlgorithm.h"
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
