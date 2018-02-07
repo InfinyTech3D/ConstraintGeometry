@@ -34,6 +34,10 @@ int PointGeometry::getNbElements() {
     return this->getTopology()->getNbPoints();
 }
 
+int PointGeometry::getNbPoints() {
+    return this->getTopology()->getNbPoints();
+}
+
 void PointGeometry::draw(const core::visual::VisualParams * vparams) {
     if (! vparams->displayFlags().getShowCollisionModels()) return;
 

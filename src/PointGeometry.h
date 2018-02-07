@@ -51,6 +51,8 @@ public:
 
     int getNbElements();
 
+    int getNbPoints();
+
     void draw(const core::visual::VisualParams * vparams);
 
 };

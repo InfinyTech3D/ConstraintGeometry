@@ -12,6 +12,7 @@
 #include <SofaBaseTopology/PointSetTopologyContainer.h>
 #include <SofaBaseTopology/EdgeSetTopologyContainer.h>
 #include <SofaBaseTopology/TriangleSetTopologyContainer.h>
+#include <sofa/helper/AdvancedTimer.h>
 
 namespace sofa {
 
@@ -49,7 +50,11 @@ public:
 
 private :
     void updatePosition(SReal /*dt*/) {
+        std::string timerName = std::string("updatePosition")+this->getName();
+
+        sofa::helper::AdvancedTimer::stepBegin(timerName.c_str());
         prepareDetection();
+        sofa::helper::AdvancedTimer::stepEnd(timerName.c_str());
     }
 
 };
