@@ -12,7 +12,10 @@
 #include <SofaBaseTopology/PointSetTopologyContainer.h>
 #include <SofaBaseTopology/EdgeSetTopologyContainer.h>
 #include <SofaBaseTopology/TriangleSetTopologyContainer.h>
-#include "ConstraintNormal.h"
+#include "BaseGeometry.h"
+#include <sofa/core/visual/VisualParams.h>
+#include <sofa/helper/system/gl.h>
+#include <sofa/helper/gl/template.h>
 
 namespace sofa {
 
@@ -20,22 +23,85 @@ namespace core {
 
 namespace behavior {
 
+typedef std::pair<ConstraintProximityPtr,ConstraintProximityPtr> PariProximity;
+typedef helper::vector<PariProximity > PariProximityVector;
 
-class CollisionAlgorithm : public core::BehaviorModel {
-public:
+//class CollisionResponse : public core::BehaviorModel {
+//public:
 
-    typedef std::pair<ConstraintProximityPtr,ConstraintProximityPtr> PariProximity;
-    typedef helper::vector<PariProximity > PariProximityVector;
+//    virtual void fillConstraints(helper::vector<ConstraintNormalPtr> & cn) = 0;
 
-    virtual void processAlgorithm(helper::vector<ConstraintNormalPtr> & cn) = 0;
+//    void updatePosition(SReal /*dt*/) {
+//        prepareDetection();
+//    }
 
-    void updatePosition(SReal /*dt*/) {
-        prepareDetection();
+//protected:
+
+//    virtual void prepareDetection() {}
+
+//};
+
+class CollisionAlgorithm : public sofa::core::objectmodel::BaseObject {
+public :
+    SOFA_CLASS(CollisionAlgorithm, sofa::core::objectmodel::BaseObject);
+
+    Data<std::string> d_from;
+    Data<std::string> d_dest;
+
+    CollisionAlgorithm()
+    : d_from(initData(&d_from, "from", "Collision reponse algorithm"))
+    , d_dest(initData(&d_dest, "dest", "Collision reponse algorithm")) {}
+
+    virtual void processAlgorithm() = 0;
+
+    void init() {
+        this->getContext()->get(m_from,d_from.getValue());
+        if (m_from == NULL) serr << "Error cannot find the reponse" << std::endl;
+
+        this->getContext()->get(m_dest,d_dest.getValue());
+        if (m_dest == NULL) serr << "Error cannot find the reponse" << std::endl;
     }
 
-protected:
+    void draw(const core::visual::VisualParams* vparams) {
+        if (! vparams->displayFlags().getShowInteractionForceFields()) return;
 
-    virtual void prepareDetection() {}
+        for (unsigned i=0;i<m_pairDetection.size();i++) {
+
+            glBegin(GL_LINES);
+
+            defaulttype::Vector3 P = m_pairDetection[i].first->getPosition();
+            defaulttype::Vector3 Q = m_pairDetection[i].second->getPosition();
+
+            helper::gl::glVertexT(P);
+            helper::gl::glVertexT(Q);
+
+            glEnd();
+        }
+    }
+
+    virtual void clear() {
+        m_pairDetection.clear();
+    }
+
+    virtual void update() {
+        if (m_from == NULL) return;
+        if (m_dest == NULL) return;
+
+        m_from->update();
+        m_dest->update();
+
+        processAlgorithm();
+    }
+
+    const PariProximityVector & getDetection() {
+        return m_pairDetection;
+    }
+
+
+protected:
+    PariProximityVector m_pairDetection;
+    BaseGeometry * m_from;
+    BaseGeometry * m_dest;
 };
 
 } // namespace controller

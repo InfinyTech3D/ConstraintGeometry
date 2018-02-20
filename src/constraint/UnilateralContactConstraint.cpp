@@ -23,7 +23,8 @@
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
 
-#include "Constraint.h"
+#include "response/UnilateralResponse.h"
+#include "UnilateralContactConstraint.h"
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <math.h>
@@ -38,11 +39,35 @@ namespace core
 namespace behavior
 {
 
-SOFA_DECL_CLASS(ConstraintResponse)
+UnilateralContactConstraint::UnilateralContactConstraint()
+: d_algo(initData(&d_algo, "algo", "Collision reponse algorithm")) {}
 
-int ConstraintResponseClass = core::RegisterObject("Triangle liear interpolation")
-.add<Constraint >()
+
+void UnilateralContactConstraint::init() {
+    this->getContext()->get(m_algo,d_algo.getValue());
+    if (m_algo == NULL) serr << "Error cannot find the algo" << std::endl;
+}
+
+void UnilateralContactConstraint::fillConstraints(helper::vector<ConstraintResponsePtr> &constraints) {
+    m_algo->clear();
+    m_algo->update();
+
+    const PariProximityVector & detection = m_algo->getDetection();
+
+    for (unsigned i=0;i<detection.size();i++) {
+        ConstraintResponsePtr cst = std::make_shared<UnilateralResponse>(detection[i].first,detection[i].second);
+
+        constraints.push_back(cst);
+    }
+}
+
+
+SOFA_DECL_CLASS(UnilateralContactConstraint)
+
+int UnilateralContactConstraintClass = core::RegisterObject("Triangle liear interpolation")
+.add<UnilateralContactConstraint >()
 ;
+
 } // namespace controller
 
 } // namespace component

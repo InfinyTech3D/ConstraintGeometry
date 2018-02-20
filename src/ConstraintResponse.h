@@ -12,7 +12,7 @@
 #include <SofaBaseTopology/PointSetTopologyContainer.h>
 #include <SofaBaseTopology/EdgeSetTopologyContainer.h>
 #include <SofaBaseTopology/TriangleSetTopologyContainer.h>
-#include "ConstraintNormal.h"
+//#include "ConstraintResponse.h"
 #include "CollisionAlgorithm.h"
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/helper/system/gl.h>
@@ -25,36 +25,29 @@ namespace core {
 
 namespace behavior {
 
-class ConstraintResponse : public core::BehaviorModel {
-public :
+class ConstraintResponse {
+public:
+    virtual void buildConstraintMatrix(const ConstraintParams* cParams, core::MultiMatrixDerivId cId, unsigned cline) = 0;
 
-    virtual void processAlgorithm(helper::vector<ConstraintNormal> & cn) = 0;
+    virtual void getConstraintViolation(const ConstraintParams* /*cParams*/, defaulttype::BaseVector *v,unsigned cid) = 0;
 
+    virtual core::behavior::ConstraintResolution * getResolution() = 0;
+
+    virtual unsigned size() = 0;
 };
+
+typedef std::shared_ptr<ConstraintResponse> ConstraintResponsePtr;
 
 class Constraint : public sofa::core::behavior::BaseConstraint {
 public :
 
     SOFA_CLASS(Constraint, sofa::core::behavior::BaseConstraint );
 
-public:
-
-    Data<std::string> d_algorithm;
-
-    Constraint()
-    : d_algorithm(initData(&d_algorithm, "algorithm", "Collision reponse algorithm")) {}
-
-    void init () {
-        this->getContext()->get(m_algorithm,d_algorithm.getValue());
-        if (m_algorithm == NULL) serr << "Error cannot find the reponse" << std::endl;
-    }
+    virtual void fillConstraints(helper::vector<ConstraintResponsePtr> & cst) = 0;
 
     void processGeometricalData() {
         m_constraints.clear();
-
-        if (m_algorithm == NULL) return;
-
-        m_algorithm->processAlgorithm(m_constraints);
+        fillConstraints(m_constraints);
     }
 
     void buildConstraintMatrix(const ConstraintParams* cParams, core::MultiMatrixDerivId cId, unsigned int &constraintId) {
@@ -78,32 +71,10 @@ public:
         }
     }
 
-    void draw(const core::visual::VisualParams* vparams) {
-        for (unsigned i=0;i<m_constraints.size();i++) {
-
-            glBegin(GL_LINES);
-
-            defaulttype::Vector3 P = m_constraints[i]->getP1()->getPosition();
-            defaulttype::Vector3 Q = m_constraints[i]->getP2()->getPosition();
-
-            helper::gl::glVertexT(P);
-            helper::gl::glVertexT(Q);
-
-            glEnd();
-
-            for (unsigned n=0;n<m_constraints[i]->getNormals().size();n++) {
-                defaulttype::Vector3 N = m_constraints[i]->getNormals()[n];
-
-                vparams->drawTool()->drawArrow(Q,Q + N,1.0/20.0, defaulttype::Vec<4,float>(0.0f,0.0f,1.0f,1.0f));
-            }
-        }
-    }
-
     void updateForceMask() {}
 
 private:
-    helper::vector<ConstraintNormalPtr> m_constraints;
-    CollisionAlgorithm * m_algorithm;
+    helper::vector<ConstraintResponsePtr> m_constraints;
 
 };
 

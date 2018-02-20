@@ -1,45 +1,40 @@
-#ifndef SOFA_COMPONENT_CONSTRAINT_BINDPOINTNALGORITHM_H
-#define SOFA_COMPONENT_CONSTRAINT_BINDPOINTNALGORITHM_H
+//#ifndef SOFA_COMPONENT_CONSTRAINT_BINDPOINTNALGORITHM_H
+//#define SOFA_COMPONENT_CONSTRAINT_BINDPOINTNALGORITHM_H
 
-#include "CollisionAlgorithm.h"
-#include "ConstraintProximity.h"
-#include "geometry/PointGeometry.h"
-#include <sofa/defaulttype/SolidTypes.h>
-#include <sofa/core/behavior/BaseController.h>
-#include <sofa/core/behavior/MechanicalState.h>
-#include <math.h>
-#include <sofa/defaulttype/Vec.h>
+//#include "CollisionAlgorithm.h"
+//#include "ConstraintProximity.h"
+//#include "geometry/PointGeometry.h"
+//#include <sofa/defaulttype/SolidTypes.h>
+//#include <sofa/core/behavior/BaseController.h>
+//#include <sofa/core/behavior/MechanicalState.h>
+//#include <math.h>
+//#include <sofa/defaulttype/Vec.h>
 
-namespace sofa {
+//namespace sofa {
 
-namespace core {
+//namespace core {
 
-namespace behavior {
+//namespace behavior {
 
-class PointCloudBindingAlgorithm : public CollisionAlgorithm {
-public:
+//class PointCloudBindingAlgorithm : public CollisionAlgorithm {
+//public:
 
-    SOFA_CLASS(PointCloudBindingAlgorithm , CollisionAlgorithm );
+//    SOFA_CLASS(PointCloudBindingAlgorithm , CollisionAlgorithm );
 
-    Data<std::string> d_from;
-    Data<std::string> d_dest;
-    Data<double> d_maxDist;
+//    Data<double> d_maxDist;
 
-    PointCloudBindingAlgorithm();
+//    PointCloudBindingAlgorithm();
 
-    void init();
+//    void init();
 
-    void processAlgorithm(helper::vector<ConstraintNormalPtr> & cn) ;
+//    PariProximityVector processAlgorithm(BaseGeometry * from,BaseGeometry * dest);
 
-protected:
-    PointGeometry * m_from;
-    PointGeometry * m_dest;
-};
+//};
 
-} // namespace controller
+//} // namespace controller
 
-} // namespace component
+//} // namespace component
 
-} // namespace sofa
+//} // namespace sofa
 
-#endif // SOFA_COMPONENT_CONTROLLER_NeedleConstraint_H
+//#endif // SOFA_COMPONENT_CONTROLLER_NeedleConstraint_H

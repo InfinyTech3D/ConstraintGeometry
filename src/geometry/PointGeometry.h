@@ -26,7 +26,6 @@
 #define SOFA_COMPONENT_POINTGEOMETRY_H
 
 #include "BaseGeometry.h"
-#include "ConstraintProximity.h"
 #include <sofa/core/objectmodel/Data.h>
 #include <sofa/defaulttype/VecTypes.h>
 
@@ -37,67 +36,21 @@ namespace core {
 namespace behavior {
 
 
-class PointGeometry : public BaseGeometry
-{
+class PointGeometry : public BaseGeometry {
 public:
     SOFA_CLASS(PointGeometry , BaseGeometry );
 
-    class PointConstraintProximity : public ConstraintProximity {
-    public:
+    ConstraintElementPtr getPointElement(unsigned eid) const;
 
-        PointConstraintProximity(const PointGeometry * geo, unsigned pid) {
-            m_geo = geo;
-
-            m_pid.resize(1);
-            m_fact.resize(1);
-
-            m_pid[0] = pid;
-            m_fact[0] = 1.0;
-        }
-
-        defaulttype::Vector3 getPosition() const {
-            const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getMstate()->read(core::VecCoordId::position());
-            return x[m_pid[0]];
-        }
-
-        defaulttype::Vector3 getFreePosition() const {
-            const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getMstate()->read(core::VecCoordId::freePosition());
-            return x[m_pid[0]];
-        }
-
-        defaulttype::Vector3 getNormal() {
-            return defaulttype::Vector3();
-        }
-
-        void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) {
-            DataMatrixDeriv & c_d = *cId[m_geo->getMstate()].write();
-            MatrixDeriv & c = *c_d.beginEdit();
-            MatrixDerivRowIterator c_it1 = c.writeLine(cline);
-            c_it1.addCol(m_pid[0],N);
-            c_d.endEdit();
-        }
-
-        void refineToClosestPoint(const Coord & /*P*/) {}
-
-        void getControlPoints(helper::vector<defaulttype::Vector3> & controlPoints) {
-            const helper::ReadAccessor<Data <VecCoord> > & x = m_geo->getMstate()->read(core::VecCoordId::position());
-            controlPoints.push_back(x[m_pid[0]]);
-        }
-
-    protected:
-        const PointGeometry * m_geo;
-    };
-
-
-    virtual ConstraintProximityPtr getPointProximity(unsigned eid) const;
-
-    virtual int getNbPoints() const;
+    virtual unsigned getNbPoints() const;
 
     void draw(const core::visual::VisualParams * vparams);
 
-    int getNbElements() const;
+    virtual defaulttype::Vector3 getPos(unsigned pid,core::VecCoordId vid = core::VecCoordId::position()) const;
 
-    ConstraintProximityPtr getElementProximity(unsigned eid) const;
+    virtual unsigned getNbElements() const;
+
+    virtual ConstraintElementPtr getElement(unsigned eid) const;
 
 };
 

@@ -86,8 +86,9 @@
 <!--                         <EdgeSetTopologyContainer name="Container" position="0 0 0   16 0 0" edges="0 1 "/> -->
 			<MechanicalObject name="ms" />
 
-                        <PointGeometry name="needle" />
-<!--                         <EdgeGeometry name="needle" /> -->
+                        <PointGeometry name="point" />
+                        <EdgeGeometry name="needle" />
+                        
 			<RigidMapping />
                 </Node>
                 
@@ -132,10 +133,12 @@
                 <Node name="Surface">
 			<TriangleSetTopologyContainer name="Container" src="@../../Topology/GelSurface/Container"/>
 			<MechanicalObject name="ms" />
-                        <BezierTriangleGeometry name="surface" />
+<!--                        <BezierTriangleGeometry name="surface" />-->
 <!--                         <TriangleGeometry name="surface" phong="false" /> -->
 <!--                        <EdgeLinearInterpolation name="surface" />-->
-                        <AABBGeometry name="AABB" geometry="surface" />
+<!--                        <AABBGeometry name="AABB" geometry="surface" />-->
+
+                        <TriangleGeometry name="surface" />
 			<BarycentricMapping />
                 </Node>
 
@@ -150,11 +153,11 @@
                 <LinearSolverConstraintCorrection solverName="precond"/>
 	</Node>	
 
-	<CollisionDetectionAlgorithm name="contactAlgo" from="Needle/Collision/needle" dest="GEL/Surface/surface" />
-<!-- 	<CollisionDetectionAlgorithm name="contactAlgo2" from="Needle/Collision2/needle" to="GEL/Surface/surface" broadPhase="GEL/Surface/AABB" /> -->
+	<CollisionDetectionAlgorithm name="contactAlgo" from="Needle/Collision/point" dest="GEL/Surface/surface" />
+	<CollisionDetectionAlgorithm name="contactAlgo2" from="Needle/Collision/needle" dest="GEL/Surface/surface" />
 	
 
 
-        <Constraint algorithm="contactAlgo" />
-<!-- 	<ConstraintResponse algorithm="contactAlgo2" template="U" /> -->
+<!--        <Constraint algorithm="contactAlgo" />-->
+	<UnilateralContactConstraint algorithm="contactAlgo" />
 </Node>

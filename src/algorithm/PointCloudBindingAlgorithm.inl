@@ -1,137 +1,129 @@
-#ifndef SOFA_COMPONENT_CONSTRAINT_BINDPOINTNALGORITHM_INL
-#define SOFA_COMPONENT_CONSTRAINT_BINDPOINTNALGORITHM_INL
+//#ifndef SOFA_COMPONENT_CONSTRAINT_BINDPOINTNALGORITHM_INL
+//#define SOFA_COMPONENT_CONSTRAINT_BINDPOINTNALGORITHM_INL
 
-#include "PointCloudBindingAlgorithm.h"
-#include "ConstraintProximity.h"
-#include <sofa/defaulttype/SolidTypes.h>
-#include <sofa/core/behavior/BaseController.h>
-#include <sofa/core/behavior/MechanicalState.h>
-#include <math.h>
-#include <sofa/defaulttype/Vec.h>
+//#include "PointCloudBindingAlgorithm.h"
+//#include "ConstraintProximity.h"
+//#include <sofa/defaulttype/SolidTypes.h>
+//#include <sofa/core/behavior/BaseController.h>
+//#include <sofa/core/behavior/MechanicalState.h>
+//#include <math.h>
+//#include <sofa/defaulttype/Vec.h>
 
-namespace sofa {
+//namespace sofa {
 
-namespace core {
+//namespace core {
 
-namespace behavior {
+//namespace behavior {
 
-PointCloudBindingAlgorithm::PointCloudBindingAlgorithm()
-: d_from(initData(&d_from, "from", "From geometry"))
-, d_dest(initData(&d_dest, "dest", "Dest geometry"))
-, d_maxDist(initData(&d_maxDist, "maxDist", "Collision detection algorithm")) {
-
-}
-
-void PointCloudBindingAlgorithm::init() {
-    this->getContext()->get(m_from,d_from.getValue());
-    this->getContext()->get(m_dest,d_dest.getValue());
-
-    if (m_from == NULL) serr << "Error cannot find from topology" << std::endl;
-    if (m_dest == NULL) serr << "Error cannot find dest topology" << std::endl;
-}
-
-void PointCloudBindingAlgorithm::processAlgorithm(helper::vector<ConstraintNormalPtr> & cn) {
-    if (m_from == NULL) return;
-    if (m_dest == NULL) return;
-
-    if (m_from->getNbElements() == 0) return;
-
-    helper::vector<defaulttype::Vector3> p1;
-    helper::vector<defaulttype::Vector3> p2;
-    for (int i=0;i<m_from->getNbElements();i++) p1.push_back(m_from->getElementProximity(i)->getPosition());
-    for (int i=0;i<m_dest->getNbElements();i++) p1.push_back(m_dest->getElementProximity(i)->getPosition());
+//PointCloudBindingAlgorithm::PointCloudBindingAlgorithm()
+//: d_maxDist(initData(&d_maxDist, "maxDist", "Collision detection algorithm")) {}
 
 
-    helper::vector<int> bindId;
-    bindId.resize(p1.size(),-1);
+//PariProximityVector PointCloudBindingAlgorithm::processAlgorithm(BaseGeometry * from,BaseGeometry * dest) {
+//    PariProximityVector res;
 
-    bool change = true;
+//    PointGeometry * m_from = dynamic_cast<PointGeometry *>(from);
+//    PointGeometry * m_dest = dynamic_cast<PointGeometry *>(dest);
 
-    helper::vector<int> invBind;
-    invBind.resize(p2.size(),-1);
+//    if (m_from == NULL) return res;
+//    if (m_dest == NULL) return res;
 
-    while (change) {
-//        printf("NEW LOOP\n");
-//        std::cout << "BIND=" << bindId << std::endl;
-//        std::cout << "IBIND=" << invBind << std::endl;
-        change = false;//ne new change
+//    if (m_from->getNbPoints() == 0) return res;
+//    if (m_dest->getNbPoints() == 0) return res;
 
-        for (unsigned p=0;p<p1.size();p++) {
-            if (bindId[p] != -1) continue;
+//    helper::vector<defaulttype::Vector3> p1;
+//    helper::vector<defaulttype::Vector3> p2;
 
-            defaulttype::Vector3 P = p1[p];
-            int closestId = -1;
-            double closestDist = std::numeric_limits<double>::max();
+//    for (int i=0;i<m_from->getNbPoints();i++) p1.push_back(m_from->getElement(i)->getDefaultProximity()->getPosition());
+//    for (int i=0;i<m_dest->getNbPoints();i++) p1.push_back(m_dest->getElement(i)->getDefaultProximity()->getPosition());
 
-            //Find minimal distance
-            for (unsigned i=0;i<p2.size();i++) {
-                defaulttype::Vector3 Q = p2[i];
-                double dist = (Q-P).norm();
+//    helper::vector<int> bindId;
+//    bindId.resize(p1.size(),-1);
 
-                if (dist < closestDist && invBind[i] == -1) {
-                    closestId = i;
-                    closestDist = dist;
-//                    printf("TMP ASSO p<->i %d %d\n",p,i);
-                }
-            }
+//    bool change = true;
 
-//            printf("MIN DIST %f    p=%f    %d\n",closestDist,minDist,closestId);
+//    helper::vector<int> invBind;
+//    invBind.resize(p2.size(),-1);
 
-            if ((d_maxDist.getValue()!=0) && (closestDist > d_maxDist.getValue())) closestId = -1;
+//    while (change) {
+////        printf("NEW LOOP\n");
+////        std::cout << "BIND=" << bindId << std::endl;
+////        std::cout << "IBIND=" << invBind << std::endl;
+//        change = false;//ne new change
 
-//            printf("CLOSEST ID %d\n",closestId);
+//        for (unsigned p=0;p<p1.size();p++) {
+//            if (bindId[p] != -1) continue;
 
-            bindId[p] = closestId;
-        }
+//            defaulttype::Vector3 P = p1[p];
+//            int closestId = -1;
+//            double closestDist = std::numeric_limits<double>::max();
 
-        //try to remove point that are binded multiple times to the same one
-        for (unsigned i=0;i<p1.size();i++) {
-            if (bindId[i] == -1) continue;
+//            //Find minimal distance
+//            for (unsigned i=0;i<p2.size();i++) {
+//                defaulttype::Vector3 Q = p2[i];
+//                double dist = (Q-P).norm();
 
-            int & B = bindId[i]; //current point in p1
-            int & C = invBind[bindId[i]]; // previous binded point in p2
+//                if (dist < closestDist && invBind[i] == -1) {
+//                    closestId = i;
+//                    closestDist = dist;
+////                    printf("TMP ASSO p<->i %d %d\n",p,i);
+//                }
+//            }
 
-            if (C == -1) { // the point has not yet been associated
-                C = i;
-            } else if (C != (int) i) { // the point is already associated
-                int & A = bindId[C]; // previous binded point in p1
+////            printf("MIN DIST %f    p=%f    %d\n",closestDist,minDist,closestId);
 
-                change = true; // we retry the binding because two points are associated with the same point
+//            if ((d_maxDist.getValue()!=0) && (closestDist > d_maxDist.getValue())) closestId = -1;
 
-                double d1 = (p1[A] - p2[C]).norm();
-                double d2 = (p1[B] - p2[C]).norm();
+////            printf("CLOSEST ID %d\n",closestId);
 
-                if (d2<d1) {
-                    A = -1; // invalidate A
-                    C = i; // change the invbinding
-                } else {
-                    B = -1; // invalidate A
-                }
-            }
-        }
-    }
+//            bindId[p] = closestId;
+//        }
+
+//        //try to remove point that are binded multiple times to the same one
+//        for (unsigned i=0;i<p1.size();i++) {
+//            if (bindId[i] == -1) continue;
+
+//            int & B = bindId[i]; //current point in p1
+//            int & C = invBind[bindId[i]]; // previous binded point in p2
+
+//            if (C == -1) { // the point has not yet been associated
+//                C = i;
+//            } else if (C != (int) i) { // the point is already associated
+//                int & A = bindId[C]; // previous binded point in p1
+
+//                change = true; // we retry the binding because two points are associated with the same point
+
+//                double d1 = (p1[A] - p2[C]).norm();
+//                double d2 = (p1[B] - p2[C]).norm();
+
+//                if (d2<d1) {
+//                    A = -1; // invalidate A
+//                    C = i; // change the invbinding
+//                } else {
+//                    B = -1; // invalidate A
+//                }
+//            }
+//        }
+//    }
 
 
-    for (unsigned i=0;i<bindId.size();i++) {
-        if (bindId[i] == -1) continue;
+//    for (unsigned i=0;i<bindId.size();i++) {
+//        if (bindId[i] == -1) continue;
 
-        PariProximity pair;
-        pair.first = m_from->getElementProximity(bindId[i]);
-        pair.second = m_dest->getElementProximity(invBind[i]);
+//        PariProximity pair;
+//        pair.first = m_from->getElement(bindId[i])->getDefaultProximity();
+//        pair.second = m_dest->getElement(invBind[i])->getDefaultProximity();
 
-        helper::fixed_array<defaulttype::Vector3,3> normals;
-        normals[0] = defaulttype::Vector3(1,0,0);
-        normals[1] = defaulttype::Vector3(0,1,0);
-        normals[2] = defaulttype::Vector3(0,0,1);
+//        res.push_back(pair);
+//    }
 
-        cn.push_back(std::make_shared<BilateralConstraintNormal>(pair,normals));
-    }
-}
+//    return res;
+//}
 
-} // namespace controller
+//} // namespace controller
 
-} // namespace component
+//} // namespace component
 
-} // namespace sofa
+//} // namespace sofa
 
-#endif // SOFA_COMPONENT_CONTROLLER_NeedleConstraint_H
+//#endif // SOFA_COMPONENT_CONTROLLER_NeedleConstraint_H

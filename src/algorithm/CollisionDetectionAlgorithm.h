@@ -1,7 +1,6 @@
 #ifndef SOFA_COMPONENT_CONSTRAINT_COLLISIONDETECTIONALGORITHM_H
 #define SOFA_COMPONENT_CONSTRAINT_COLLISIONDETECTIONALGORITHM_H
 
-#include "ConstraintProximity.h"
 #include "CollisionAlgorithm.h"
 #include <sofa/defaulttype/SolidTypes.h>
 #include <sofa/core/behavior/BaseController.h>
@@ -20,7 +19,7 @@ namespace behavior {
 
 class BroadPhase {
 public:
-    virtual ElementIteratorPtr getBroadPhaseIterator(const ConstraintProximityPtr P) = 0;
+    virtual ElementIteratorPtr getBroadPhaseIterator(ConstraintElementPtr elmt) = 0;
 };
 
 class CollisionDetectionAlgorithm : public CollisionAlgorithm {
@@ -28,21 +27,13 @@ public:
 
     SOFA_CLASS(CollisionDetectionAlgorithm , CollisionAlgorithm );
 
-    Data<std::string> d_from;
-    Data<std::string> d_dest;
-    Data<double> d_maxf;
-
     CollisionDetectionAlgorithm();
 
-    void init();
-
-    void processAlgorithm(helper::vector<ConstraintNormalPtr> & cn) ;
+    void processAlgorithm();
 
 private:
 
-    PariProximity getClosestPoint(unsigned i);
-    BaseGeometry * m_from;
-    BaseGeometry * m_dest;
+    PariProximity getClosestPoint(ConstraintElementPtr efrom, BaseGeometry * dest);
 
 };
 

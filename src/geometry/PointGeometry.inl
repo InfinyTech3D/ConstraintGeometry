@@ -13,22 +13,92 @@ namespace core {
 
 namespace behavior {
 
-ConstraintProximityPtr PointGeometry::getPointProximity(unsigned eid) const {
-    return std::make_shared<PointConstraintProximity>(this,eid);
+/**************************************************************************/
+/******************************PROXIMITY***********************************/
+/**************************************************************************/
+
+class PointProximity : public BaseGeometry::ConstraintProximity {
+public :
+    PointProximity(const PointGeometry * geo,unsigned pid) {
+        m_geo = geo;
+        m_pid = pid;
+    }
+
+    defaulttype::Vector3 getPosition(core::VecCoordId vid) const {
+        return m_geo->getPos(m_pid,vid);
+    }
+
+    void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) {
+        DataMatrixDeriv & c_d = *cId[m_geo->getMstate()].write();
+        MatrixDeriv & c = *c_d.beginEdit();
+        MatrixDerivRowIterator c_it1 = c.writeLine(cline);
+        c_it1.addCol(m_pid,N);
+        c_d.endEdit();
+    }
+
+    const PointGeometry * m_geo;
+    unsigned m_pid;
+};
+
+/**************************************************************************/
+/******************************ELEMENT*************************************/
+/**************************************************************************/
+
+class PointElement : public BaseGeometry::ConstraintElement {
+public:
+
+    PointElement(const PointGeometry * geo,unsigned pid) {
+        m_pid = pid;
+        m_geo = geo;
+    }
+
+    ConstraintProximityPtr getDefaultProximity() {
+        return std::make_shared<PointProximity>(m_geo,m_pid);
+    }
+
+    //this function returns a vector with all the control points of the element
+    helper::vector<ConstraintProximityPtr> getConstrolPoints() {
+        helper::vector<ConstraintProximityPtr> res;
+        res.push_back(getDefaultProximity());
+        return res;
+    }
+
+    //this function project the point P on the element and return the corresponding proximity
+    virtual ConstraintProximityPtr project(defaulttype::Vector3 /*P*/) {
+        return getDefaultProximity();
+    }
+
+
+protected:
+    unsigned m_pid;
+    const PointGeometry * m_geo;
+};
+
+/**************************************************************************/
+/******************************GEOMETRY************************************/
+/**************************************************************************/
+
+ConstraintElementPtr PointGeometry::getPointElement(unsigned eid) const {
+    return std::make_shared<PointElement>(this,eid);
 }
 
-int PointGeometry::getNbPoints() const {
-    return this->getTopology()->getNbPoints();
+unsigned PointGeometry::getNbPoints() const {
+    return getTopology()->getNbPoints();
 }
 
-int PointGeometry::getNbElements() const {
+unsigned PointGeometry::getNbElements() const {
     return getNbPoints();
 }
 
-ConstraintProximityPtr PointGeometry::getElementProximity(unsigned eid) const {
-    return getPointProximity(eid);
+ConstraintElementPtr PointGeometry::getElement(unsigned eid) const {
+    return getPointElement(eid);
 }
 
+defaulttype::Vector3 PointGeometry::getPos(unsigned pid, core::VecCoordId vid) const {
+    helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(vid);
+
+    return x[pid];
+}
 
 void PointGeometry::draw(const core::visual::VisualParams * vparams) {
     if (!vparams->displayFlags().getShowCollisionModels()) return;
@@ -39,7 +109,7 @@ void PointGeometry::draw(const core::visual::VisualParams * vparams) {
 
     glDisable(GL_LIGHTING);
     glColor4f(d_color.getValue()[0],d_color.getValue()[1],d_color.getValue()[2],d_color.getValue()[3]);
-    for (int i=0;i<this->getNbPoints();i++) {
+    for (unsigned i=0;i<this->getNbPoints();i++) {
         vparams->drawTool()->drawSphere(x[i],norm*0.01);
     }
 }

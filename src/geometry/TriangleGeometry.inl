@@ -16,22 +16,202 @@ namespace core {
 
 namespace behavior {
 
+/**************************************************************************/
+/******************************PROXIMITY***********************************/
+/**************************************************************************/
+
+class TriangleProximity : public BaseGeometry::ConstraintProximity {
+public:
+    friend class TriangleGeometry;
+
+    TriangleProximity(const TriangleGeometry * geo,unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3) {
+        m_geo = geo;
+
+        m_pid[0] = p1;
+        m_fact[0] = f1;
+
+        m_pid[1] = p2;
+        m_fact[1] = f2;
+
+        m_pid[2] = p3;
+        m_fact[2] = f3;
+    }
+
+    defaulttype::Vector3 getPosition(core::VecCoordId vid) const {
+        return m_geo->getPos(m_pid[0],vid) * m_fact[0] + m_geo->getPos(m_pid[1],vid) * m_fact[1] + m_geo->getPos(m_pid[2],vid) * m_fact[2];
+    }
+
+    void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) {
+        DataMatrixDeriv & c_d = *cId[m_geo->getMstate()].write();
+        MatrixDeriv & c = *c_d.beginEdit();
+        MatrixDerivRowIterator c_it1 = c.writeLine(cline);
+
+        c_it1.addCol(m_pid[0],N*m_fact[0]);
+        c_it1.addCol(m_pid[1],N*m_fact[1]);
+        c_it1.addCol(m_pid[2],N*m_fact[2]);
+
+        c_d.endEdit();
+    }
+
+//    defaulttype::Vector3 getNormal() {
+//        return ((const TriangleGeometry *)m_geo)->m_triangle_info[m_eid].tn;
+//    }
+
+//    void refineToClosestPoint(const Coord & P) {
+//        ((const TriangleGeometry*) m_geo)->projectPoint(P,this);
+//    }
+
+protected:
+    unsigned m_pid[3];
+    double m_fact[3];
+    const TriangleGeometry * m_geo;
+};
+
+/**************************************************************************/
+/******************************ELEMENT*************************************/
+/**************************************************************************/
+
+class TriangleElement : public BaseGeometry::ConstraintElement {
+public:
+
+    TriangleElement(const TriangleGeometry * geo,unsigned eid) {
+        m_eid = eid;
+        m_geo = geo;
+
+        topology::BaseMeshTopology::Triangle edge = geo->getTopology()->getTriangle(eid);
+        m_pid[0] = edge[0];
+        m_pid[1] = edge[1];
+        m_pid[2] = edge[2];
+    }
+
+    ConstraintProximityPtr getProximity(double f1,double f2,double f3) {
+        return std::make_shared<TriangleProximity>(m_geo,m_pid[0],f1,m_pid[1],f2,m_pid[2],f3);
+    }
+
+    ConstraintProximityPtr getDefaultProximity() {
+        return getProximity(1.0/3.0,1.0/3.0,1.0/3.0);
+    }
+
+    //this function returns a vector with all the control points of the element
+    helper::vector<ConstraintProximityPtr> getConstrolPoints() {
+        helper::vector<ConstraintProximityPtr> res;
+        res.push_back(getProximity(1.0,0.0,0.0));
+        res.push_back(getProximity(0.0,1.0,0.0));
+        res.push_back(getProximity(0.0,0.0,1.0));
+        return res;
+    }
+
+//    //this function project the point P on the element and return the corresponding proximity
+//    ConstraintProximityPtr project(defaulttype::Vector3 P) {
+//        double fact_u,fact_v;
+
+//        defaulttype::Vector3 P1 = m_geo->getPos(m_pid[0]);
+//        defaulttype::Vector3 P2 = m_geo->getPos(m_pid[1]);
+
+//        defaulttype::Vector3 v = P2-P1;
+//        fact_v = dot (P - P1,v) / dot (v,v);
+
+//        if (fact_v<0.0) fact_v = 0.0;
+//        else if (fact_v>1.0) fact_v = 1.0;
+
+//        fact_u = 1.0-fact_v;
+
+//        return getProximity(fact_u,fact_v);
+//    }
+
+    //proj_P must be on the plane
+
+    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleGeometry::TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const {
+        defaulttype::Vector3 v2 = proj_P - p0;
+
+        double d20 = dot(v2, tinfo.v0);
+        double d21 = dot(v2, tinfo.v1);
+
+        fact_v = (tinfo.d11 * d20 - tinfo.d01 * d21) * tinfo.invDenom;
+        fact_w = (tinfo.d00 * d21 - tinfo.d01 * d20) * tinfo.invDenom;
+        fact_u = 1.0 - fact_v  - fact_w;
+    }
+
+    //Barycentric coordinates are computed according to
+    //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
+
+    ConstraintProximityPtr project(defaulttype::Vector3 P) {
+        defaulttype::Vector3 P1 = m_geo->getPos(m_pid[0]);
+        defaulttype::Vector3 P2 = m_geo->getPos(m_pid[1]);
+        defaulttype::Vector3 P3 = m_geo->getPos(m_pid[2]);
+
+        defaulttype::Vector3 x1x2 = P - P1;
+
+        const TriangleGeometry::TriangleInfo & tinfo = m_geo->m_triangle_info[m_eid];
+
+        //corrdinate on the plane
+        double c0 = dot(x1x2,tinfo.ax1);
+        double c1 = dot(x1x2,tinfo.ax2);
+        defaulttype::Vector3 proj_P = P1 + c0 * tinfo.ax1 + c1 * tinfo.ax2;
+
+        double fact_u,fact_v,fact_w;
+
+        computeBaryCoords(proj_P, tinfo, P1, fact_u,fact_v,fact_w);
+
+        if (fact_u<0) {
+            defaulttype::Vector3 v3 = P2 - P3;
+            defaulttype::Vector3 v4 = proj_P - P3;
+            double alpha = dot (v4,v3) / dot(v3,v3);
+
+            if (alpha<0) alpha = 0;
+            else if (alpha>1) alpha = 1;
+
+            fact_u = 0;
+            fact_v = alpha;
+            fact_w = 1.0 - alpha;
+        } else if (fact_v<0) {
+            defaulttype::Vector3 v3 = P1 - P3;
+            defaulttype::Vector3 v4 = proj_P - P3;
+            double alpha = dot (v4,v3) / dot(v3,v3);
+
+            if (alpha<0) alpha = 0;
+            else if (alpha>1) alpha = 1;
+
+            fact_u = alpha;
+            fact_v = 0;
+            fact_w = 1.0 - alpha;
+        } else if (fact_w<0) {
+            defaulttype::Vector3 v3 = P2 - P1;
+            defaulttype::Vector3 v4 = proj_P - P3;
+            double alpha = dot (v4,v3) / dot(v3,v3);
+
+            if (alpha<0) alpha = 0;
+            else if (alpha>1) alpha = 1;
+
+            fact_u = 1.0 - alpha;
+            fact_v = alpha;
+            fact_w = 0;
+        }
+
+        return getProximity(fact_u,fact_v,fact_w);
+    }
+
+protected:
+    unsigned m_eid;
+    unsigned m_pid[3];
+    const TriangleGeometry * m_geo;
+};
+
+/**************************************************************************/
+/******************************GEOMETRY************************************/
+/**************************************************************************/
+
 TriangleGeometry::TriangleGeometry()
 : d_phong(initData(&d_phong, false, "phong", "Phong interpolation of the normal")) {
 
 }
 
-ConstraintProximityPtr TriangleGeometry::getTriangleProximity(unsigned eid, unsigned p1, double f1, unsigned p2, double f2, unsigned p3, double f3) const {
-    return std::make_shared<TriangleConstraintProximity>(this, eid, p1,f1,p2,f2,p3,f3);
+ConstraintElementPtr TriangleGeometry::getElement(unsigned eid) const {
+    return std::make_shared<TriangleElement>(this, eid);
 }
 
-int TriangleGeometry::getNbElements() const {
+unsigned TriangleGeometry::getNbElements() const {
     return getNbTriangles();
-}
-
-ConstraintProximityPtr TriangleGeometry::getElementProximity(unsigned eid) const {
-    const sofa::core::topology::BaseMeshTopology::Triangle tri = getTopology()->getTriangle(eid);
-    return getTriangleProximity(eid, tri[0],0.3333,tri[1],0.3333,tri[2],0.3333);
 }
 
 void TriangleGeometry::prepareDetection() {
@@ -78,79 +258,8 @@ void TriangleGeometry::prepareDetection() {
     }
 }
 
-//proj_P must be on the plane
-
-void TriangleGeometry::computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const {
-    defaulttype::Vector3 v2 = proj_P - p0;
-
-    double d20 = dot(v2, tinfo.v0);
-    double d21 = dot(v2, tinfo.v1);
-
-    fact_v = (tinfo.d11 * d20 - tinfo.d01 * d21) * tinfo.invDenom;
-    fact_w = (tinfo.d00 * d21 - tinfo.d01 * d20) * tinfo.invDenom;
-    fact_u = 1.0 - fact_v  - fact_w;
-}
-
 int TriangleGeometry::getNbTriangles() const {
     return this->getTopology()->getNbTriangles();
-}
-
-//Barycentric coordinates are computed according to
-//http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-
-void TriangleGeometry::projectPoint(const defaulttype::Vector3 & s, TriangleConstraintProximity *pinfo) const {
-    helper::vector<defaulttype::Vector3> pos;
-    pinfo->getControlPoints(pos);
-
-    defaulttype::Vector3 x1x2 = s - pos[0];
-
-    const TriangleInfo & tinfo = m_triangle_info[pinfo->m_eid];
-
-    //corrdinate on the plane
-    double c0 = dot(x1x2,tinfo.ax1);
-    double c1 = dot(x1x2,tinfo.ax2);
-    defaulttype::Vector3 proj_P = pos[0] + c0 * tinfo.ax1 + c1 * tinfo.ax2;
-
-    double & fact_u = pinfo->m_fact[0];
-    double & fact_v = pinfo->m_fact[1];
-    double & fact_w = pinfo->m_fact[2];
-
-    computeBaryCoords(proj_P, tinfo, pos[0], fact_u,fact_v,fact_w);
-
-    if (fact_u<0) {
-        defaulttype::Vector3 v3 = pos[1] - pos[2];
-        defaulttype::Vector3 v4 = proj_P - pos[2];
-        double alpha = dot (v4,v3) / dot(v3,v3);
-
-        if (alpha<0) alpha = 0;
-        else if (alpha>1) alpha = 1;
-
-        fact_u = 0;
-        fact_v = alpha;
-        fact_w = 1.0 - alpha;
-    } else if (fact_v<0) {
-        defaulttype::Vector3 v3 = pos[0] - pos[2];
-        defaulttype::Vector3 v4 = proj_P - pos[2];
-        double alpha = dot (v4,v3) / dot(v3,v3);
-
-        if (alpha<0) alpha = 0;
-        else if (alpha>1) alpha = 1;
-
-        fact_u = alpha;
-        fact_v = 0;
-        fact_w = 1.0 - alpha;
-    } else if (fact_w<0) {
-        defaulttype::Vector3 v3 = pos[1] - pos[0];
-        defaulttype::Vector3 v4 = proj_P - pos[0];
-        double alpha = dot (v4,v3) / dot(v3,v3);
-
-        if (alpha<0) alpha = 0;
-        else if (alpha>1) alpha = 1;
-
-        fact_u = 1.0 - alpha;
-        fact_v = alpha;
-        fact_w = 0;
-    }
 }
 
 void TriangleGeometry::drawTriangle(const core::visual::VisualParams * vparams,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C) {
