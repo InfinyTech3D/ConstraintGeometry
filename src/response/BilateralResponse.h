@@ -38,7 +38,7 @@ public:
     : m_pfrom(p1)
     , m_pdest(p2)
     {
-        m_normals.push_back(N);
+        m_normals.push_back(N.normalized());
     }
 
     void buildConstraintMatrix(const ConstraintParams* cParams, core::MultiMatrixDerivId cId, unsigned cline) {

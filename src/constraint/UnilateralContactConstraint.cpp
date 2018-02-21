@@ -55,7 +55,12 @@ void UnilateralContactConstraint::fillConstraints(helper::vector<ConstraintRespo
     const PariProximityVector & detection = m_algo->getDetection();
 
     for (unsigned i=0;i<detection.size();i++) {
-        ConstraintResponsePtr cst = std::make_shared<UnilateralResponse>(detection[i].first,detection[i].second);
+        ConstraintProximityPtr prox1 = detection[i].first;
+        ConstraintProximityPtr prox2 = detection[i].second;
+        defaulttype::Vector3 N = prox2->getPosition() - prox1->getPosition();
+        N.normalize();
+
+        ConstraintResponsePtr cst = std::make_shared<UnilateralResponse>(prox1,prox2,N);
 
         constraints.push_back(cst);
     }

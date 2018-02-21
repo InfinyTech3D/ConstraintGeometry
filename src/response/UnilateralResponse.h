@@ -35,11 +35,11 @@ public:
 class UnilateralResponse : public ConstraintResponse {
 public:
 
-    UnilateralResponse(ConstraintProximityPtr p1,ConstraintProximityPtr p2)
+    UnilateralResponse(ConstraintProximityPtr p1,ConstraintProximityPtr p2,defaulttype::Vector3 N)
     : m_pfrom(p1)
     , m_pdest(p2)
     {
-        m_normals.push_back(p2->getPosition() - p1->getPosition());
+        m_normals.push_back(N.normalized());
     }
 
     void buildConstraintMatrix(const ConstraintParams* cParams, core::MultiMatrixDerivId cId, unsigned cline) {
