@@ -13,33 +13,32 @@ namespace core {
 
 namespace behavior {
 
-class UnilateralConstraintResolution1 : public core::behavior::ConstraintResolution {
+class BilateralConstraintResolution : public core::behavior::ConstraintResolution {
 public:
-    UnilateralConstraintResolution1(double m = std::numeric_limits<double>::max())
+    BilateralConstraintResolution(double m = std::numeric_limits<double>::max())
     : m_maxForce(m)
     {}
 
     virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/)
     {
         if (w[line][line] == 0.0) force[line] = 0.0;
-        else
-        force[line] -= d[line] / w[line][line];
+        else force[line] -= d[line] / w[line][line];
 
         if (force[line]*w[line][line]>m_maxForce) force[line] = m_maxForce;
-        else if (force[line]*w[line][line]<0) force[line] = 0.0;
+        else if (force[line]*w[line][line]<-m_maxForce) force[line] = -m_maxForce;
     }
 
     double m_maxForce;
 };
 
-class UnilateralResponse : public ConstraintResponse {
+class BilateralResponse : public ConstraintResponse {
 public:
 
-    UnilateralResponse(ConstraintProximityPtr p1,ConstraintProximityPtr p2)
+    BilateralResponse(ConstraintProximityPtr p1,ConstraintProximityPtr p2,defaulttype::Vector3 N)
     : m_pfrom(p1)
     , m_pdest(p2)
     {
-        m_normals.push_back(p2->getPosition() - p1->getPosition());
+        m_normals.push_back(N);
     }
 
     void buildConstraintMatrix(const ConstraintParams* cParams, core::MultiMatrixDerivId cId, unsigned cline) {
@@ -58,7 +57,7 @@ public:
     }
 
     core::behavior::ConstraintResolution * getResolution() {
-        return new UnilateralConstraintResolution1();
+        return new BilateralConstraintResolution();
     }
 
     unsigned size() {
