@@ -46,8 +46,6 @@ public:
 
     void draw(const core::visual::VisualParams * vparams);
 
-    virtual defaulttype::Vector3 getPos(unsigned pid,core::VecCoordId vid = core::VecCoordId::position()) const;
-
     virtual unsigned getNbElements() const;
 
     virtual ConstraintElementPtr getElement(unsigned eid) const;

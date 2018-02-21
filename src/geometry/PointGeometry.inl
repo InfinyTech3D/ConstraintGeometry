@@ -94,12 +94,6 @@ ConstraintElementPtr PointGeometry::getElement(unsigned eid) const {
     return getPointElement(eid);
 }
 
-defaulttype::Vector3 PointGeometry::getPos(unsigned pid, core::VecCoordId vid) const {
-    helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(vid);
-
-    return x[pid];
-}
-
 void PointGeometry::draw(const core::visual::VisualParams * vparams) {
     if (!vparams->displayFlags().getShowCollisionModels()) return;
 

@@ -14,6 +14,8 @@
 #include <SofaBaseTopology/PointSetTopologyContainer.h>
 #include <SofaBaseTopology/EdgeSetTopologyContainer.h>
 #include <SofaBaseTopology/TriangleSetTopologyContainer.h>
+#include <sofa/simulation/AnimateBeginEvent.h>
+#include <sofa/simulation/AnimateEndEvent.h>
 
 namespace sofa {
 
@@ -125,7 +127,8 @@ public :
 
     BaseGeometry()
     : d_color(initData(&d_color, defaulttype::Vec4f(1,0.5,0,1), "color", "Color of the collision model")) {
-        m_dirty=true;
+//        m_dirty=true;
+        f_listening.setValue(true);
     }
 
     core::topology::BaseMeshTopology* getTopology() const {
@@ -135,6 +138,12 @@ public :
     sofa::core::behavior::MechanicalState<BaseGeometry::DataTypes> * getMstate() const {
         return dynamic_cast<sofa::core::behavior::MechanicalState<DataTypes> *>(this->getContext()->getState());
     }
+
+    defaulttype::Vector3 getPos(unsigned pid,core::VecCoordId vid = core::VecCoordId::position()) const {
+        helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(vid);
+        return x[pid];
+    }
+
 
     void computeBBox(const core::ExecParams* params, bool /*onlyVisible*/)  {
         m_dirty=true;
@@ -163,11 +172,10 @@ public :
     virtual ConstraintElementPtr getElement(unsigned i) const = 0;
 
 
-//    void BaseCamera::handleEvent(sofa::core::objectmodel::Event* event)
-//    {
-//        if (sofa::simulation::AnimateBeginEvent::checkEventType(event))
-//            updateOutputData();
-//    }
+    void handleEvent(sofa::core::objectmodel::Event* event) {
+        if (dynamic_cast<simulation::AnimateBeginEvent*>(event)) update();
+        else if (dynamic_cast<simulation::AnimateEndEvent*>(event)) m_dirty = true;
+    }
 
     void update() {
         if (m_dirty) {

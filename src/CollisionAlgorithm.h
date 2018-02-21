@@ -60,6 +60,8 @@ public :
 
         this->getContext()->get(m_dest,d_dest.getValue());
         if (m_dest == NULL) serr << "Error cannot find the reponse" << std::endl;
+
+        m_dirty = true;
     }
 
     void draw(const core::visual::VisualParams* vparams) {
@@ -81,9 +83,13 @@ public :
 
     virtual void clear() {
         m_pairDetection.clear();
+        m_dirty = true;
     }
 
     virtual void update() {
+        if (! m_dirty) return;
+        m_dirty = false;
+
         if (m_from == NULL) return;
         if (m_dest == NULL) return;
 
@@ -91,6 +97,11 @@ public :
         m_dest->update();
 
         processAlgorithm();
+    }
+
+    void handleEvent(sofa::core::objectmodel::Event* event) {
+        if (dynamic_cast<simulation::AnimateBeginEvent*>(event)) update();
+        else if (dynamic_cast<simulation::AnimateEndEvent*>(event)) m_dirty = true;
     }
 
     const PariProximityVector & getDetection() {
@@ -102,6 +113,7 @@ protected:
     PariProximityVector m_pairDetection;
     BaseGeometry * m_from;
     BaseGeometry * m_dest;
+    bool m_dirty;
 };
 
 } // namespace controller

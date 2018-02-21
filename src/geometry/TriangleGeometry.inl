@@ -285,6 +285,7 @@ void TriangleGeometry::drawTriangle(const core::visual::VisualParams * vparams,c
 void TriangleGeometry::draw(const core::visual::VisualParams * vparams) {
 
     if (! vparams->displayFlags().getShowCollisionModels()) return;
+    if (d_color.getValue()[3] == 0.0) return;
 
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
 
@@ -292,7 +293,7 @@ void TriangleGeometry::draw(const core::visual::VisualParams * vparams) {
 
     if (vparams->displayFlags().getShowWireFrame()) glBegin(GL_LINES);
     else {
-        glEnable(GL_CULL_FACE);
+//        glEnable(GL_CULL_FACE);
         glBegin(GL_TRIANGLES);
     }
 
