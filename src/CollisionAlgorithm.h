@@ -88,10 +88,13 @@ public :
 
     virtual void update() {
         if (! m_dirty) return;
+
+        clear();
         m_dirty = false;
 
         if (m_from == NULL) return;
         if (m_dest == NULL) return;
+
 
         m_from->update();
         m_dest->update();

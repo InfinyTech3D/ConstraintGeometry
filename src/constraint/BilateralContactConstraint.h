@@ -29,6 +29,7 @@ class BilateralContactConstraint : public Constraint {
 public :
 
     Data<std::string> d_algo;
+    Data<double> d_maxforce;
 
     SOFA_CLASS(BilateralContactConstraint, sofa::core::behavior::BaseConstraint );
 

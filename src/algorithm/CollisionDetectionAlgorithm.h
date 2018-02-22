@@ -17,11 +17,6 @@ namespace core {
 
 namespace behavior {
 
-class BroadPhase {
-public:
-    virtual ElementIteratorPtr getBroadPhaseIterator(ConstraintElementPtr elmt) = 0;
-};
-
 class CollisionDetectionAlgorithm : public CollisionAlgorithm {
 public:
 

@@ -15,7 +15,7 @@ namespace behavior {
 
 class BilateralConstraintResolution : public core::behavior::ConstraintResolution {
 public:
-    BilateralConstraintResolution(double m = std::numeric_limits<double>::max())
+    BilateralConstraintResolution(double m)
     : m_maxForce(m)
     {}
 
@@ -34,9 +34,10 @@ public:
 class BilateralResponse : public ConstraintResponse {
 public:
 
-    BilateralResponse(ConstraintProximityPtr p1,ConstraintProximityPtr p2,defaulttype::Vector3 N)
+    BilateralResponse(ConstraintProximityPtr p1,ConstraintProximityPtr p2,defaulttype::Vector3 N, double mf)
     : m_pfrom(p1)
     , m_pdest(p2)
+    , m_maxForce(mf)
     {
         m_normals.push_back(N.normalized());
     }
@@ -57,7 +58,7 @@ public:
     }
 
     core::behavior::ConstraintResolution * getResolution() {
-        return new BilateralConstraintResolution();
+        return new BilateralConstraintResolution(m_maxForce);
     }
 
     unsigned size() {
@@ -88,6 +89,7 @@ protected:
     ConstraintProximityPtr m_pfrom;
     ConstraintProximityPtr m_pdest;
     helper::vector<defaulttype::Vector3> m_normals;
+    double m_maxForce;
 
 };
 

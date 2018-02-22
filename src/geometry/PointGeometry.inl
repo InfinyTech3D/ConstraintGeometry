@@ -56,11 +56,13 @@ public:
         return std::make_shared<PointProximity>(m_geo,m_pid);
     }
 
-    //this function returns a vector with all the control points of the element
-    helper::vector<ConstraintProximityPtr> getConstrolPoints() {
-        helper::vector<ConstraintProximityPtr> res;
-        res.push_back(getDefaultProximity());
-        return res;
+    ConstraintProximityPtr getConstrolPoint(const int cid) {
+        if (cid == 0) return getDefaultProximity();
+        return NULL;
+    }
+
+    unsigned size() {
+        return 1;
     }
 
     //this function project the point P on the element and return the corresponding proximity

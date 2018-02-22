@@ -40,7 +40,8 @@ namespace behavior
 {
 
 BilateralContactConstraint::BilateralContactConstraint()
-: d_algo(initData(&d_algo, "algo", "Collision reponse algorithm")) {}
+: d_algo(initData(&d_algo, "algo", "Collision reponse algorithm"))
+, d_maxforce(initData(&d_maxforce, std::numeric_limits<double>::max(), "maxForce", "MaxForce")){}
 
 
 void BilateralContactConstraint::init() {
@@ -60,7 +61,7 @@ void BilateralContactConstraint::fillConstraints(helper::vector<ConstraintRespon
         defaulttype::Vector3 N = prox2->getPosition() - prox1->getPosition();
         N.normalize();
 
-        ConstraintResponsePtr cst = std::make_shared<BilateralResponse>(prox1,prox2,N);
+        ConstraintResponsePtr cst = std::make_shared<BilateralResponse>(prox1,prox2,N, d_maxforce.getValue());
 
         constraints.push_back(cst);
     }

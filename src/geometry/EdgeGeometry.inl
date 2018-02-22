@@ -82,6 +82,8 @@ public:
         topology::BaseMeshTopology::Edge edge = geo->getTopology()->getEdge(eid);
         m_pid[0] = edge[0];
         m_pid[1] = edge[1];
+
+
     }
 
     ConstraintProximityPtr getProximity(double f1,double f2) {
@@ -92,12 +94,16 @@ public:
         return getProximity(0.5,0.5);
     }
 
-    //this function returns a vector with all the control points of the element
-    helper::vector<ConstraintProximityPtr> getConstrolPoints() {
-        helper::vector<ConstraintProximityPtr> res;
-        res.push_back(getProximity(1.0,0.0));
-        res.push_back(getProximity(0.0,1.0));
-        return res;
+    ConstraintProximityPtr getConstrolPoint(const int cid) {
+        if (cid == 0) return getProximity(1.0,0.0);
+        else if (cid == 1) return getProximity(0.0,1.0);
+        else return NULL;
+
+        return getDefaultProximity();
+    }
+
+    unsigned size() {
+        return 2;
     }
 
     //this function project the point P on the element and return the corresponding proximity

@@ -54,6 +54,10 @@ public :
 
         virtual void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) = 0;
 
+//        //this function returns a vector with all the control points of the element
+//        virtual void moveToConstrolPoints(double * ptr) = 0;
+
+
 ////        bool operator ==(const ConstraintProximity & b) const {
 ////            if (m_fact.size() != b.m_fact.size()) return false;
 
@@ -87,7 +91,10 @@ public :
         virtual ConstraintProximityPtr getDefaultProximity() = 0;
 
         //this function returns a vector with all the control points of the element
-        virtual helper::vector<ConstraintProximityPtr> getConstrolPoints() = 0;
+        virtual ConstraintProximityPtr getConstrolPoint(const int i) = 0;
+
+        // return the number of control points
+        virtual unsigned size() = 0;
 
         //this function project the point P on the element and return the corresponding proximity
         virtual ConstraintProximityPtr project(defaulttype::Vector3 P) = 0;
@@ -95,35 +102,41 @@ public :
 
     typedef std::shared_ptr<ConstraintElement> ConstraintElementPtr;
 
-    class ElementIterator {
-    public:
-        virtual bool next() = 0;
+//    class ElementIterator {
+//    public:
+//        virtual bool end() = 0;
 
-        virtual ConstraintElementPtr getElement() = 0;
-    };
+//        virtual void next() = 0;
 
-    typedef std::shared_ptr<ElementIterator> ElementIteratorPtr;
+//        virtual ConstraintElementPtr getElement() = 0;
+//    };
 
-    class DefaultElementIterator : public ElementIterator {
-    public:
-        DefaultElementIterator(const BaseGeometry * geo) {
-            m_id = 0;
-            m_geo = geo;
-        }
+//    typedef std::shared_ptr<ElementIterator> ElementIteratorPtr;
 
-        bool next() {
-            m_id++;
-            return m_id<m_geo->getNbElements();
-        }
+//    class DefaultElementIterator : public ElementIterator {
+//    public:
+//        DefaultElementIterator(const BaseGeometry * geo) {
+//            m_id = 0;
+//            m_geo = geo;
+//        }
 
-        ConstraintElementPtr getElement() {
-            return m_geo->getElement(m_id);
-        }
+//        bool next() {
+//            m_id++;
+//            return m_id<m_geo->getNbElements();
+//        }
 
-    private:
-        unsigned m_id;
-        const BaseGeometry * m_geo;
-    };
+//        void next() {
+//            return
+//        }
+
+//        ConstraintElementPtr getElement() {
+//            return m_geo->getElement(m_id);
+//        }
+
+//    private:
+//        unsigned m_id;
+//        const BaseGeometry * m_geo;
+//    };
 
     BaseGeometry()
     : d_color(initData(&d_color, defaulttype::Vec4f(1,0.5,0,1), "color", "Color of the collision model")) {
@@ -163,9 +176,9 @@ public :
         this->f_bbox.setValue(params,sofa::defaulttype::TBoundingBox<SReal>(minBBox,maxBBox));
     }
 
-    ElementIteratorPtr getElementIterator() const {
-        return std::make_shared<DefaultElementIterator>(this);
-    }
+//    ElementIteratorPtr getElementIterator() const {
+//        return std::make_shared<DefaultElementIterator>(this);
+//    }
 
     virtual unsigned getNbElements() const = 0;
 
@@ -194,7 +207,7 @@ protected:
 
 typedef std::shared_ptr<BaseGeometry::ConstraintProximity> ConstraintProximityPtr;
 typedef std::shared_ptr<BaseGeometry::ConstraintElement> ConstraintElementPtr;
-typedef std::shared_ptr<BaseGeometry::ElementIterator> ElementIteratorPtr;
+//typedef std::shared_ptr<BaseGeometry::ElementIterator> ElementIteratorPtr;
 
 } // namespace controller
 

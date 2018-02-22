@@ -19,20 +19,19 @@ CollisionDetectionAlgorithm::CollisionDetectionAlgorithm()
 PariProximity  CollisionDetectionAlgorithm::getClosestPoint(ConstraintElementPtr efrom,BaseGeometry * dest) {
     double min_dist = std::numeric_limits<double>::max();
 
-    ElementIteratorPtr it = dest->getElementIterator();
-
     ConstraintProximityPtr pfrom = efrom->getDefaultProximity();
     defaulttype::Vector3 P = pfrom->getPosition();
     PariProximity min_pair;
 
-    do {
-        ConstraintProximityPtr pdest = it->getElement()->project(P);
+    for (unsigned i=0;i<dest->getNbElements();i++) {
+        ConstraintElementPtr edest = dest->getElement(i);
+        ConstraintProximityPtr pdest = edest->project(P);
         pfrom = efrom->project(pdest->getPosition());
 
         //iterate until to find the correct location on pfrom
         for (int itearation = 0;itearation<10 && (P-pfrom->getPosition()).norm()>0.0001;itearation++) {
             P = pfrom->getPosition();
-            pdest = it->getElement()->project(P);
+            pdest = edest->project(P);
             pfrom = efrom->project(pdest->getPosition());
         }
 
@@ -44,22 +43,20 @@ PariProximity  CollisionDetectionAlgorithm::getClosestPoint(ConstraintElementPtr
             min_pair.first = pfrom;
             min_pair.second = pdest;
         }
-    } while (it->next());
+    }
 
     return min_pair;
 }
 
 void CollisionDetectionAlgorithm::processAlgorithm() {
-    ElementIteratorPtr iter = m_from->getElementIterator();
-
-    do {
-        PariProximity pair = getClosestPoint(iter->getElement(),m_dest);
+    for (unsigned i=0;i<m_from->getNbElements();i++) {
+        PariProximity pair = getClosestPoint(m_from->getElement(i),m_dest);
 
         if (pair.first == NULL) continue;
         if (pair.second == NULL) continue;
 
         m_pairDetection.push_back(pair);
-    } while(iter->next());
+    }
 }
 
 } // namespace controller

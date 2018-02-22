@@ -93,12 +93,16 @@ public:
     }
 
     //this function returns a vector with all the control points of the element
-    helper::vector<ConstraintProximityPtr> getConstrolPoints() {
-        helper::vector<ConstraintProximityPtr> res;
-        res.push_back(getProximity(1.0,0.0,0.0));
-        res.push_back(getProximity(0.0,1.0,0.0));
-        res.push_back(getProximity(0.0,0.0,1.0));
-        return res;
+    ConstraintProximityPtr getConstrolPoint(const int cid) {
+        if (cid == 0) return getProximity(1.0,0.0,0.0);
+        else if (cid == 1) return getProximity(0.0,1.0,0.0);
+        else if (cid == 2) return getProximity(0.0,0.0,1.0);
+
+        return NULL;
+    }
+
+    unsigned size() {
+        return 3;
     }
 
 //    //this function project the point P on the element and return the corresponding proximity

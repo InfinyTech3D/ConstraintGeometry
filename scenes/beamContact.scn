@@ -13,8 +13,8 @@
         <Node name="Topology" >
                     <Node name="GelVolume" >
 <!--                            <SparseGrid name="HexaTop" cellWidth="1.2" fileTopology="mesh/Armadillo_simplified.obj" />-->
-<!--                             <RegularGrid name="HexaTop" n="8 8 8	" min="-10 -6 -10" max="10 14 10" /> -->
-                           <RegularGrid name="HexaTop" n="2 2 2" min="-10 -6 -10" max="10 14 10" />
+                            <RegularGrid name="HexaTop" n="8 8 8	" min="-10 -6 -10" max="10 14 10" />
+<!--                            <RegularGrid name="HexaTop" n="2 2 2" min="-10 -6 -10" max="10 14 10" /> -->
 
                             <TetrahedronSetTopologyContainer name="Container" position="@HexaTop.position" />
                             <TetrahedronSetTopologyModifier name="Modifier"/>
@@ -75,19 +75,20 @@
         </Node>-->
 
         <Node name="Needle">
-                <EulerImplicitSolver rayleighMass="0" rayleighStiffness="0" />
-                <SparseLUSolver />
+               <EulerImplicitSolver rayleighMass="0" rayleighStiffness="0" />
+               <SparseLUSolver />
 
                 <MechanicalObject name="ms" template="Rigid" dy="20" />
                 <RestShapeSpringsForceField external_rest_shape="@../OmniControler/ms" stiffness="500000"  angularStiffness="500000" points="0" external_points="0" />
 
                 <Node name="Collision">
-                        <EdgeSetTopologyContainer name="Container" position="0 0 0   2 0 0    4 0 0    6 0 0    8 0 0   10 0 0   12 0 0    14 0 0   16 0 0" edges="0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8"/>
+                       <EdgeSetTopologyContainer name="Container" position="0 0 0   2 0 0    4 0 0    6 0 0    8 0 0   10 0 0   12 0 0    14 0 0   16 0 0" edges="0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8"/>
 <!--                         <EdgeSetTopologyContainer name="Container" position="0 0 0   16 0 0" edges="0 1 "/> -->
+<!--                          <EdgeSetTopologyContainer name="Container" position="0 0 0" /> -->
 			<MechanicalObject name="ms" />
 
                         <PointGeometry name="point" />
-                        <EdgeGeometry name="needle" />
+<!--                        <EdgeGeometry name="needle" />-->
                         
 			<RigidMapping />
                 </Node>
@@ -132,13 +133,16 @@
 
                 <Node name="Surface">
 			<TriangleSetTopologyContainer name="Container" src="@../../Topology/GelSurface/Container"/>
-			<MechanicalObject name="ms" />
+<!--                         <TriangleSetTopologyContainer name="Container" triangles="0 1 2" position="-10 -6 0    10 -6 0    -10 -6 10"/> -->
+                        <MechanicalObject name="ms" />
+
 <!--                        <BezierTriangleGeometry name="surface" />-->
 <!--                         <TriangleGeometry name="surface" phong="false" /> -->
 <!--                        <EdgeLinearInterpolation name="surface" />-->
-<!--                        <AABBGeometry name="AABB" geometry="surface" />-->
 
                         <TriangleGeometry name="surface" />
+			<AABBGeometry name="AABB" geometry="surface" />
+			
 			<BarycentricMapping />
                 </Node>
 
@@ -153,11 +157,11 @@
                 <LinearSolverConstraintCorrection solverName="precond"/>
 	</Node>	
 
-	<CollisionDetectionAlgorithm name="contactAlgo" from="Needle/Collision/point" dest="GEL/Surface/surface" />
-	<CollisionDetectionAlgorithm name="contactAlgo2" from="Needle/Collision/needle" dest="GEL/Surface/surface" />
+        <CollisionDetectionAlgorithm name="contactAlgo" from="Needle/Collision/point" dest="GEL/Surface/surface" listening="true" />
+<!--	<CollisionDetectionAlgorithm name="contactAlgo2" from="Needle/Collision/needle" dest="GEL/Surface/surface" />-->
 	
 
 
 <!--        <Constraint algorithm="contactAlgo" />-->
-	<UnilateralContactConstraint algorithm="contactAlgo" />
+<!--	<UnilateralContactConstraint algorithm="contactAlgo" />-->
 </Node>
