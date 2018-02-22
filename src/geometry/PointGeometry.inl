@@ -28,6 +28,10 @@ public :
         return m_geo->getPos(m_pid,vid);
     }
 
+//    defaulttype::Vector3 getNormal(core::VecCoordId /*vid*/) {
+//        return defaulttype::Vector3();
+//    }
+
     void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) {
         DataMatrixDeriv & c_d = *cId[m_geo->getMstate()].write();
         MatrixDeriv & c = *c_d.beginEdit();

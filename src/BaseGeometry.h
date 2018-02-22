@@ -52,6 +52,8 @@ public :
 
         virtual defaulttype::Vector3 getPosition(core::VecCoordId vid = core::VecCoordId::position()) const = 0;
 
+//        virtual defaulttype::Vector3 getNormal(core::VecCoordId vid = core::VecCoordId::position()) const = 0;
+
         virtual void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) = 0;
 
 //        //this function returns a vector with all the control points of the element
@@ -141,7 +143,7 @@ public :
     BaseGeometry()
     : d_color(initData(&d_color, defaulttype::Vec4f(1,0.5,0,1), "color", "Color of the collision model")) {
 //        m_dirty=true;
-        f_listening.setValue(true);
+//        f_listening.setValue(true);
     }
 
     core::topology::BaseMeshTopology* getTopology() const {
@@ -183,7 +185,6 @@ public :
     virtual unsigned getNbElements() const = 0;
 
     virtual ConstraintElementPtr getElement(unsigned i) const = 0;
-
 
     void handleEvent(sofa::core::objectmodel::Event* event) {
         if (dynamic_cast<simulation::AnimateBeginEvent*>(event)) update();

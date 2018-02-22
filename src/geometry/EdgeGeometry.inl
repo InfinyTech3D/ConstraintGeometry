@@ -47,7 +47,8 @@ public:
         return m_geo->getPos(m_pid[0],vid) * m_fact[0] + m_geo->getPos(m_pid[1],vid) * m_fact[1];
     }
 
-//    defaulttype::Vector3 getNormal() {
+//    defaulttype::Vector3 getNormal(core::VecCoordId vid) {
+//        return m_geo->pointNormal(m_pid[0],vid) * m_fact[0] + m_geo->getPos(m_pid[1],vid) * m_fact[1];
 //        const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getMstate()->read(core::VecCoordId::position());
 
 //        defaulttype::Vector3 En = x[m_pid[1]] - x[m_pid[0]];

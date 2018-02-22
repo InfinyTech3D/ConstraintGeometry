@@ -59,6 +59,7 @@ void BilateralContactConstraint::fillConstraints(helper::vector<ConstraintRespon
         ConstraintProximityPtr prox1 = detection[i].first;
         ConstraintProximityPtr prox2 = detection[i].second;
         defaulttype::Vector3 N = prox2->getPosition() - prox1->getPosition();
+//        if (N.norm()<0.00001) N = prox2->getNormal();
         N.normalize();
 
         ConstraintResponsePtr cst = std::make_shared<BilateralResponse>(prox1,prox2,N, d_maxforce.getValue());
