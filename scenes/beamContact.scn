@@ -82,9 +82,9 @@
                 <RestShapeSpringsForceField external_rest_shape="@../OmniControler/ms" stiffness="500000"  angularStiffness="500000" points="0" external_points="0" />
 
                 <Node name="Collision">
-                       <EdgeSetTopologyContainer name="Container" position="0 0 0   2 0 0    4 0 0    6 0 0    8 0 0   10 0 0   12 0 0    14 0 0   16 0 0" edges="0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8"/>
-<!--                         <EdgeSetTopologyContainer name="Container" position="0 0 0   16 0 0" edges="0 1 "/> -->
-<!--                          <EdgeSetTopologyContainer name="Container" position="0 0 0" /> -->
+<!--                       <EdgeSetTopologyContainer name="Container" position="0 0 0   2 0 0    4 0 0    6 0 0    8 0 0   10 0 0   12 0 0    14 0 0   16 0 0" edges="0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8"/>-->
+                         <EdgeSetTopologyContainer name="Container" position="0 0 0   16 0 0" edges="0 1 "/>
+<!--                          <EdgeSetTopologyContainer name="Container" position="0 0 0 " />-->
 			<MechanicalObject name="ms" />
 
                         <PointGeometry name="point" />
@@ -141,7 +141,7 @@
 <!--                        <EdgeLinearInterpolation name="surface" />-->
 
                         <TriangleGeometry name="surface" />
-			<AABBGeometry name="AABB" geometry="surface" />
+<!--			<AABBGeometry name="AABB" geometry="surface" />-->
 			
 			<BarycentricMapping />
                 </Node>
@@ -157,7 +157,14 @@
                 <LinearSolverConstraintCorrection solverName="precond"/>
 	</Node>	
 
-        <CollisionDetectionAlgorithm name="contactAlgo" from="Needle/Collision/point" dest="GEL/Surface/surface" listening="true" />
+<!--        <BilateralResponse name="uni"/>-->
+        <UnilateralResponse name="uni" />
+        <CollisionDetectionAlgorithm name="contactAlgo" />
+
+
+        <ConstraintPair response="uni" algo="contactAlgo" from="Needle/Collision/point" dest="GEL/Surface/surface" />
+
+
 <!--	<CollisionDetectionAlgorithm name="contactAlgo2" from="Needle/Collision/needle" dest="GEL/Surface/surface" />-->
 	
 

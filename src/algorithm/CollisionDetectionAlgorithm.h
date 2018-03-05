@@ -1,15 +1,6 @@
-#ifndef SOFA_COMPONENT_CONSTRAINT_COLLISIONDETECTIONALGORITHM_H
-#define SOFA_COMPONENT_CONSTRAINT_COLLISIONDETECTIONALGORITHM_H
+#pragma once
 
-#include "CollisionAlgorithm.h"
-#include <sofa/defaulttype/SolidTypes.h>
-#include <sofa/core/behavior/BaseController.h>
-#include <sofa/core/behavior/MechanicalState.h>
-#include <sofa/helper/Quater.h>
-#include <sofa/core/visual/VisualParams.h>
-#include <sofa/simulation/AnimateBeginEvent.h>
-#include <SofaBaseMechanics/MechanicalObject.h>
-#include <sofa/helper/gl/template.h>
+#include <CollisionAlgorithm.h>
 
 namespace sofa {
 
@@ -24,7 +15,7 @@ public:
 
     CollisionDetectionAlgorithm();
 
-    void processAlgorithm();
+    void processAlgorithm(BaseGeometry * from, BaseGeometry * dest, PariProximityVector & detection);
 
 private:
 
@@ -37,5 +28,3 @@ private:
 } // namespace component
 
 } // namespace sofa
-
-#endif // SOFA_COMPONENT_CONTROLLER_NeedleConstraint_H

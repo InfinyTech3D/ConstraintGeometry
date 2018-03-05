@@ -47,7 +47,7 @@ public:
         return m_geo->getPos(m_pid[0],vid) * m_fact[0] + m_geo->getPos(m_pid[1],vid) * m_fact[1];
     }
 
-//    defaulttype::Vector3 getNormal(core::VecCoordId vid) {
+    defaulttype::Vector3 getNormal() const {
 //        return m_geo->pointNormal(m_pid[0],vid) * m_fact[0] + m_geo->getPos(m_pid[1],vid) * m_fact[1];
 //        const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getMstate()->read(core::VecCoordId::position());
 
@@ -58,7 +58,7 @@ public:
 //        if (dot(En,Z) < 0.000000000001) Z=defaulttype::Vector3(0,1,0);
 
 //        return cross(En,Z);
-//    }
+    }
 
 //    void refineToClosestPoint(const Coord & P) {
 //        ((const EdgeGeometry*) m_geo)->projectPoint(P,this);

@@ -45,6 +45,7 @@ namespace behavior {
 class TriangleGeometry : public EdgeGeometry
 {
     friend class TriangleElement;
+    friend class TriangleProximity;
 
 public:
     SOFA_CLASS(TriangleGeometry , EdgeGeometry );

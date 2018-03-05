@@ -23,12 +23,11 @@
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
 
-#include <algorithm/CollisionDetectionAlgorithm.inl>
+#include "response/UnilateralResponse.h"
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <math.h>
 #include <assert.h>     /* assert */
-
 
 namespace sofa
 {
@@ -39,10 +38,10 @@ namespace core
 namespace behavior
 {
 
-SOFA_DECL_CLASS(CollisionDetectionAlgorithm)
+SOFA_DECL_CLASS(UnilateralResponse)
 
-int CollisionDetectionAlgorithmClass = core::RegisterObject("Triangle liear interpolation")
-.add<CollisionDetectionAlgorithm >()
+int UnilateralResponseClass = core::RegisterObject("Triangle liear interpolation")
+.add<UnilateralResponse >()
 ;
 
 } // namespace controller

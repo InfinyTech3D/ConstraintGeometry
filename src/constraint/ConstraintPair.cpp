@@ -23,8 +23,7 @@
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
 
-#include "response/UnilateralResponse.h"
-#include "UnilateralContactConstraint.h"
+#include <constraint/ConstraintPair.h>
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <math.h>
@@ -39,38 +38,33 @@ namespace core
 namespace behavior
 {
 
-UnilateralContactConstraint::UnilateralContactConstraint()
-: d_algo(initData(&d_algo, "algo", "Collision reponse algorithm")) {}
+ConstraintPair::ConstraintPair()
+: d_from(initData(&d_from, "from", "Collision reponse algorithm"))
+, d_dest(initData(&d_dest, "dest", "Collision reponse algorithm")) {}
 
 
-void UnilateralContactConstraint::init() {
-    this->getContext()->get(m_algo,d_algo.getValue());
-    if (m_algo == NULL) serr << "Error cannot find the algo" << std::endl;
+void ConstraintPair::init() {
+    Inherit1::init();
+
+    this->getContext()->get(m_from,d_from.getValue());
+    if (m_from == NULL) serr << "Error cannot find the algo" << std::endl;
+
+    this->getContext()->get(m_dest,d_dest.getValue());
+    if (m_dest == NULL) serr << "Error cannot find the algo" << std::endl;
 }
 
-void UnilateralContactConstraint::fillConstraints(helper::vector<ConstraintResponsePtr> &constraints) {
-    m_algo->clear();
-    m_algo->update();
+void ConstraintPair::processGeometricalData() {
+    if (m_algo == NULL) return;
 
-    const PariProximityVector & detection = m_algo->getDetection();
-
-    for (unsigned i=0;i<detection.size();i++) {
-        ConstraintProximityPtr prox1 = detection[i].first;
-        ConstraintProximityPtr prox2 = detection[i].second;
-        defaulttype::Vector3 N = prox2->getPosition() - prox1->getPosition();
-        N.normalize();
-
-        ConstraintResponsePtr cst = std::make_shared<UnilateralResponse>(prox1,prox2,N);
-
-        constraints.push_back(cst);
-    }
+    m_detections.clear();
+    m_algo->processAlgorithm(m_from, m_dest, m_detections);
 }
 
 
-SOFA_DECL_CLASS(UnilateralContactConstraint)
+SOFA_DECL_CLASS(ConstraintPair)
 
-int UnilateralContactConstraintClass = core::RegisterObject("Triangle liear interpolation")
-.add<UnilateralContactConstraint >()
+int ConstraintPairClass = core::RegisterObject("Triangle liear interpolation")
+.add<ConstraintPair >()
 ;
 
 } // namespace controller

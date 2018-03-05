@@ -24,7 +24,6 @@
 ******************************************************************************/
 
 #include "response/BilateralResponse.h"
-#include "BilateralContactConstraint.h"
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <math.h>
@@ -39,40 +38,10 @@ namespace core
 namespace behavior
 {
 
-BilateralContactConstraint::BilateralContactConstraint()
-: d_algo(initData(&d_algo, "algo", "Collision reponse algorithm"))
-, d_maxforce(initData(&d_maxforce, std::numeric_limits<double>::max(), "maxForce", "MaxForce")){}
+SOFA_DECL_CLASS(BilateralResponse)
 
-
-void BilateralContactConstraint::init() {
-    this->getContext()->get(m_algo,d_algo.getValue());
-    if (m_algo == NULL) serr << "Error cannot find the algo" << std::endl;
-}
-
-void BilateralContactConstraint::fillConstraints(helper::vector<ConstraintResponsePtr> &constraints) {
-    m_algo->clear();
-    m_algo->update();
-
-    const PariProximityVector & detection = m_algo->getDetection();
-
-    for (unsigned i=0;i<detection.size();i++) {
-        ConstraintProximityPtr prox1 = detection[i].first;
-        ConstraintProximityPtr prox2 = detection[i].second;
-        defaulttype::Vector3 N = prox2->getPosition() - prox1->getPosition();
-//        if (N.norm()<0.00001) N = prox2->getNormal();
-        N.normalize();
-
-        ConstraintResponsePtr cst = std::make_shared<BilateralResponse>(prox1,prox2,N, d_maxforce.getValue());
-
-        constraints.push_back(cst);
-    }
-}
-
-
-SOFA_DECL_CLASS(BilateralContactConstraint)
-
-int BilateralContactConstraintClass = core::RegisterObject("Triangle liear interpolation")
-.add<BilateralContactConstraint >()
+int BilateralResponseClass = core::RegisterObject("Triangle liear interpolation")
+.add<BilateralResponse >()
 ;
 
 } // namespace controller

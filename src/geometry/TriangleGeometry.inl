@@ -24,8 +24,10 @@ class TriangleProximity : public BaseGeometry::ConstraintProximity {
 public:
     friend class TriangleGeometry;
 
-    TriangleProximity(const TriangleGeometry * geo,unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3) {
+    TriangleProximity(const TriangleGeometry * geo,unsigned eid, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3) {
         m_geo = geo;
+
+        m_eid = eid;
 
         m_pid[0] = p1;
         m_fact[0] = f1;
@@ -53,9 +55,9 @@ public:
         c_d.endEdit();
     }
 
-//    defaulttype::Vector3 getNormal() {
-//        return ((const TriangleGeometry *)m_geo)->m_triangle_info[m_eid].tn;
-//    }
+    defaulttype::Vector3 getNormal() const {
+        return ((const TriangleGeometry *)m_geo)->m_triangle_info[m_eid].tn;
+    }
 
 //    void refineToClosestPoint(const Coord & P) {
 //        ((const TriangleGeometry*) m_geo)->projectPoint(P,this);
@@ -64,6 +66,7 @@ public:
 protected:
     unsigned m_pid[3];
     double m_fact[3];
+    unsigned m_eid;
     const TriangleGeometry * m_geo;
 };
 
@@ -85,7 +88,7 @@ public:
     }
 
     ConstraintProximityPtr getProximity(double f1,double f2,double f3) {
-        return std::make_shared<TriangleProximity>(m_geo,m_pid[0],f1,m_pid[1],f2,m_pid[2],f3);
+        return std::make_shared<TriangleProximity>(m_geo,m_eid, m_pid[0],f1,m_pid[1],f2,m_pid[2],f3);
     }
 
     ConstraintProximityPtr getDefaultProximity() {
@@ -140,26 +143,26 @@ public:
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 
     ConstraintProximityPtr project(defaulttype::Vector3 P) {
-        defaulttype::Vector3 P1 = m_geo->getPos(m_pid[0]);
-        defaulttype::Vector3 P2 = m_geo->getPos(m_pid[1]);
-        defaulttype::Vector3 P3 = m_geo->getPos(m_pid[2]);
+        defaulttype::Vector3 P0 = m_geo->getPos(m_pid[0]);
+        defaulttype::Vector3 P1 = m_geo->getPos(m_pid[1]);
+        defaulttype::Vector3 P2 = m_geo->getPos(m_pid[2]);
 
-        defaulttype::Vector3 x1x2 = P - P1;
+        defaulttype::Vector3 x1x2 = P - P0;
 
         const TriangleGeometry::TriangleInfo & tinfo = m_geo->m_triangle_info[m_eid];
 
         //corrdinate on the plane
         double c0 = dot(x1x2,tinfo.ax1);
         double c1 = dot(x1x2,tinfo.ax2);
-        defaulttype::Vector3 proj_P = P1 + c0 * tinfo.ax1 + c1 * tinfo.ax2;
+        defaulttype::Vector3 proj_P = P0 + c0 * tinfo.ax1 + c1 * tinfo.ax2;
 
         double fact_u,fact_v,fact_w;
 
-        computeBaryCoords(proj_P, tinfo, P1, fact_u,fact_v,fact_w);
+        computeBaryCoords(proj_P, tinfo, P0, fact_u,fact_v,fact_w);
 
         if (fact_u<0) {
-            defaulttype::Vector3 v3 = P2 - P3;
-            defaulttype::Vector3 v4 = proj_P - P3;
+            defaulttype::Vector3 v3 = P1 - P2;
+            defaulttype::Vector3 v4 = proj_P - P2;
             double alpha = dot (v4,v3) / dot(v3,v3);
 
             if (alpha<0) alpha = 0;
@@ -169,8 +172,8 @@ public:
             fact_v = alpha;
             fact_w = 1.0 - alpha;
         } else if (fact_v<0) {
-            defaulttype::Vector3 v3 = P1 - P3;
-            defaulttype::Vector3 v4 = proj_P - P3;
+            defaulttype::Vector3 v3 = P0 - P2;
+            defaulttype::Vector3 v4 = proj_P - P2;
             double alpha = dot (v4,v3) / dot(v3,v3);
 
             if (alpha<0) alpha = 0;
@@ -180,8 +183,8 @@ public:
             fact_v = 0;
             fact_w = 1.0 - alpha;
         } else if (fact_w<0) {
-            defaulttype::Vector3 v3 = P2 - P1;
-            defaulttype::Vector3 v4 = proj_P - P3;
+            defaulttype::Vector3 v3 = P1 - P0;
+            defaulttype::Vector3 v4 = proj_P - P2;
             double alpha = dot (v4,v3) / dot(v3,v3);
 
             if (alpha<0) alpha = 0;

@@ -1,5 +1,4 @@
-#ifndef SOFA_COMPONENT_CONSTRAINT_GEOMETRY_H
-#define SOFA_COMPONENT_CONSTRAINT_GEOMETRY_H
+#pragma once
 
 #include <math.h>
 #include <sofa/defaulttype/Vec.h>
@@ -23,11 +22,11 @@ namespace core {
 
 namespace behavior {
 
-class BaseGeometry : public sofa::core::objectmodel::BaseObject {
+class BaseGeometry : public core::BehaviorModel {
     friend class ConstraintProximity;
 
 public :
-    SOFA_CLASS(BaseGeometry, sofa::core::objectmodel::BaseObject);
+    SOFA_CLASS(BaseGeometry, core::BehaviorModel);
 
     typedef sofa::defaulttype::Vec3dTypes DataTypes;
     typedef DataTypes::VecCoord VecCoord;
@@ -52,13 +51,12 @@ public :
 
         virtual defaulttype::Vector3 getPosition(core::VecCoordId vid = core::VecCoordId::position()) const = 0;
 
-//        virtual defaulttype::Vector3 getNormal(core::VecCoordId vid = core::VecCoordId::position()) const = 0;
+        virtual defaulttype::Vector3 getNormal() const = 0;
 
         virtual void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) = 0;
 
 //        //this function returns a vector with all the control points of the element
 //        virtual void moveToConstrolPoints(double * ptr) = 0;
-
 
 ////        bool operator ==(const ConstraintProximity & b) const {
 ////            if (m_fact.size() != b.m_fact.size()) return false;
@@ -161,8 +159,6 @@ public :
 
 
     void computeBBox(const core::ExecParams* params, bool /*onlyVisible*/)  {
-        m_dirty=true;
-
         SReal minBBox[3] = {1e10,1e10,1e10};
         SReal maxBBox[3] = {-1e10,-1e10,-1e10};
 
@@ -186,34 +182,24 @@ public :
 
     virtual ConstraintElementPtr getElement(unsigned i) const = 0;
 
-    void handleEvent(sofa::core::objectmodel::Event* event) {
-        if (dynamic_cast<simulation::AnimateBeginEvent*>(event)) update();
-        else if (dynamic_cast<simulation::AnimateEndEvent*>(event)) m_dirty = true;
-    }
-
-    void update() {
-        if (m_dirty) {
-            prepareDetection();
-            m_dirty = false;
-        }
-    }
-
-
-protected:
     virtual void prepareDetection() {}
 
-    bool m_dirty;
+protected:
+    void updatePosition(SReal /*dt*/) {
+//        std::string timerName = std::string("updatePosition")+this->getName();
+
+//        sofa::helper::AdvancedTimer::stepBegin(timerName.c_str());
+        prepareDetection();
+//        sofa::helper::AdvancedTimer::stepEnd(timerName.c_str());
+    }
 
 };
 
 typedef std::shared_ptr<BaseGeometry::ConstraintProximity> ConstraintProximityPtr;
 typedef std::shared_ptr<BaseGeometry::ConstraintElement> ConstraintElementPtr;
-//typedef std::shared_ptr<BaseGeometry::ElementIterator> ElementIteratorPtr;
 
 } // namespace controller
 
 } // namespace component
 
 } // namespace sofa
-
-#endif // SOFA_COMPONENT_CONTROLLER_NeedleConstraint_H
