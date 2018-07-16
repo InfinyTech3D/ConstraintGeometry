@@ -13,6 +13,8 @@
 #include <SofaBaseTopology/EdgeSetTopologyContainer.h>
 #include <SofaBaseTopology/TriangleSetTopologyContainer.h>
 #include <sofa/helper/AdvancedTimer.h>
+#include <sofa/helper/gl/template.h>
+#include <sofa/core/behavior/Constraint.h>
 
 namespace sofa {
 
