@@ -16,51 +16,25 @@
 * along with this library; if not, write to the Free Software Foundation,     *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.          *
 *******************************************************************************
-*                               SOFA :: Modules                               *
+*                               SOFA :: Plugins                               *
 *                                                                             *
 * Authors: The SOFA Team and external contributors (see Authors.txt)          *
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_EDGEGEOMETRY_H
-#define SOFA_COMPONENT_EDGEGEOMETRY_H
+#ifndef INITMISCPLUGIN_H
+#define INITMISCPLUGIN_H
 
-#include <sofa/core/behavior/ForceField.h>
-#include <sofa/core/behavior/MechanicalState.h>
-#include <sofa/core/objectmodel/Data.h>
-#include <sofa/defaulttype/VecTypes.h>
-#include "PointGeometry.h"
+#include <sofa/helper/system/config.h>
 
-namespace sofa {
+#ifdef SOFA_BUILD_PLUGINEXAMPLE
+#define SOFA_COLLISIONALGORITHMPLUGIN_API SOFA_EXPORT_DYNAMIC_LIBRARY
+#else
+#define SOFA_COLLISIONALGORITHMPLUGIN_API SOFA_IMPORT_DYNAMIC_LIBRARY
+#endif
 
-namespace core {
+/** \mainpage
+  This is a simple example plugin.
+  */
 
-namespace behavior {
-
-
-
-class EdgeGeometry : public PointGeometry
-{
-public:
-    SOFA_CLASS(EdgeGeometry , PointGeometry );
-
-    unsigned getNbEdges() const ;
-
-    void draw(const core::visual::VisualParams * /*vparams*/);
-
-    unsigned getNbElements() const;
-
-    ConstraintElementPtr getElement(unsigned eid) const;
-
-
-};
-
-
-} // namespace forcefield
-
-} // namespace component
-
-} // namespace sofa
-
-
-#endif // NeedleLinearDescription_H
+#endif // INITMyPluginExample_H

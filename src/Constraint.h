@@ -1,29 +1,18 @@
 #pragma once
 
-#include <sofa/core/visual/VisualParams.h>
-#include <sofa/helper/system/gl.h>
-#include <sofa/helper/gl/template.h>
-#include <CollisionAlgorithm.h>
 #include <BaseGeometry.h>
 #include <Response.h>
 
-namespace sofa {
+namespace constraintGeometry {
 
-namespace core {
-
-namespace behavior {
-
-class Constraint : public sofa::core::behavior::BaseConstraint {
+class Constraint : public BaseConstraint {
 public:
-    SOFA_CLASS(Constraint, sofa::core::behavior::BaseConstraint);
-
     Data<std::string> d_response;
     Data<std::string> d_algo;
 
     Constraint()
     : d_response(initData(&d_response, "response", "Response"))
     , d_algo(initData(&d_algo, "algo", "Algorithm")) {}
-
 
     void init() {
         this->getContext()->get(m_response,d_response.getValue());
@@ -94,9 +83,4 @@ protected:
     helper::vector<ConstraintNormal> m_constraints;
 };
 
-} // namespace controller
-
-} // namespace component
-
-} // namespace sofa
-
+}

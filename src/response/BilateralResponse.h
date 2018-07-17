@@ -3,17 +3,11 @@
 #include <Response.h>
 #include "BaseGeometry.h"
 #include <math.h>
-#include <sofa/defaulttype/Vec.h>
-#include <sofa/helper/gl/template.h>
 
-namespace sofa {
-
-namespace core {
-
-namespace behavior {
+namespace constraintGeometry {
 
 template<int C>
-class BilateralConstraintResolution : public core::behavior::ConstraintResolution {
+class BilateralConstraintResolution : public ConstraintResolution {
 public:
     BilateralConstraintResolution(double m)
     : m_maxForce(m) {
@@ -45,7 +39,6 @@ public:
 
 class BilateralResponse : public Response {
 public:
-    SOFA_CLASS(BilateralResponse, Response);
 
     Data<double> d_maxForce;
 
@@ -78,8 +71,4 @@ public:
     }
 };
 
-} // namespace controller
-
-} // namespace component
-
-} // namespace sofa
+}

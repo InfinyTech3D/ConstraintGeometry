@@ -22,13 +22,21 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-
-#include "TriangleGeometry.inl"
+#include "initPlugin.h"
+#include <sofa/helper/system/config.h>
 #include <sofa/core/ObjectFactory.h>
-#include <sofa/core/visual/VisualParams.h>
-#include <math.h>
-#include <assert.h>     /* assert */
+#include <string>
+#include <sofa/helper/system/FileRepository.h>
+#include <stdio.h>
 
+#define Q(x) #x
+#define QUOTE(x) Q(x)
+
+#ifndef PLUGIN_DATA_DIR
+#define PLUGIN_DATA_DIR_ ""
+#else
+#define PLUGIN_DATA_DIR_ QUOTE(PLUGIN_DATA_DIR)
+#endif
 
 namespace sofa
 {
@@ -39,15 +47,56 @@ namespace core
 namespace behavior
 {
 
-using namespace sofa::defaulttype;
+	//Here are just several convenient functions to help user to know what contains the plugin
 
-SOFA_DECL_CLASS(TriangleGeometry)
+	extern "C" {
+                SOFA_COLLISIONALGORITHMPLUGIN_API void initExternalModule();
+                SOFA_COLLISIONALGORITHMPLUGIN_API const char* getModuleName();
+                SOFA_COLLISIONALGORITHMPLUGIN_API const char* getModuleVersion();
+                SOFA_COLLISIONALGORITHMPLUGIN_API const char* getModuleLicense();
+                SOFA_COLLISIONALGORITHMPLUGIN_API const char* getModuleDescription();
+                SOFA_COLLISIONALGORITHMPLUGIN_API const char* getModuleComponentList();
+	}
+	
+	void initExternalModule()
+	{
+		static bool first = true;
+		if (first)
+		{
+            first = false;
+            sofa::helper::system::DataRepository.addLastPath(std::string(PLUGIN_DATA_DIR_));
+            sofa::helper::system::DataRepository.addLastPath(std::string(PLUGIN_DATA_DIR_) + "/data");
+		}
+	}
 
-int TriangleGeometryClass = core::RegisterObject("Triangle liear interpolation")
-.add<TriangleGeometry >();
-} // namespace controller
+	const char* getModuleName()
+	{
+                 return "CollisionAlgorithmPlugin";
+	}
 
-} // namespace component
+	const char* getModuleVersion()
+	{
+                return "0.0";
+	}
 
-} // namespace sofa
+	const char* getModuleLicense()
+	{
+		return "LGPL";
+	}
 
+
+	const char* getModuleDescription()
+	{
+		return "a simple example of a plugin component module";
+	}
+
+	const char* getModuleComponentList()
+	{
+                return "";
+	}
+
+}
+
+} 
+
+} 

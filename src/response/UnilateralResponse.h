@@ -3,18 +3,11 @@
 #include <Response.h>
 #include "BaseGeometry.h"
 #include <math.h>
-#include <sofa/defaulttype/Vec.h>
-#include <sofa/helper/gl/template.h>
 
-namespace sofa {
-
-namespace core {
-
-namespace behavior {
-
+namespace constraintGeometry {
 
 template<int C>
-class UnilateralConstraintResolution : public core::behavior::ConstraintResolution {
+class UnilateralConstraintResolution : public ConstraintResolution {
 public:
     UnilateralConstraintResolution(double m)
     : m_maxForce(m) {
@@ -76,17 +69,17 @@ public:
         }
     }
 
-    void getConstraintViolation(const PariProximity & detection, const ConstraintNormal & normal, defaulttype::BaseVector *v,unsigned cid) {
-        defaulttype::Vector3 PFree = detection.first->getPosition(core::VecCoordId::freePosition());
-        defaulttype::Vector3 QFree = detection.second->getPosition(core::VecCoordId::freePosition());
-        defaulttype::Vector3 PQFree = PFree - QFree;
+    void getConstraintViolation(const collisionAlgorithm::PairProximity & detection, const ConstraintNormal & normal, defaulttype::BaseVector *v,unsigned cid) {
+        Vector3 PFree = detection.first->getPosition(core::VecCoordId::freePosition());
+        Vector3 QFree = detection.second->getPosition(core::VecCoordId::freePosition());
+        Vector3 PQFree = PFree - QFree;
 
         for (unsigned i=0;i<normal.normals().size();i++) {
             v->set(cid+i,dot(normal.normals()[i],PQFree));
         }
     }
 
-    core::behavior::ConstraintResolution * getResolution(const ConstraintNormal & normal) {
+    ConstraintResolution * getResolution(const ConstraintNormal & normal) {
         if (normal.size() == 1) return new UnilateralConstraintResolution<1>(d_maxForce.getValue());
         else if (normal.size() == 2) return new UnilateralConstraintResolution<2>(d_maxForce.getValue());
         else if (normal.size() == 3) return new UnilateralConstraintResolution<3>(d_maxForce.getValue());
@@ -94,10 +87,4 @@ public:
     }
 };
 
-
-} // namespace controller
-
-} // namespace component
-
-} // namespace sofa
-
+}
