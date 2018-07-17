@@ -22,7 +22,7 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#include "initPlugin.h"
+#include "constraintGeometry.h"
 #include <sofa/helper/system/config.h>
 #include <sofa/core/ObjectFactory.h>
 #include <string>
@@ -50,12 +50,12 @@ namespace behavior
 	//Here are just several convenient functions to help user to know what contains the plugin
 
 	extern "C" {
-                SOFA_COLLISIONALGORITHMPLUGIN_API void initExternalModule();
-                SOFA_COLLISIONALGORITHMPLUGIN_API const char* getModuleName();
-                SOFA_COLLISIONALGORITHMPLUGIN_API const char* getModuleVersion();
-                SOFA_COLLISIONALGORITHMPLUGIN_API const char* getModuleLicense();
-                SOFA_COLLISIONALGORITHMPLUGIN_API const char* getModuleDescription();
-                SOFA_COLLISIONALGORITHMPLUGIN_API const char* getModuleComponentList();
+                SOFA_CONSTRAINTGEOMETRYPLUGIN_API void initExternalModule();
+                SOFA_CONSTRAINTGEOMETRYPLUGIN_API const char* getModuleName();
+                SOFA_CONSTRAINTGEOMETRYPLUGIN_API const char* getModuleVersion();
+                SOFA_CONSTRAINTGEOMETRYPLUGIN_API const char* getModuleLicense();
+                SOFA_CONSTRAINTGEOMETRYPLUGIN_API const char* getModuleDescription();
+                SOFA_CONSTRAINTGEOMETRYPLUGIN_API const char* getModuleComponentList();
 	}
 	
 	void initExternalModule()

@@ -9,8 +9,8 @@
 namespace constraintGeometry {
 
 CollisionForceField::CollisionForceField()
-: p_state("state",RIGHT,this)
-, d_stiffness("stiffness",40.0,this)
+: d_stiffness("stiffness",(double) 40.0,this)
+, p_state("state",RIGHT,this)
 , p_collision("collision",RIGHT, this)
 {}
 
@@ -18,6 +18,7 @@ void CollisionForceField::addForce(VecID f) {
 //    std::cout << "ADD FORCE" << std::endl;
     collisionAlgorithm::PairProximityVector & collision = p_collision->getCollisionPairs();
 
+#if 0
     WriteAccessor<Vector3> force = p_state->write(f);
 
     for (unsigned i=0;i<collision.size();i++) {
@@ -44,6 +45,7 @@ void CollisionForceField::addForce(VecID f) {
             }
         }
     }
+#endif
 }
 
 void CollisionForceField::addToMatrix(BaseMatrix * /*M*/) {

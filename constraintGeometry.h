@@ -26,15 +26,12 @@
 #define INITMISCPLUGIN_H
 
 #include <sofa/helper/system/config.h>
+#include <commonTypes.h>
 
 #ifdef SOFA_BUILD_PLUGINEXAMPLE
-#define SOFA_COLLISIONALGORITHMPLUGIN_API SOFA_EXPORT_DYNAMIC_LIBRARY
+#define SOFA_CONSTRAINTGEOMETRYPLUGIN_API SOFA_EXPORT_DYNAMIC_LIBRARY
 #else
-#define SOFA_COLLISIONALGORITHMPLUGIN_API SOFA_IMPORT_DYNAMIC_LIBRARY
+#define SOFA_CONSTRAINTGEOMETRYPLUGIN_API SOFA_IMPORT_DYNAMIC_LIBRARY
 #endif
 
-/** \mainpage
-  This is a simple example plugin.
-  */
-
-#endif // INITMyPluginExample_H
+#endif

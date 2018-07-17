@@ -1,8 +1,8 @@
-#include <response/BilateralResponse.h>
+//#include <response/BilateralResponse.h>
 
-namespace constraintGeometry {
+//namespace constraintGeometry {
 
-DECLARE_CLASS(BilateralResponse)
+//DECLARE_CLASS(BilateralResponse)
 
-}
+//}
 
