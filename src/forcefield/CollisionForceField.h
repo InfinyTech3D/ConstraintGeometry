@@ -10,7 +10,6 @@ class CollisionForceField :  public ForceField {
 public:
 
     Data<double> d_stiffness;
-    Port<State,REQUIRED> p_state;
     Port<collisionAlgorithm::Collision, REQUIRED> p_collision;
 
     CollisionForceField();

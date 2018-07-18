@@ -10,7 +10,6 @@ namespace constraintGeometry {
 
 CollisionForceField::CollisionForceField()
 : d_stiffness("stiffness",(double) 40.0,this)
-, p_state("state",RIGHT,this)
 , p_collision("collision",RIGHT, this)
 {}
 
@@ -18,34 +17,29 @@ void CollisionForceField::addForce(VecID f) {
 //    std::cout << "ADD FORCE" << std::endl;
     collisionAlgorithm::PairProximityVector & collision = p_collision->getCollisionPairs();
 
-#if 0
-    WriteAccessor<Vector3> force = p_state->write(f);
-
     for (unsigned i=0;i<collision.size();i++) {
         Vector3 P = collision[i].first->getPosition();
         Vector3 Q = collision[i].second->getPosition();
         Vector3 PQ = P-Q;
 
-        if (p_state() == collision[i].first->getState()) {
-            if (dot(PQ,collision[i].second->getNormal())<0) {
-                std::map<unsigned,double> line = collision[i].first->getContributions();
 
-                for (std::map<unsigned,double>::iterator it = line.begin();it!=line.end();it++) {
-                    force[it->first] -=  PQ * it->second * d_stiffness.getValue();
-                }
+        if (dot(PQ,collision[i].second->getNormal())<0) {
+            WriteAccessor<Vector3> force_1 = collision[i].first->getState()->write(f);
+            std::map<unsigned,double> line_1 = collision[i].first->getContributions();
+
+            for (std::map<unsigned,double>::iterator it = line_1.begin();it!=line_1.end();it++) {
+                force_1[it->first] -=  PQ * it->second * d_stiffness.getValue();
             }
-        } else {
-            PQ*=-1;
-            if (dot(PQ,collision[i].first->getNormal())<0) {
-                std::map<unsigned,double> line = collision[i].second->getContributions();
 
-                for (std::map<unsigned,double>::iterator it = line.begin();it!=line.end();it++) {
-                    force[it->first] -=  PQ * it->second * d_stiffness.getValue();
-                }
+            WriteAccessor<Vector3> force_2 = collision[i].second->getState()->write(f);
+            std::map<unsigned,double> line_2 = collision[i].second->getContributions();
+
+            for (std::map<unsigned,double>::iterator it = line_2.begin();it!=line_2.end();it++) {
+                force_2[it->first] +=  PQ * it->second * d_stiffness.getValue();
             }
         }
+
     }
-#endif
 }
 
 void CollisionForceField::addToMatrix(BaseMatrix * /*M*/) {
