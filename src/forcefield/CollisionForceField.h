@@ -14,7 +14,7 @@ public:
 
     CollisionForceField();
 
-    void addForce(VecID f);
+    void addForce(VecDerivId f);
 
     void addToMatrix(BaseMatrix *M);
 
