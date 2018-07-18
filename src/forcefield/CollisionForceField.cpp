@@ -16,12 +16,11 @@ CollisionForceField::CollisionForceField()
 void CollisionForceField::addForce(VecID f) {
 //    std::cout << "ADD FORCE" << std::endl;
     collisionAlgorithm::PairProximityVector & collision = p_collision->getCollisionPairs();
-
+#if 0
     for (unsigned i=0;i<collision.size();i++) {
         Vector3 P = collision[i].first->getPosition();
         Vector3 Q = collision[i].second->getPosition();
         Vector3 PQ = P-Q;
-
 
         if (dot(PQ,collision[i].second->getNormal())<0) {
             WriteAccessor<Vector3> force_1 = collision[i].first->getState()->write(f);
@@ -38,8 +37,8 @@ void CollisionForceField::addForce(VecID f) {
                 force_2[it->first] +=  PQ * it->second * d_stiffness.getValue();
             }
         }
-
     }
+#endif
 }
 
 void CollisionForceField::addToMatrix(BaseMatrix * /*M*/) {
