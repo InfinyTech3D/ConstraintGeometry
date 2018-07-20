@@ -14,7 +14,6 @@ CollisionForceField::CollisionForceField()
 {}
 
 void CollisionForceField::addForce(VecDerivId f) {
-//    std::cout << "ADD FORCE" << std::endl;
     collisionAlgorithm::PairProximityVector & collision = p_collision->getCollisionPairs();
 
     for (unsigned i=0;i<collision.size();i++) {
