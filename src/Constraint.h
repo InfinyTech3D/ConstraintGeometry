@@ -22,11 +22,15 @@ public:
         if (m_algo == NULL) serr << "Error cannot find the reponse" << std::endl;
     }
 
-    void buildConstraintMatrix(const ConstraintParams* cParams, core::MultiMatrixDerivId cId, unsigned int &constraintId) {
+    void processGeometricalData() {
         m_constraints.clear();
         if (m_response == NULL) return;
 
-        m_response->getConstraintNormals(m_detections,m_constraints);
+        m_constraints = m_response->getConstraintNormals(m_detections);
+    }
+
+    void buildConstraintMatrix(const ConstraintParams* cParams, core::MultiMatrixDerivId cId, unsigned int &constraintId) {
+
 
         for (unsigned i=0;i<m_constraints.size();i++) {
             m_constraints[i].buildConstraintMatrix(cParams,cId,constraintId);
