@@ -21,7 +21,7 @@ void CollisionForceField::addForce(VecDerivId f) {
         Vector3 Q = collision[i].second->getPosition();
         Vector3 PQ = P-Q;
 
-//        if (dot(PQ,collision[i].second->getNormal())<0) {
+        if (dot(PQ,collision[i].second->getNormal())<0) {
             WriteAccessor<Vector3> force_1 = collision[i].first->getState()->write(f);
             std::map<unsigned,double> line_1 = collision[i].first->getContributions();
 
@@ -35,7 +35,7 @@ void CollisionForceField::addForce(VecDerivId f) {
             for (std::map<unsigned,double>::iterator it = line_2.begin();it!=line_2.end();it++) {
                 force_2[it->first] +=  PQ * it->second * d_stiffness.getValue();
             }
-//        }
+        }
     }
 }
 
