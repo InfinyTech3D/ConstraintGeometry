@@ -10,7 +10,7 @@ namespace constraintGeometry {
 
 CollisionForceField::CollisionForceField()
 : d_stiffness("stiffness",(double) 40.0,this)
-, p_collision("collision",RIGHT, this)
+, p_collision("collision",OUT, this)
 {}
 
 void CollisionForceField::addForce(VecDerivId f) {
