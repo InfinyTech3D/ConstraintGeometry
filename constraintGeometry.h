@@ -26,7 +26,6 @@
 #define INITMISCPLUGIN_H
 
 #include <sofa/helper/system/config.h>
-#include <sofaport.h>
 
 #ifdef SOFA_BUILD_PLUGINEXAMPLE
 #define SOFA_CONSTRAINTGEOMETRYPLUGIN_API SOFA_EXPORT_DYNAMIC_LIBRARY
