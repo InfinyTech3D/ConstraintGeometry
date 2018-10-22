@@ -1,0 +1,14 @@
+# CMake package configuration file for the ConstraintGeometry plugin
+
+@PACKAGE_INIT@
+
+find_package(SofaGeneral REQUIRED)
+
+if(NOT TARGET ConstraintGeometry)
+        include("${CMAKE_CURRENT_LIST_DIR}/ConstraintGeometryTargets.cmake")
+endif()
+
+#check_required_components(ConstraintGeometry)
+
+set(ConstraintGeometry_LIBRARIES "ConstraintGeometry")
+set_and_check(CONSTRAINTGEOMETRY_INCLUDE_DIRS "@CONSTRAINTGEOMETRY_INCLUDE_DIRS@")
