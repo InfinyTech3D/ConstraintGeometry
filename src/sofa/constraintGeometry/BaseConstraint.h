@@ -68,6 +68,8 @@ public:
 
     virtual void normalize(unsigned sz) = 0;
 
+    virtual void draw(const core::visual::VisualParams* vparams, double scale, defaulttype::Vector4 c) = 0;
+
     static InternalConstraint::SPtr createPairConstraint(collisionAlgorithm::PairProximity pproxy, ConstraintNormal cn);
 };
 
@@ -116,7 +118,7 @@ public:
                 MatrixDerivRowIterator c_it = c2.writeLine(constraintId+j);
 
                 for (auto it=m2.begin();it!=m2.end();it++) {
-                    c_it.addCol(it->first, m_directions.m_normals[j] * it->second);
+                    c_it.addCol(it->first, -m_directions.m_normals[j] * it->second);
                 }
             }
 
@@ -133,7 +135,7 @@ public:
         defaulttype::Vector3 PQFree = PFree - QFree;
 
         for (unsigned i=0;i<m_directions.m_normals.size();i++) {
-            v->set(cid+i,dot(m_directions.m_normals[i],PQFree));
+            v->set(cid+i,dot(PQFree,m_directions.m_normals[i]));
         }
     }
 
@@ -146,6 +148,15 @@ public:
     }
 
 
+    virtual void draw(const core::visual::VisualParams* vparams, double scale, defaulttype::Vector4 c) {
+        for (unsigned i=0;i<m_directions.size();i++) {
+            vparams->drawTool()->drawArrow(m_pproxy.second->getPosition(),
+                                           m_pproxy.second->getPosition() + m_directions.m_normals[i] * scale,
+                                           scale*0.1,
+                                           c);
+
+        }
+    }
 
 protected:
     collisionAlgorithm::PairProximity m_pproxy;
@@ -172,9 +183,13 @@ public:
     typedef MatrixDeriv::RowIterator MatrixDerivRowIterator;
 
     DataLink<BaseResponse> d_response;
+    Data<double> d_drawScale;
+    Data<defaulttype::Vector4> d_drawColor;
 
     BaseConstraint()
-    : d_response(initData(&d_response, "response", "Response")) {}
+    : d_response(initData(&d_response, "response", "Response"))
+    , d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
+    , d_drawColor(initData(&d_drawColor, defaulttype::Vector4(1,0,0,1), "draw_color", "draw color")){}
 
     virtual void createConstraints() = 0;
 
@@ -192,9 +207,7 @@ public:
         createConstraints();
 
         unsigned sz = d_response->size();
-        for (unsigned i=0;i<m_constraints.size();i++) {
-            m_constraints[i]->normalize(sz);
-        }
+        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i]->normalize(sz);
     }
 
     void buildConstraintMatrix(const core::ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned int &constraintId) {
@@ -207,7 +220,7 @@ public:
     void getConstraintViolation(const core::ConstraintParams* /*cParams*/, defaulttype::BaseVector *v,unsigned cid) {
         for (unsigned i=0;i<m_constraints.size();i++) {
             m_constraints[i]->getConstraintViolation(v, cid);
-            cid+=m_constraints[i]->size();
+            cid += m_constraints[i]->size();
         }
     }
 
@@ -222,26 +235,11 @@ public:
         if (! vparams->displayFlags().getShowInteractionForceFields()) return;
 
         for (unsigned i=0;i<m_constraints.size();i++) {
-//            m_constraints[i].draw(vparams);
-            //        for (unsigned i=0;i<m_pairDetection.size();i++) {
-            //            vparams->drawTool()->drawArrow(m_pairDetection[i].second->getPosition(),
-            //                                           m_pairDetection[i].second->getPosition() + m_pairDetection[i].second->getNormal(),
-            //                                           0.1,
-            //                                           defaulttype::Vector4(0,0,1,1));
-
-            //            vparams->drawTool()->drawArrow(m_pairDetection[i].first->getPosition(),
-            //                                           m_pairDetection[i].first->getPosition() + m_pairDetection[i].first->getNormal(),
-            //                                           0.1,
-            //                                           defaulttype::Vector4(0,0,1,1));
-            //        }
-
+            m_constraints[i]->draw(vparams,d_drawScale.getValue(),d_drawColor.getValue());
         }
     }
 
-    void updateForceMask() {}
-
     void storeLambda(const core::ConstraintParams* cParams, Data<VecDeriv>& result, const Data<MatrixDeriv>& jacobian, const sofa::defaulttype::BaseVector* lambda) {
-
         auto res = sofa::helper::write(result, cParams);
         const MatrixDeriv& j = jacobian.getValue(cParams);
         j.multTransposeBaseVector(res, lambda ); // lambda is a vector of scalar value so block size is one.
@@ -254,6 +252,8 @@ public:
             }
         }
     }
+
+    void updateForceMask() {}
 
 protected:        
     helper::vector<InternalConstraint::SPtr> m_constraints;

@@ -23,6 +23,7 @@ public:
         for (unsigned i=0;i<d_algo->getCollisionPairs().size();i++) {
             collisionAlgorithm::PairProximity pair = d_algo->getCollisionPairs()[i];
             ConstraintNormal cn = ConstraintNormal::createFrame(pair.first->getPosition() - pair.second->getPosition());
+
             addConstraint(InternalConstraint::createPairConstraint(pair,cn));
         }
     }
