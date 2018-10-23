@@ -1,4 +1,4 @@
-#include <sofa/constraintGeometry/constraint/ContactReponse.h>
+#include <sofa/constraintGeometry/constraint/ContactConstraint.h>
 #include <sofa/core/ObjectFactory.h>
 #include <stdio.h>
 #include <iostream>
@@ -11,8 +11,8 @@ namespace sofa {
 
 namespace constraintGeometry {
 
-int ContactReponseClass = core::RegisterObject("ContactReponse")
-.add<ContactReponse>();
+int ContactConstraintClass = core::RegisterObject("ContactConstraint")
+.add<ContactConstraint>();
 
 }
 

@@ -1,90 +1,70 @@
-//#pragma once
+#pragma once
 
-//#include <Response.h>
-//#include "BaseGeometry.h"
-//#include <math.h>
+#include <sofa/constraintGeometry/BaseResponse.h>
+#include <math.h>
 
-//namespace constraintGeometry {
+namespace sofa {
 
-//template<int C>
-//class UnilateralConstraintResolution : public ConstraintResolution {
-//public:
-//    UnilateralConstraintResolution(double m)
-//    : m_maxForce(m) {
-//        nbLines = C;
-//    }
-
-//    virtual void init(int line, double** w, double */*force*/)
-//    {
-//        sofa::defaulttype::Mat<C,C,double> temp;
-//        for (unsigned j=0;j<C;j++) {
-//            for (unsigned i=0;i<C;i++) {
-//                temp[j][i] = w[line+j][line+i];
-//            }
-//        }
-//        invertMatrix(invW, temp);
-//    }
-
-//    virtual void resolution(int line, double** /*w*/, double* d, double* force, double * /*dFree*/)
-//    {
-//        for(int i=0; i<C; i++) {
-//            for(int j=0; j<C; j++)
-//                force[line+i] -= d[line+j] * invW[i][j];
-//        }
+namespace constraintGeometry {
 
 
-//        for(int i=0; i<C; i++) {
-//            if (force[line+i]>m_maxForce) force[line+i] = m_maxForce;
-//            else if (force[line+i]<0) force[line+i] = 0.0;
-//        }
-//    }
+class UFFResponse : public BaseResponse {
+public:
+    SOFA_CLASS(UFFResponse, BaseResponse);
 
-//    double m_maxForce;
-//    sofa::defaulttype::Mat<C,C,double> invW;
-//};
+    Data<double> d_maxForce;
+    Data<double> d_friction;
 
-//class UnilateralResponse : public Response {
-//public:
-//    SOFA_CLASS(UnilateralResponse, Response);
+    UFFResponse()
+    : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
+    , d_friction(initData(&d_friction, 0.0, "friction", "Friction")) {}
 
-//    Data<double> d_maxForce;
+    class UnilateralConstraintResolution : public sofa::core::behavior::ConstraintResolution {
+    public:
+        UnilateralConstraintResolution(double m,double f) : ConstraintResolution(3), m_maxForce(m), m_friction(f) {}
 
-//    UnilateralResponse()
-//    : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force")) {}
+        virtual void init(int line, double** w, double */*force*/) {
+            sofa::defaulttype::Mat<3,3,double> temp;
+            for (unsigned j=0;j<3;j++) {
+                for (unsigned i=0;i<3;i++) {
+                    temp[j][i] = w[line+j][line+i];
+                }
+            }
 
-//    void getConstraintNormals(const PariProximityVector & pp, std::vector<ConstraintNormal> & out) {
-//        for (unsigned i=0;i<pp.size();i++) {
-//            defaulttype::Vector3 P = pp[i].first->getPosition();
-//            defaulttype::Vector3 Q = pp[i].second->getPosition();
+            invertMatrix(invW, temp);
+        }
 
-//            defaulttype::Vector3 PQ = P-Q;
+        virtual void resolution(int line, double** /*w*/, double* d, double* force, double * /*dFree*/) {
+            double bforce[3];
+            for(int i=0; i<3; i++) bforce[line+i] = bforce[line+i];
 
-//            PQ.normalize();
-//            defaulttype::Vector3 N = pp[i].second->getNormal();
+            for(int i=0; i<3; i++) {
+                for(int j=0; j<3; j++)
+                    force[line+i] -= d[line+j] * invW[i][j];
+            }
 
-//            double dotPQ = dot(PQ,N);
-//            if (dotPQ<0) PQ *= -1;
 
-//            out.push_back(ConstraintNormal(pp[i], PQ));
-//        }
-//    }
+            for(int i=0; i<3; i++) {
+                if (force[line+i]>m_maxForce) force[line+i] = m_maxForce;
+                else if (force[line+i]<0) force[line+i] = 0.0;
+            }
+        }
 
-//    void getConstraintViolation(const collisionAlgorithm::PairProximity & detection, const ConstraintNormal & normal, defaulttype::BaseVector *v,unsigned cid) {
-//        Vector3 PFree = detection.first->getPosition(core::VecCoordId::freePosition());
-//        Vector3 QFree = detection.second->getPosition(core::VecCoordId::freePosition());
-//        Vector3 PQFree = PFree - QFree;
+        double m_maxForce;
+        double m_friction;
+        sofa::defaulttype::Mat<3,3,double> invW;
+    };
 
-//        for (unsigned i=0;i<normal.normals().size();i++) {
-//            v->set(cid+i,dot(normal.normals()[i],PQFree));
-//        }
-//    }
+    virtual unsigned size() {
+        return 3;
+    }
 
-//    ConstraintResolution * getResolution(const ConstraintNormal & normal) {
-//        if (normal.size() == 1) return new UnilateralConstraintResolution<1>(d_maxForce.getValue());
-//        else if (normal.size() == 2) return new UnilateralConstraintResolution<2>(d_maxForce.getValue());
-//        else if (normal.size() == 3) return new UnilateralConstraintResolution<3>(d_maxForce.getValue());
-//        return NULL;
-//    }
-//};
+    virtual core::behavior::ConstraintResolution* getConstraintResolution() {
+        return new UnilateralConstraintResolution(d_maxForce.getValue(), d_friction.getValue());
+    }
 
-//}
+};
+
+}
+
+}

@@ -1,8 +1,14 @@
-//#include <response/UnilateralResponse.h>
+#include <sofa/constraintGeometry/response/UnilateralResponse.h>
+#include <sofa/core/ObjectFactory.h>
 
-//namespace constraintGeometry {
+namespace sofa {
 
-//DECLARE_CLASS(UnilateralResponse)
+namespace constraintGeometry {
 
-//}
+int UFFResponseClass = core::RegisterObject("UFFResponse")
+.add<UFFResponse>();
+
+}
+
+}
 
