@@ -38,7 +38,7 @@ public:
 
     }
 
-    static ConstraintNormal createFrame(defaulttype::Vector3 N1) {
+    static ConstraintNormal createFrame(defaulttype::Vector3 N1 = defaulttype::Vector3()) {
         if (N1.norm() == 0) N1 = defaulttype::Vector3(1,0,0);
         N1.normalize();
         defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(0,1,0)))>0.99) ? defaulttype::Vector3(0,0,1) : defaulttype::Vector3(0,1,0)));

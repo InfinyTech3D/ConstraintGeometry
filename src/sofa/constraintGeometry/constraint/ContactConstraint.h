@@ -22,7 +22,12 @@ public:
     void createConstraints() {
         for (unsigned i=0;i<d_algo->getCollisionPairs().size();i++) {
             collisionAlgorithm::PairProximity pair = d_algo->getCollisionPairs()[i];
-            ConstraintNormal cn = ConstraintNormal::createFrame(pair.first->getPosition() - pair.second->getPosition());
+
+            defaulttype::Vector3 mainDir = pair.first->getPosition() - pair.second->getPosition();
+            if (mainDir.norm() < 0.00000000000000001) mainDir = pair.first->getNormal();
+            else if (dot(mainDir,pair.first->getNormal())<0) mainDir *= -1.0;
+
+            ConstraintNormal cn = ConstraintNormal::createFrame(mainDir);
 
             addConstraint(InternalConstraint::createPairConstraint(pair,cn));
         }
