@@ -24,8 +24,11 @@ public:
             collisionAlgorithm::PairProximity pair = d_algo->getCollisionPairs()[i];
 
             defaulttype::Vector3 mainDir = pair.first->getPosition() - pair.second->getPosition();
-            if (mainDir.norm() < 0.00000000000000001) mainDir = pair.first->getNormal();
-            else if (dot(mainDir,pair.first->getNormal())<0) mainDir *= -1.0;
+            defaulttype::Vector3 secondDir = pair.second->getNormal();
+
+            mainDir.normalize();
+
+            if (dot(mainDir,secondDir) < 0.8) mainDir = secondDir;
 
             ConstraintNormal cn = ConstraintNormal::createFrame(mainDir);
 

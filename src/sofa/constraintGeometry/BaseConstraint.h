@@ -35,7 +35,7 @@ public:
     }
 
     void normalize(unsigned sz) {
-
+        if (m_normals.size() > sz) m_normals.resize(sz);
     }
 
     static ConstraintNormal createFrame(defaulttype::Vector3 N1 = defaulttype::Vector3()) {
