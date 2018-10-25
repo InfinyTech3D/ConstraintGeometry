@@ -255,7 +255,7 @@ public:
 
     void updateForceMask() {}
 
-protected:        
+protected:
     helper::vector<InternalConstraint::SPtr> m_constraints;
     std::set<sofa::core::behavior::MechanicalState<DataTypes> * > m_state;
 };

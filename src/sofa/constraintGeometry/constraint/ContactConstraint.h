@@ -26,9 +26,12 @@ public:
             defaulttype::Vector3 mainDir = pair.first->getPosition() - pair.second->getPosition();
             defaulttype::Vector3 secondDir = pair.second->getNormal();
 
-            mainDir.normalize();
+            if (mainDir.norm()<0.01) mainDir = secondDir;
+            else {
+                mainDir.normalize();
+                if (dot(mainDir,secondDir) < 0) mainDir = secondDir;
+            }
 
-            if (dot(mainDir,secondDir) < 0.8) mainDir = secondDir;
 
             ConstraintNormal cn = ConstraintNormal::createFrame(mainDir);
 
