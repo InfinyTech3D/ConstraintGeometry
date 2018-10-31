@@ -184,6 +184,7 @@ public :
 
         defaulttype::Vector3 PFree = pinfo1.getFreePosition();
         defaulttype::Vector3 PQFree = PFree - QFree;
+        std::cout << "cid 2 :"<< cid << std::endl;
 
         for (unsigned i=0;i<m_normals.size();i++) {
             v->set(cid+i,dot(m_normals[i],PQFree));

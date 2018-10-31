@@ -16,14 +16,30 @@ namespace core {
 
 namespace behavior {
 
+PointGeometry::PointGeometry()
+: d_checkConnectivity(initData(&d_checkConnectivity, false, "checkConnectivity", "d_checkConnectivity")) {}
+
 defaulttype::Vector3 PointGeometry::getNormal(const ConstraintProximity & /*pinfo*/) {
     return defaulttype::Vector3();
 }
 
 ConstraintProximity PointGeometry::getPointProximity(unsigned eid) {
     ConstraintProximity res(this,eid);
-    res.push(eid,1.0);
+    res.push(m_indices[eid],1.0);
     return res;
+}
+
+void PointGeometry::init() {
+    if (d_checkConnectivity.getValue()) {
+        for (int i=0;i<this->getTopology()->getNbPoints();i++) {
+            const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = this->getTopology()->getTrianglesAroundVertex(i);
+            if (tav.size()) m_indices.push_back(i);
+        }
+    } else {
+        for (int i=0;i<this->getTopology()->getNbPoints();i++) {
+            m_indices.push_back(i);
+        }
+    }
 }
 
 double PointGeometry::projectPoint(unsigned eid,const defaulttype::Vector3 & T,ConstraintProximity & pinfo) {
@@ -32,11 +48,11 @@ double PointGeometry::projectPoint(unsigned eid,const defaulttype::Vector3 & T,C
 }
 
 int PointGeometry::getNbElements() {
-    return this->getTopology()->getNbPoints();
+    return m_indices.size();
 }
 
 int PointGeometry::getNbPoints() {
-    return this->getTopology()->getNbPoints();
+    return m_indices.size();
 }
 
 void PointGeometry::draw(const core::visual::VisualParams * vparams) {
@@ -45,8 +61,8 @@ void PointGeometry::draw(const core::visual::VisualParams * vparams) {
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
 
     glColor3f(0.9,0.46,0);
-    for (int i=0;i<this->getTopology()->getNbPoints();i++) {
-        vparams->drawTool()->drawSphere(x[i],0.001);
+    for (int i=0;i<m_indices.size();i++) {
+        vparams->drawTool()->drawSphere(x[m_indices[i]],0.001);
     }
 }
 
