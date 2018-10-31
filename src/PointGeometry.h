@@ -55,7 +55,7 @@ public:
 
     int getNbElements();
 
-    void init();
+    void bwdInit();
 
     int getNbPoints();
 
