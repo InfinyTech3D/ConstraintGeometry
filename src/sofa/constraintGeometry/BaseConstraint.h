@@ -2,7 +2,6 @@
 
 #include <sofa/collisionAlgorithm/BaseCollisionAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/core/objectmodel/DataLink.h>
 #include <sofa/core/behavior/BaseConstraint.h>
 #include <sofa/constraintGeometry/BaseResponse.h>
 
@@ -170,6 +169,8 @@ InternalConstraint::SPtr InternalConstraint::createPairConstraint(collisionAlgor
 
 class BaseConstraint : public sofa::core::behavior::BaseConstraint {
 public:
+    SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseConstraint);
+
     typedef sofa::defaulttype::Vec3dTypes DataTypes;
     typedef DataTypes::VecCoord VecCoord;
     typedef DataTypes::Coord Coord;
@@ -182,14 +183,13 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef MatrixDeriv::RowIterator MatrixDerivRowIterator;
 
-    DataLink<BaseResponse> d_response;
     Data<double> d_drawScale;
     Data<defaulttype::Vector4> d_drawColor;
 
     BaseConstraint()
-    : d_response(initData(&d_response, "response", "Response"))
-    , d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
-    , d_drawColor(initData(&d_drawColor, defaulttype::Vector4(1,0,0,1), "draw_color", "draw color")){}
+    : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
+    , d_drawColor(initData(&d_drawColor, defaulttype::Vector4(1,0,0,1), "draw_color", "draw color"))
+    , l_response(initLink("response", "Link to Response")) {}
 
     virtual void createConstraints() = 0;
 
@@ -206,7 +206,7 @@ public:
         getState(m_state);
         createConstraints();
 
-        unsigned sz = d_response->size();
+        unsigned sz = l_response->size();
         for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i]->normalize(sz);
     }
 
@@ -226,7 +226,7 @@ public:
 
     void getConstraintResolution(const core::ConstraintParams* /*cParams*/, std::vector<core::behavior::ConstraintResolution*>& resTab, unsigned int& offset) {
         for (unsigned i=0;i<m_constraints.size();i++) {
-            resTab[offset] = d_response->getConstraintResolution();
+            resTab[offset] = l_response->getConstraintResolution();
             offset+=m_constraints[i]->size();
         }
     }
@@ -258,6 +258,8 @@ public:
 protected:
     helper::vector<InternalConstraint::SPtr> m_constraints;
     std::set<sofa::core::behavior::MechanicalState<DataTypes> * > m_state;
+
+    core::objectmodel::SingleLink<BaseConstraint,BaseResponse,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_response;
 };
 
 }

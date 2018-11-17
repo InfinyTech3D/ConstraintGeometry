@@ -3,7 +3,6 @@
 #include <sofa/collisionAlgorithm/BaseCollisionAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/behavior/BaseForceField.h>
-#include <sofa/core/objectmodel/DataLink.h>
 
 namespace sofa {
 
@@ -12,12 +11,12 @@ namespace constraintGeometry {
 template<class DataTypes>
 class CollisionForceField :  public sofa::core::behavior::BaseForceField {
 public:
+    SOFA_CLASS(CollisionForceField, sofa::core::behavior::BaseForceField);
 
     typedef typename DataTypes::VecDeriv VecDeriv;
     typedef Data<VecDeriv> DataVecDeriv;
 
     Data<double> d_stiffness;
-    DataLink<collisionAlgorithm::BaseCollisionAlgorithm> d_collision;
 
     CollisionForceField();
 
@@ -34,6 +33,9 @@ public:
     void draw(const core::visual::VisualParams * );
 
     void updateForceMask() {}
+
+protected:
+    core::objectmodel::SingleLink<CollisionForceField,collisionAlgorithm::BaseCollisionAlgorithm,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_collision;
 };
 
 }

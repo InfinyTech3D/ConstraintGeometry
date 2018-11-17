@@ -14,7 +14,7 @@ namespace constraintGeometry {
 template<class DataTypes>
 CollisionForceField<DataTypes>::CollisionForceField()
 : d_stiffness(initData(&d_stiffness, (double) 40.0,"stiffness","this"))
-, d_collision(initData(&d_collision, "collision", "this")) {}
+, l_collision(initLink("collision", "Link to collision algorithm")) {}
 
 template<class DataTypes>
 void CollisionForceField<DataTypes>::addForce(const core::MechanicalParams* mparams, core::MultiVecDerivId fId) {
@@ -88,7 +88,7 @@ void CollisionForceField<DataTypes>::draw(const core::visual::VisualParams *flag
 //    glEnd(); // GL_LINES
 //    glLineWidth(1);
 
-    collisionAlgorithm::PairProximityVector & collision = d_collision->getCollisionPairs();
+    collisionAlgorithm::PairProximityVector & collision = l_collision->getCollisionPairs();
     for (unsigned i=0;i<collision.size();i++) {
         defaulttype::Vector3 P = collision[i].first->getPosition();
         defaulttype::Vector3 Q = collision[i].second->getPosition();
