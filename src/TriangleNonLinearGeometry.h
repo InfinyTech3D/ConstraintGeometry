@@ -27,6 +27,7 @@
 
 #include "TriangleGeometry.h"
 #include "ConstraintProximity.h"
+#include "GL/gl.h"
 
 namespace sofa {
 

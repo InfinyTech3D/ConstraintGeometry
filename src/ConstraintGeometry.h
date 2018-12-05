@@ -38,8 +38,11 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef MatrixDeriv::RowIterator MatrixDerivRowIterator;
 
-    topology::TopologyContainer * getTopology() {
-        return dynamic_cast<topology::TopologyContainer *>(getContext()->getTopology());
+    //    topology::TopologyContainer * getTopology() {
+    //        return dynamic_cast<topology::TopologyContainer *>(getContext()->getTopology());
+    //    }
+    topology::BaseMeshTopology * getTopology() {
+        return dynamic_cast<topology::BaseMeshTopology *>(getContext()->getTopology());
     }
 
     sofa::core::behavior::MechanicalState<DataTypes> * getMstate() {
@@ -86,9 +89,9 @@ public :
 
     virtual BaseDecorator * getDecorator();
 
-//    void getAlgorithm(CollisionAlgorithm * algo);
+    //    void getAlgorithm(CollisionAlgorithm * algo);
 
-//    void createAlgorithm(CollisionAlgorithm * alg);
+    //    void createAlgorithm(CollisionAlgorithm * alg);
 };
 
 //class CollisionAlgorithm : public BaseConstraintGeometry {

@@ -124,6 +124,25 @@ public :
         return res;
     }
 
+    static ConstraintNormal createTangentialPlane(defaulttype::Vector3 N1) {
+        ConstraintNormal res;
+
+        if (N1.norm() == 0) return res;
+
+        N1.normalize();
+
+        defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(1,0,0)))>0.99) ? defaulttype::Vector3(0,1,0) : defaulttype::Vector3(1,0,0)));
+        N2.normalize();
+
+        defaulttype::Vector3 N3 = cross(N1,N2);
+        N3.normalize();
+
+        res.m_normals.push_back(N2);
+        res.m_normals.push_back(N3);
+
+        return res;
+    }
+
     static ConstraintNormal createFrameConstraint(defaulttype::Vector3 N1) {
         ConstraintNormal res;
 
@@ -152,21 +171,26 @@ public :
         }
 
         cline += m_normals.size();
+
     }
 
     void addConstraint(core::MultiMatrixDerivId cId, unsigned & cline, const ConstraintProximity & pinfo1, const ConstraintProximity & pinfo2) {
         if (empty()) return;
-
         for (unsigned i=0;i<m_normals.size();i++) {
             pinfo1.addConstraint(cId,cline+i,m_normals[i]);
             pinfo2.addConstraint(cId,cline+i,-m_normals[i]);
         }
 
         cline += m_normals.size();
+        m_cId=cline;
+        std::cout<<"cline " << cline << std::endl;
+
     }
 
     void addViolation(defaulttype::BaseVector *v,unsigned & cid, const ConstraintProximity & pinfo1, const ConstraintProximity & pinfo2) {
         if (empty()) return;
+        cid=m_cId;
+        std::cout<<" constraintId " << cid << std::endl;
 
         defaulttype::Vector3 PFree = pinfo1.getFreePosition();
         defaulttype::Vector3 QFree = pinfo2.getFreePosition();
@@ -211,6 +235,7 @@ public :
 
 
     helper::vector<defaulttype::Vector3> m_normals;
+    unsigned int  m_cId;
 };
 
 } // namespace controller
