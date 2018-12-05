@@ -43,6 +43,10 @@ public:
 
     typedef defaulttype::Vector3 Vector3;
 
+    Data<bool> d_checkConnectivity;
+
+    PointGeometry();
+
     virtual defaulttype::Vector3 getNormal(const ConstraintProximity & /*pinfo*/);
 
     virtual ConstraintProximity getPointProximity(unsigned eid);
@@ -51,10 +55,13 @@ public:
 
     int getNbElements();
 
+    void bwdInit();
+
     int getNbPoints();
 
     void draw(const core::visual::VisualParams * vparams);
 
+    std::vector<unsigned> m_indices;
 };
 
 } // namespace forcefield

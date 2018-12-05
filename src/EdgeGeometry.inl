@@ -7,7 +7,7 @@
 #include <sofa/simulation/AnimateBeginEvent.h>
 #include <SofaBaseMechanics/MechanicalObject.h>
 #include "ConstraintProximity.h"
-#include <sofa/helper/gl/template.h>
+
 
 namespace sofa {
 
