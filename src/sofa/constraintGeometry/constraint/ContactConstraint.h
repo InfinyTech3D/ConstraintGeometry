@@ -30,8 +30,7 @@ public:
             }
 
 
-            ConstraintNormal cn = ConstraintNormal::createFrame(mainDir);
-
+            ConstraintNormal cn = l_response->createConstraintNormal(mainDir);
             addConstraint(InternalConstraint::createPairConstraint(pair,cn));
         }
     }

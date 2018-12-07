@@ -63,6 +63,16 @@ public:
         return C;
     }
 
+    virtual ConstraintNormal createConstraintNormal(defaulttype::Vector3 mainDir) {
+        if (C>=3) { // specific case where the problem is full constrained
+            return ConstraintNormal::createFrame(defaulttype::Vector3(1,0,0));
+        } else {
+            ConstraintNormal cn = ConstraintNormal::createFrame(mainDir);
+            cn.m_normals.resize(C);
+            return cn;
+        }
+    }
+
 };
 
 }

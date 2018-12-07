@@ -86,6 +86,9 @@ public:
         return 3;
     }
 
+    ConstraintNormal createConstraintNormal(defaulttype::Vector3 mainDir) {
+        return ConstraintNormal::createFrame(mainDir);
+    }
 };
 
 class ContactResponseU : public TResponse<UnilateralConstraintResolution> {
@@ -104,6 +107,10 @@ public:
 
     unsigned size() {
         return 1;
+    }
+
+    ConstraintNormal createConstraintNormal(defaulttype::Vector3 mainDir) {
+        return ConstraintNormal(mainDir);
     }
 };
 
