@@ -40,17 +40,10 @@ public:
 
     static ConstraintNormal createFrame(defaulttype::Vector3 N1 = defaulttype::Vector3()) {
         if (N1.norm() == 0) N1 = defaulttype::Vector3(1,0,0);
-        N1.normalize();
         defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(0,1,0)))>0.99) ? defaulttype::Vector3(0,0,1) : defaulttype::Vector3(0,1,0)));
-        N2.normalize();
         defaulttype::Vector3 N3 = cross(N1,N2);
-        N3.normalize();
 
-        ConstraintNormal cn;
-        cn.m_normals.push_back(N1);
-        cn.m_normals.push_back(N2);
-        cn.m_normals.push_back(N3);
-        return cn;
+        return ConstraintNormal(N1,N2,N3);
     }
 
     std::vector<defaulttype::Vector3> m_normals;

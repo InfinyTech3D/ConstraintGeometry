@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Node name="Root" gravity="0 -9 0" >
+    <RequiredPlugin pluginName="CollisionAlgorithm"/>
+	<RequiredPlugin pluginName="ConstraintGeometry"/>
+	<RequiredPlugin pluginName="SofaCUDASolvers"/>
+	<RequiredPlugin pluginName="SofaAsyncSolvers"/>
+	
+<!--         <DefaultAnimationLoop /> -->
+	<FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
+	<GenericConstraintSolver maxIterations="1000" tolerance="0.0001" />
+	
+	<CollisionDetectionAlgorithm name="algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" angle="0" dist="0.5" />
+
+	<Node name="Liver">
+		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
+<!--         <CGLinearSolver name="CGLinearSolver" tolerance="1e-09" threshold="1e-09" /> -->
+		<SparseLDLSolver name="precond" template="CompressedRowSparseMatrix3f" />
+		
+		<MeshGmshLoader name="loader" filename="mesh/liver.msh"/>
+		<MeshTopology name="Topology" tetrahedra="@loader.tetrahedra" />
+		<MechanicalObject name="State3D" position="@loader.position" />
+		
+		<TetrahedronFEMForceField name="TetrahedronFEMForceField" poissonRatio="0.4" youngModulus="50" />
+<!--         <BoxConstraint name="BoxConstraint" box="0 -10 -10 10 10 10"/> -->
+        <UniformMass name="UniformMass" totalMass="1"/>
+
+		<Node name="Collision">
+			<TriangleSetTopologyContainer name="Container" position="@../loader.position"   />
+			<TriangleSetTopologyModifier name="Modifier"/>
+			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="true"/>
+            <MechanicalObject name="state" />
+			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" />
+			<AABBDecorator name="AABBDecorator" />
+			<BarycentricMapping name="BarycentricMapping"/>
+        </Node>
+		
+		<Node name="Surface">
+			<MeshObjLoader name="loader" filename="mesh/liver-smooth.obj"/>
+			<MeshTopology name="Topology1" triangles="@loader.triangles" />
+			<OglModel name="OglModel" color="0 1 0"  src='@loader'/>			
+			<BarycentricMapping name="BarycentricMapping"/>
+        </Node>
+		
+		<LinearSolverConstraintCorrection solverName="precond" />
+	</Node>
+	
+	<Node name="Plane">
+		<MeshObjLoader name="loader" filename="mesh/box_inside.obj"/>
+		<MeshTopology name="Topology1" triangles="@loader.triangles" />
+		<MechanicalObject name="State3D1" position="@loader.position" />
+		<OglModel name="OglModel" color="1 1 1 0.8"/>
+		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0"/>
+    </Node>
+	
+	<ConstraintResponse name="response" template="U"  />
+	<ContactConstraint name="contact" algo="@algo" response="@response" />
+<!-- 	<PairConstraint algo.first="@algo.first" algo.second="@algo.second"  response="@response" /> -->
+<!-- 	<SingleConstraint algo.first="@algo.first" algo.second="@algo.second"  response="@response" /> -->
+
+	
+	
+</Node>

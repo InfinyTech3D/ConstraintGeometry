@@ -20,14 +20,14 @@ public:
         for (unsigned i=0;i<l_algo->getCollisionPairs().size();i++) {
             collisionAlgorithm::PairProximity pair = l_algo->getCollisionPairs()[i];
 
-            defaulttype::Vector3 mainDir = pair.first->getPosition() - pair.second->getPosition();
-            defaulttype::Vector3 secondDir = pair.second->getNormal();
+            defaulttype::Vector3 mainDir = pair.second->getNormal();//pair.first->getPosition() - pair.second->getPosition();
+//            defaulttype::Vector3 secondDir = -pair.first->getNormal();
 
-            if (mainDir.norm()<0.01) mainDir = secondDir;
-            else {
-                mainDir.normalize();
-                if (dot(mainDir,secondDir) < 0) mainDir = secondDir;
-            }
+//            if (mainDir.norm()<0.01) mainDir = secondDir;
+//            else {
+//                mainDir.normalize();
+//                if (dot(mainDir,secondDir) < 0) mainDir = secondDir;
+//            }
 
 
             ConstraintNormal cn = l_response->createConstraintNormal(mainDir);
