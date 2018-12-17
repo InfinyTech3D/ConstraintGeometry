@@ -9,118 +9,6 @@ namespace sofa {
 
 namespace constraintGeometry {
 
-class InternalConstraint {
-public:
-    typedef std::shared_ptr<InternalConstraint> SPtr;
-
-    virtual void buildConstraintMatrix(core::MultiMatrixDerivId cId, unsigned int constraintId) = 0;
-
-    virtual void getConstraintViolation(defaulttype::BaseVector *v,unsigned cid) = 0;
-
-    virtual unsigned size() = 0;
-
-    virtual void normalize(unsigned sz) = 0;
-
-    virtual void draw(const core::visual::VisualParams* vparams, double scale, defaulttype::Vector4 c) = 0;
-
-    static InternalConstraint::SPtr createPairConstraint(collisionAlgorithm::PairProximity pproxy, ConstraintNormal cn);
-};
-
-class PairConstraint : public InternalConstraint {
-public:
-    typedef sofa::defaulttype::Vec3dTypes DataTypes;
-    typedef DataTypes::VecCoord VecCoord;
-    typedef DataTypes::Coord Coord;
-    typedef DataTypes::Real Real;
-    typedef DataTypes::VecDeriv VecDeriv;
-    typedef DataTypes::MatrixDeriv MatrixDeriv;
-    typedef DataTypes::Deriv Deriv1;
-    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
-    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef MatrixDeriv::RowIterator MatrixDerivRowIterator;
-
-    PairConstraint(collisionAlgorithm::PairProximity pproxy, ConstraintNormal cn) : m_pproxy(pproxy), m_directions(cn) {}
-
-    virtual void buildConstraintMatrix(core::MultiMatrixDerivId cId, unsigned int constraintId) {
-        collisionAlgorithm::ConstraintProximity::SPtr prox1 = m_pproxy.first;
-
-        { // object 1
-            DataMatrixDeriv & c1_d = *cId[prox1->getState()].write();
-            MatrixDeriv & c1 = *c1_d.beginEdit();
-
-            std::map<unsigned, double> m1 = prox1->getContributions();
-            for (unsigned j=0;j<m_directions.size();j++) {
-                MatrixDerivRowIterator c_it = c1.writeLine(constraintId+j);
-
-                for (auto it=m1.begin();it!=m1.end();it++) {
-                    c_it.addCol(it->first, m_directions.m_normals[j] * it->second);
-                }
-            }
-
-            c1_d.endEdit();
-        }
-
-        { // object 2
-            collisionAlgorithm::ConstraintProximity::SPtr prox2 = m_pproxy.second;
-            DataMatrixDeriv & c2_d = *cId[prox2->getState()].write();
-            MatrixDeriv & c2 = *c2_d.beginEdit();
-
-            std::map<unsigned, double> m2 = prox2->getContributions();
-            for (unsigned j=0;j<m_directions.size();j++) {
-                MatrixDerivRowIterator c_it = c2.writeLine(constraintId+j);
-
-                for (auto it=m2.begin();it!=m2.end();it++) {
-                    c_it.addCol(it->first, -m_directions.m_normals[j] * it->second);
-                }
-            }
-
-            c2_d.endEdit();
-        }
-    }
-
-    virtual void getConstraintViolation(defaulttype::BaseVector *v,unsigned cid) {
-        collisionAlgorithm::ConstraintProximity::SPtr prox1 = m_pproxy.first;
-        collisionAlgorithm::ConstraintProximity::SPtr prox2 = m_pproxy.second;
-
-        defaulttype::Vector3 PFree = prox1->getPosition(core::VecCoordId::freePosition());
-        defaulttype::Vector3 QFree = prox2->getPosition(core::VecCoordId::freePosition());
-        defaulttype::Vector3 PQFree = PFree - QFree;
-
-        for (unsigned i=0;i<m_directions.m_normals.size();i++) {
-            v->set(cid+i,dot(PQFree,m_directions.m_normals[i]));
-        }
-    }
-
-    virtual unsigned size() {
-        return m_directions.size();
-    }
-
-    virtual void normalize(unsigned sz) {
-        m_directions.normalize(sz);
-    }
-
-
-    virtual void draw(const core::visual::VisualParams* vparams, double scale, defaulttype::Vector4 c) {
-        for (unsigned i=0;i<m_directions.size();i++) {
-            vparams->drawTool()->drawArrow(m_pproxy.second->getPosition(),
-                                           m_pproxy.second->getPosition() + m_directions.m_normals[i] * scale,
-                                           scale*0.1,
-                                           c);
-
-        }
-    }
-
-protected:
-    collisionAlgorithm::PairProximity m_pproxy;
-    ConstraintNormal m_directions;
-
-};
-
-InternalConstraint::SPtr InternalConstraint::createPairConstraint(collisionAlgorithm::PairProximity pproxy, ConstraintNormal cn) {
-    return std::shared_ptr<InternalConstraint>(new PairConstraint(pproxy,cn));
-}
-
 class BaseConstraint : public sofa::core::behavior::BaseConstraint {
 public:
     SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseConstraint);
@@ -143,28 +31,22 @@ public:
     BaseConstraint()
     : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
     , d_drawColor(initData(&d_drawColor, defaulttype::Vector4(1,0,0,1), "draw_color", "draw color"))
-    , l_response(initLink("response", "Link to Response")) {}
+    , l_detection(initLink("response", "Link to Response")) {}
 
-    virtual void createConstraints() = 0;
-
-    virtual void getState(std::set<sofa::core::behavior::MechanicalState<DataTypes>* > & list_state) = 0;
-
-    void addConstraint(InternalConstraint::SPtr c) {
-        m_constraints.push_back(c);
-    }
+    virtual ConstraintReponse * createResponse(const collisionAlgorithm::DetectionOutput::SPtr d) = 0;
 
     void processGeometricalData() {
+        //each component of this vector will be deleted by sofa at each time step so we don't have to delete each component
         m_constraints.clear();
-        m_state.clear();
 
-        getState(m_state);
-        createConstraints();
-
-        unsigned sz = l_response->size();
-        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i]->normalize(sz);
+        for (unsigned i=0;i<l_detection->getNbOutput();i++) {
+            m_constraints.push_back(createResponse(l_detection->getOutput(i)));
+        }
     }
 
     void buildConstraintMatrix(const core::ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned int &constraintId) {
+        m_cid = constraintId;
+
         for (unsigned i=0;i<m_constraints.size();i++) {
             m_constraints[i]->buildConstraintMatrix(cId,constraintId);
             constraintId += m_constraints[i]->size();
@@ -172,6 +54,8 @@ public:
     }
 
     void getConstraintViolation(const core::ConstraintParams* /*cParams*/, defaulttype::BaseVector *v,unsigned cid) {
+        cid = m_cid;
+
         for (unsigned i=0;i<m_constraints.size();i++) {
             m_constraints[i]->getConstraintViolation(v, cid);
             cid += m_constraints[i]->size();
@@ -180,7 +64,7 @@ public:
 
     void getConstraintResolution(const core::ConstraintParams* /*cParams*/, std::vector<core::behavior::ConstraintResolution*>& resTab, unsigned int& offset) {
         for (unsigned i=0;i<m_constraints.size();i++) {
-            resTab[offset] = l_response->getConstraintResolution();
+            resTab[offset] = m_constraints[i];
             offset+=m_constraints[i]->size();
         }
     }
@@ -193,27 +77,26 @@ public:
         }
     }
 
-    void storeLambda(const core::ConstraintParams* cParams, Data<VecDeriv>& result, const Data<MatrixDeriv>& jacobian, const sofa::defaulttype::BaseVector* lambda) {
-        auto res = sofa::helper::write(result, cParams);
-        const MatrixDeriv& j = jacobian.getValue(cParams);
-        j.multTransposeBaseVector(res, lambda ); // lambda is a vector of scalar value so block size is one.
-    }
+//    void storeLambda(const core::ConstraintParams* cParams, Data<VecDeriv>& result, const Data<MatrixDeriv>& jacobian, const sofa::defaulttype::BaseVector* lambda) {
+//        auto res = sofa::helper::write(result, cParams);
+//        const MatrixDeriv& j = jacobian.getValue(cParams);
+//        j.multTransposeBaseVector(res, lambda ); // lambda is a vector of scalar value so block size is one.
+//    }
 
-    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
-        if (cParams) {
-            for (auto it=m_state.cbegin();it!=m_state.cend();it++) {
-                storeLambda(cParams, *res[(*it)].write(), *cParams->readJ((*it)), lambda);
-            }
-        }
+    void storeLambda(const core::ConstraintParams* /*cParams*/, core::MultiVecDerivId /*res*/, const sofa::defaulttype::BaseVector* /*lambda*/) {
+//        if (cParams) {
+//            for (auto it=m_state.cbegin();it!=m_state.cend();it++) {
+//                storeLambda(cParams, *res[(*it)].write(), *cParams->readJ((*it)), lambda);
+//            }
+//        }
     }
 
     void updateForceMask() {}
 
-protected:
-    helper::vector<InternalConstraint::SPtr> m_constraints;
-    std::set<sofa::core::behavior::MechanicalState<DataTypes> * > m_state;
-
-    core::objectmodel::SingleLink<BaseConstraint,BaseResponse,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_response;
+protected:    
+    unsigned m_cid;
+    std::vector<ConstraintReponse *> m_constraints;
+    core::objectmodel::SingleLink<BaseConstraint,collisionAlgorithm::BaseCollisionAlgorithm,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_detection;
 };
 
 }
