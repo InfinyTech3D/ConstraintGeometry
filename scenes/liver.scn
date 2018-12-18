@@ -52,8 +52,7 @@
 		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0"/>
     </Node>
 	
-	<ConstraintResponse name="response" template="U"  />
-	<ContactConstraint name="contact" algo="@algo" response="@response" />
+	<ConstraintU name="contact" algo="@algo" />
 <!-- 	<PairConstraint algo.first="@algo.first" algo.second="@algo.second"  response="@response" /> -->
 <!-- 	<SingleConstraint algo.first="@algo.first" algo.second="@algo.second"  response="@response" /> -->
 
