@@ -1,4 +1,3 @@
-#include <sofa/helper/system/config.h>
 #include <sofa/core/ObjectFactory.h>
 #include <string>
 #include <sofa/helper/system/FileRepository.h>

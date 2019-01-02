@@ -21,7 +21,8 @@ public:
                 temp[j][i] = w[line+j][line+i];
             }
         }
-        invertMatrix(invW, temp);
+
+        sofa::defaulttype::invertMatrix(invW,temp);
     }
 
     virtual void resolution(int line, double** /*w*/, double* d, double* force, double * /*dFree*/)

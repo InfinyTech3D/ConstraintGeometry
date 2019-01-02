@@ -4,6 +4,7 @@
 #include <sofa/core/behavior/BaseConstraint.h>
 #include <sofa/collisionAlgorithm/BaseCollisionAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/defaulttype/VecTypes.h>
 #include <memory>
 
 namespace sofa {
