@@ -1,0 +1,58 @@
+        
+  before_script:
+    - git clone git@gitlab.inria.fr:mimesis/ci-scripts.git
+    - . ci-scripts/sofa.sh
+    
+  stages:
+    - setup_env
+    - build_deps
+    - build_sofa
+    - test
+
+  setup_env:
+    stage: setup_env
+    script:
+      - echo $CI_JOB_STAGE
+      - BeforeStage
+      - echo " INSTALLING SYSTEM PACKAGES"
+      - AddPackage qt5-default qttools5-dev libqt5opengl5-dev
+      - AddPackage qt57quickcontrols qt57quickcontrols2 qtquick1-5-dev qtquick1-5-dev-tools qtquick1-qml-plugins
+      - AddPackage ffmpeg libavcodec-dev libavdevice-dev
+      - AddPackage libpng-dev zlib1g-dev libglew-dev freeglut3-dev libtiff5-dev
+      - AddPackage libboost-program-options-dev
+      - AfterStage
+    artifacts:
+      name: $CI_JOB_STAGE
+      untracked: true
+      
+  build_deps:
+    stage: build_deps
+    script:
+      - BeforeStage setup_env
+      - AfterStage
+    artifacts:
+      name: $CI_JOB_STAGE
+      untracked: true
+      
+  build_sofa:
+    stage: build_sofa
+    script:
+      - BeforeStage build_deps
+      - echo " INSTALLING CONFIGURING PLUGIN DEPENDENCIES "
+      - AddPlugin CollisionAlgorithm "-DPLUGIN_COLLISIONALGORITHM=ON" git@gitlab.inria.fr:mimesis/CollisionAlgorithm.git
+
+      - AddProjectPlugin ConstraintGeometry
+
+      - echo " BUILDING SOFA "
+      - BuildSofa mimesis
+      - AfterStage
+    artifacts:
+      name: $CI_JOB_STAGE
+      untracked: true
+
+  test:
+    stage: test
+    script:
+      - BeforeStage build_sofa
+      - echo " RUNNING TESTS (NOPE)"
+      - AfterStage
