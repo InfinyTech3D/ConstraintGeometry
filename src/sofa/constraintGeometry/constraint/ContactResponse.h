@@ -20,13 +20,22 @@ public:
     : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
     , d_friction(initData(&d_friction, 0.0, "friction", "Friction")) {}
 
-    virtual ConstraintReponse * createResponse(const collisionAlgorithm::DetectionOutput::SPtr d) {
+    virtual ConstraintReponse * createResponse(const collisionAlgorithm::DetectionOutput & d) {
         if (d_friction.getValue() == 0.0) {
-            ConstraintNormal cn(d->getNormal());
-            return new UnilateralConstraintResolution(cn,d,d_maxForce.getValue());
+            ConstraintNormal cn(d.getNormal());
+
+            return new UnilateralConstraintResolution(cn,
+                                                      d.getFirstProximity(),
+                                                      d.getSecondProximity(),
+                                                      d_maxForce.getValue());
         } else {
-            ConstraintNormal cn = ConstraintNormal::createFrame(d->getNormal());
-            return new UnilateralFrictionResolution(cn,d,d_maxForce.getValue(), d_friction.getValue());
+            ConstraintNormal cn = ConstraintNormal::createFrame(d.getNormal());
+
+            return new UnilateralFrictionResolution(cn,
+                                                    d.getFirstProximity(),
+                                                    d.getSecondProximity(),
+                                                    d_maxForce.getValue(),
+                                                    d_friction.getValue());
         }
     }
 };
@@ -40,9 +49,13 @@ public:
     ContactResponseU()
     : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force")) {}
 
-    virtual ConstraintReponse * createResponse(const collisionAlgorithm::DetectionOutput::SPtr d) {
-        ConstraintNormal cn(d->getNormal());
-        return new UnilateralConstraintResolution(cn,d,d_maxForce.getValue());
+    virtual ConstraintReponse * createResponse(const collisionAlgorithm::DetectionOutput & d) {
+        ConstraintNormal cn(d.getNormal());
+
+        return new UnilateralConstraintResolution(cn,
+                                                  d.getFirstProximity(),
+                                                  d.getSecondProximity(),
+                                                  d_maxForce.getValue());
     }
 
 };

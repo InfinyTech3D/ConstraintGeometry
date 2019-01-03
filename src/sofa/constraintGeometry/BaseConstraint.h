@@ -31,22 +31,22 @@ public:
     BaseConstraint()
     : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
     , d_drawColor(initData(&d_drawColor, defaulttype::Vector4(1,0,0,1), "draw_color", "draw color"))
-    , l_detection(initLink("response", "Link to Response")) {}
+    , l_detection(initLink("algo", "Link to Response")) {}
 
-    virtual ConstraintReponse * createResponse(const collisionAlgorithm::DetectionOutput::SPtr d) = 0;
+    //WARNING: this function return a new to an object that will be deleted by SOFA (it's the constraintResolution in the standard API)
+    virtual ConstraintReponse * createResponse(const collisionAlgorithm::DetectionOutput & d) = 0;
 
     void processGeometricalData() {
         //each component of this vector will be deleted by sofa at each time step so we don't have to delete each component
         m_constraints.clear();
 
-        for (unsigned i=0;i<l_detection->getNbOutput();i++) {
-            m_constraints.push_back(createResponse(l_detection->getOutput(i)));
+        for (unsigned i=0;i<l_detection->getOutput().size();i++) {
+            m_constraints.push_back(createResponse(l_detection->getOutput()[i]));
         }
     }
 
     void buildConstraintMatrix(const core::ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned int &constraintId) {
         m_cid = constraintId;
-
         for (unsigned i=0;i<m_constraints.size();i++) {
             m_constraints[i]->buildConstraintMatrix(cId,constraintId);
             constraintId += m_constraints[i]->size();
@@ -55,7 +55,6 @@ public:
 
     void getConstraintViolation(const core::ConstraintParams* /*cParams*/, defaulttype::BaseVector *v,unsigned cid) {
         cid = m_cid;
-
         for (unsigned i=0;i<m_constraints.size();i++) {
             m_constraints[i]->getConstraintViolation(v, cid);
             cid += m_constraints[i]->size();
@@ -73,7 +72,15 @@ public:
         if (! vparams->displayFlags().getShowInteractionForceFields()) return;
 
         for (unsigned i=0;i<m_constraints.size();i++) {
-            m_constraints[i]->draw(vparams,d_drawScale.getValue(),d_drawColor.getValue());
+            ConstraintReponse * c_i = m_constraints[i];
+
+            for (unsigned j=0;j<c_i->size();j++) {
+                vparams->drawTool()->drawArrow(c_i->m_p1->getPosition(),
+                                               c_i->m_p1->getPosition() +
+                                               c_i->m_normals[j] * d_drawScale.getValue(), d_drawScale.getValue() * 0.1,
+                                               d_drawColor.getValue());
+
+            }
         }
     }
 

@@ -18,9 +18,13 @@ public:
     BilateralResponse1()
     : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force")) {}
 
-    ConstraintReponse * createResponse(const collisionAlgorithm::DetectionOutput::SPtr d) {
-        ConstraintNormal cn(d->getNormal());
-        return new BilateralConstraintResolution<1>(cn,d,d_maxForce.getValue());
+    ConstraintReponse * createResponse(const collisionAlgorithm::DetectionOutput & d) {
+        ConstraintNormal cn(d.getNormal());
+
+        return new BilateralConstraintResolution1(cn,
+                                                  d.getFirstProximity(),
+                                                  d.getSecondProximity(),
+                                                  d_maxForce.getValue());
     }
 };
 
@@ -33,9 +37,13 @@ public:
     BilateralResponse3()
     : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force")) {}
 
-    ConstraintReponse * createResponse(const collisionAlgorithm::DetectionOutput::SPtr d) {
-        ConstraintNormal cn = ConstraintNormal::createFrame(d->getNormal());
-        return new BilateralConstraintResolution<3>(cn,d,d_maxForce.getValue());
+    ConstraintReponse * createResponse(const collisionAlgorithm::DetectionOutput & d) {
+        ConstraintNormal cn = ConstraintNormal::createFrame(d.getNormal());
+
+        return new BilateralConstraintResolution3(cn,
+                                                  d.getFirstProximity(),
+                                                  d.getSecondProximity(),
+                                                  d_maxForce.getValue());
     }
 };
 

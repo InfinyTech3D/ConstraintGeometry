@@ -30,6 +30,7 @@
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="true"/>
             <MechanicalObject name="state" />
 			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" />
+			<PhongNormalHandler />
 			<AABBDecorator name="AABBDecorator" />
 			<BarycentricMapping name="BarycentricMapping"/>
         </Node>
@@ -50,6 +51,7 @@
 		<MechanicalObject name="State3D1" position="@loader.position" />
 		<OglModel name="OglModel" color="1 1 1 0.8"/>
 		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0"/>
+<!-- 		<PhongNormalHandler /> -->
     </Node>
 	
 	<ConstraintU name="contact" algo="@algo" />

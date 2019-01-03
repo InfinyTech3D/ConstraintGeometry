@@ -10,7 +10,7 @@ namespace constraintGeometry {
 
 class UnilateralConstraintResolution : public ConstraintReponse {
 public:
-    UnilateralConstraintResolution(ConstraintNormal n, const collisionAlgorithm::DetectionOutput::SPtr o, double m) : ConstraintReponse(n,o), m_maxForce(m){}
+    UnilateralConstraintResolution(ConstraintNormal n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m) : ConstraintReponse(n,p1,p2), m_maxForce(m){}
 
     virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/) {
         force[line] -= d[line] / w[line][line];
@@ -24,7 +24,7 @@ public:
 
 class UnilateralFrictionResolution : public ConstraintReponse {
 public:
-    UnilateralFrictionResolution(ConstraintNormal n, const collisionAlgorithm::DetectionOutput::SPtr o, double m,double f) : ConstraintReponse(n,o), m_maxForce(m), m_friction(f) {}
+    UnilateralFrictionResolution(ConstraintNormal n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m,double f) : ConstraintReponse(n,p1,p2), m_maxForce(m), m_friction(f) {}
 
     virtual void init(int line, double** w, double */*force*/) {
         sofa::defaulttype::Mat<3,3,double> temp;
