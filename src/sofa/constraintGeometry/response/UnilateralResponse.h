@@ -26,7 +26,7 @@ class UnilateralFrictionResolution : public ConstraintReponse {
 public:
     UnilateralFrictionResolution(const ConstraintNormal & n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m,double f) : ConstraintReponse(n,p1,p2), m_maxForce(m), m_friction(f) {}
 
-    virtual void init(int line, double** w, double */*force*/) {
+    virtual void init(int line, double** w, double * /*force*/) {
         sofa::defaulttype::Mat<3,3,double> temp;
         for (unsigned j=0;j<3;j++) {
             for (unsigned i=0;i<3;i++) {

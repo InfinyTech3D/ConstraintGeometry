@@ -23,7 +23,7 @@ class BilateralConstraintResolution3 : public ConstraintReponse {
 public:
     BilateralConstraintResolution3(const ConstraintNormal & n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m) : ConstraintReponse(n,p1,p2), m_maxForce(m) {}
 
-    virtual void init(int line, double** w, double */*force*/)
+    virtual void init(int line, double** w, double * /*force*/)
     {
         sofa::defaulttype::Mat<3,3,double> temp;
         for (unsigned j=0;j<3;j++) {
