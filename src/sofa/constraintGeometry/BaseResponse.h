@@ -27,8 +27,8 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef MatrixDeriv::RowIterator MatrixDerivRowIterator;
 
-    ConstraintReponse(ConstraintNormal n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2)
-    : ConstraintResolution(m_normals.size())
+    ConstraintReponse(const ConstraintNormal & n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2)
+    : sofa::core::behavior::ConstraintResolution(n.size())
     , m_normals(n)
     , m_p1(p1)
     , m_p2(p2) {}

@@ -43,6 +43,12 @@ public:
         for (unsigned i=0;i<l_detection->getOutput().size();i++) {
             m_constraints.push_back(createResponse(l_detection->getOutput()[i]));
         }
+
+//        m_state.clear();
+//        for (unsigned i=0;i<m_constraints.size();i++) {
+//            if (m_constraints[i]->m_p1->getState()) m_state.insert(m_constraints[i]->m_p1->getState());
+//            if (m_constraints[i]->m_p2->getState()) m_state.insert(m_constraints[i]->m_p2->getState());
+//        }
     }
 
     void buildConstraintMatrix(const core::ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned int &constraintId) {
@@ -75,10 +81,13 @@ public:
             ConstraintReponse * c_i = m_constraints[i];
 
             for (unsigned j=0;j<c_i->size();j++) {
+                defaulttype::Vec4f color = d_drawColor.getValue() * 1.0/(1+j);
+                color[3] = d_drawColor.getValue()[3];
+
                 vparams->drawTool()->drawArrow(c_i->m_p1->getPosition(),
                                                c_i->m_p1->getPosition() +
                                                c_i->m_normals[j] * d_drawScale.getValue(), d_drawScale.getValue() * 0.1,
-                                               d_drawColor.getValue());
+                                               color);
 
             }
         }
@@ -91,10 +100,17 @@ public:
 //    }
 
     void storeLambda(const core::ConstraintParams* /*cParams*/, core::MultiVecDerivId /*res*/, const sofa::defaulttype::BaseVector* /*lambda*/) {
-//        if (cParams) {
-//            for (auto it=m_state.cbegin();it!=m_state.cend();it++) {
-//                storeLambda(cParams, *res[(*it)].write(), *cParams->readJ((*it)), lambda);
-//            }
+//        if (! cParams) return;
+//        for (auto it=m_state.cbegin();it!=m_state.cend();it++) {
+//            storeLambda(cParams, *res[(*it)].write(), *cParams->readJ((*it)), lambda);
+//        }
+
+
+//        unsigned cid = m_cid;
+//        for (unsigned i=0;i<l_detection->getOutput().size();i++) {
+//            m_constraints[i]->m_p1->storeLambda(cParams,res,lambda,cid,cid+m_constraints[i]->size());
+//            m_constraints[i]->m_p2->storeLambda(cParams,res,lambda,cid,cid+m_constraints[i]->size());
+//            cid += m_constraints[i]->size();
 //        }
     }
 
@@ -104,6 +120,7 @@ protected:
     unsigned m_cid;
     std::vector<ConstraintReponse *> m_constraints;
     core::objectmodel::SingleLink<BaseConstraint,collisionAlgorithm::BaseCollisionAlgorithm,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_detection;
+//    std::set<sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * > m_state;
 };
 
 }

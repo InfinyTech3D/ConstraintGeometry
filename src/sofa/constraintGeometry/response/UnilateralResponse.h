@@ -10,7 +10,7 @@ namespace constraintGeometry {
 
 class UnilateralConstraintResolution : public ConstraintReponse {
 public:
-    UnilateralConstraintResolution(ConstraintNormal n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m) : ConstraintReponse(n,p1,p2), m_maxForce(m){}
+    UnilateralConstraintResolution(const ConstraintNormal & n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m) : ConstraintReponse(n,p1,p2), m_maxForce(m){}
 
     virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/) {
         force[line] -= d[line] / w[line][line];
@@ -24,7 +24,7 @@ public:
 
 class UnilateralFrictionResolution : public ConstraintReponse {
 public:
-    UnilateralFrictionResolution(ConstraintNormal n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m,double f) : ConstraintReponse(n,p1,p2), m_maxForce(m), m_friction(f) {}
+    UnilateralFrictionResolution(const ConstraintNormal & n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m,double f) : ConstraintReponse(n,p1,p2), m_maxForce(m), m_friction(f) {}
 
     virtual void init(int line, double** w, double */*force*/) {
         sofa::defaulttype::Mat<3,3,double> temp;
@@ -41,16 +41,39 @@ public:
         double bforce[3];
         for(int i=0; i<3; i++) bforce[line+i] = bforce[line+i];
 
-        for(int i=0; i<3; i++) {
-            for(int j=0; j<3; j++)
-                force[line+i] -= d[line+j] * invW[i][j];
+        //we solve the first constraint as if there was no friction
+        force[line+0] -= invW[0][0] * d[line+0] +
+                         invW[0][1] * d[line+1] +
+                         invW[0][2] * d[line+2] ;
+
+        //we check unilateral conditions
+        if (force[line]<0) {
+            force[line+0] = 0.0;
+            force[line+1] = 0.0;
+            force[line+2] = 0.0;
+            return;
         }
 
+        //we clamp the force is needed
+        if (force[line]>m_maxForce) force[line] = m_maxForce;
 
-        for(int i=0; i<3; i++) {
-            if (force[line+i]>m_maxForce) force[line+i] = m_maxForce;
-            else if (force[line+i]<0) force[line+i] = 0.0;
-        }
+        //now we compute tangential forces
+        force[line+1] -= invW[1][0] * d[line+0] +
+                         invW[1][1] * d[line+1] +
+                         invW[1][2] * d[line+2] ;
+
+        force[line+2] -= invW[2][0] * d[line+0] +
+                         invW[2][1] * d[line+1] +
+                         invW[2][2] * d[line+2] ;
+
+
+        double slip_force = force[line+0] * m_friction;
+
+        if (force[line+1] >  slip_force) force[line+1] = slip_force;
+        else if (force[line+1] < -slip_force) force[line+1] = -slip_force;
+
+        if (force[line+2] >  slip_force) force[line+2] = slip_force;
+        else if (force[line+2] < -slip_force) force[line+2] = -slip_force;
     }
 
     double m_maxForce;

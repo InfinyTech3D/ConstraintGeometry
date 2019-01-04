@@ -9,16 +9,16 @@ namespace sofa {
 
 namespace constraintGeometry {
 
-class ContactResponseUFF : public BaseConstraint {
+class UnilateralConstraintWithFriction : public BaseConstraint {
 public:
-    SOFA_CLASS(ContactResponseUFF , BaseConstraint);
+    SOFA_CLASS(UnilateralConstraintWithFriction , BaseConstraint);
 
     Data<double> d_maxForce;
     Data<double> d_friction;
 
-    ContactResponseUFF()
+    UnilateralConstraintWithFriction()
     : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
-    , d_friction(initData(&d_friction, 0.0, "friction", "Friction")) {}
+    , d_friction(initData(&d_friction, 0.0, "mu", "Friction")) {}
 
     virtual ConstraintReponse * createResponse(const collisionAlgorithm::DetectionOutput & d) {
         if (d_friction.getValue() == 0.0) {
@@ -38,26 +38,6 @@ public:
                                                     d_friction.getValue());
         }
     }
-};
-
-class ContactResponseU : public BaseConstraint {
-public:
-    SOFA_CLASS(ContactResponseU , BaseConstraint);
-
-    Data<double> d_maxForce;
-
-    ContactResponseU()
-    : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force")) {}
-
-    virtual ConstraintReponse * createResponse(const collisionAlgorithm::DetectionOutput & d) {
-        ConstraintNormal cn(d.getNormal());
-
-        return new UnilateralConstraintResolution(cn,
-                                                  d.getFirstProximity(),
-                                                  d.getSecondProximity(),
-                                                  d_maxForce.getValue());
-    }
-
 };
 
 }

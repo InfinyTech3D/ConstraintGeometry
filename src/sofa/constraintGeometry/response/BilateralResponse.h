@@ -10,7 +10,7 @@ namespace constraintGeometry {
 
 class BilateralConstraintResolution1 : public ConstraintReponse {
 public:
-    BilateralConstraintResolution1(ConstraintNormal n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m) : ConstraintReponse(n,p1,p2), m_maxForce(m) {}
+    BilateralConstraintResolution1(const ConstraintNormal & n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m) : ConstraintReponse(n,p1,p2), m_maxForce(m) {}
 
     virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/) {
         force[line] -= d[line] / w[line][line];
@@ -21,7 +21,7 @@ public:
 
 class BilateralConstraintResolution3 : public ConstraintReponse {
 public:
-    BilateralConstraintResolution3(ConstraintNormal n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m) : ConstraintReponse(n,p1,p2), m_maxForce(m) {}
+    BilateralConstraintResolution3(const ConstraintNormal & n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m) : ConstraintReponse(n,p1,p2), m_maxForce(m) {}
 
     virtual void init(int line, double** w, double */*force*/)
     {
