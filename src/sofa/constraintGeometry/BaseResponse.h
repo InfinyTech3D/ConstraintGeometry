@@ -1,60 +1,150 @@
 #pragma once
 
 #include <sofa/core/objectmodel/BaseObject.h>
+#include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/core/behavior/BaseConstraint.h>
 #include <sofa/collisionAlgorithm/BaseCollisionAlgorithm.h>
-#include <sofa/collisionAlgorithm/BaseElement.h>
-#include <sofa/defaulttype/VecTypes.h>
 #include <memory>
 
 namespace sofa {
 
 namespace constraintGeometry {
 
-
-class ConstraintReponse : public sofa::core::behavior::ConstraintResolution {
+class BaseResponse : public sofa::core::objectmodel::BaseObject {
 public:
 
-    typedef sofa::defaulttype::Vec3dTypes DataTypes;
-    typedef DataTypes::VecCoord VecCoord;
-    typedef DataTypes::Coord Coord;
-    typedef DataTypes::Real Real;
-    typedef DataTypes::VecDeriv VecDeriv;
-    typedef DataTypes::MatrixDeriv MatrixDeriv;
-    typedef DataTypes::Deriv Deriv1;
-    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
-    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    SOFA_ABSTRACT_CLASS(BaseResponse, sofa::core::objectmodel::BaseObject);
 
-    ConstraintReponse(const ConstraintNormal & n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2)
-    : sofa::core::behavior::ConstraintResolution(n.size())
-    , m_normals(n)
-    , m_p1(p1)
-    , m_p2(p2) {}
+    class InternalConstraint;
 
-    inline void buildConstraintMatrix(core::MultiMatrixDerivId cId, unsigned int constraintId) {
-        m_p1->buildJacobianConstraint(cId, m_normals, 1.0, constraintId);
-        m_p2->buildJacobianConstraint(cId, m_normals, -1.0, constraintId);
-    }
+    class ConstraintNormal {
+        friend class InternalConstraint;
 
-    inline void getConstraintViolation(defaulttype::BaseVector *v,unsigned cid) {
-        defaulttype::Vector3 PFree = m_p1->getPosition(core::VecCoordId::freePosition());
-        defaulttype::Vector3 QFree = m_p2->getPosition(core::VecCoordId::freePosition());
-        defaulttype::Vector3 PQFree = PFree - QFree;
-
-        for (unsigned i=0;i<m_normals.size();i++) {
-            v->set(cid+i,dot(PQFree,m_normals[i]));
+    public:
+        ConstraintNormal(defaulttype::Vector3 n1) {
+            m_dirs.push_back(n1.normalized());
         }
-    }
 
-    inline unsigned size() {
-        return m_normals.size();
-    }
+        ConstraintNormal(defaulttype::Vector3 n1,defaulttype::Vector3 n2) {
+            m_dirs.push_back(n1.normalized());
+            m_dirs.push_back(n2.normalized());
+        }
 
-    ConstraintNormal m_normals;
-    collisionAlgorithm::ConstraintProximity::SPtr m_p1;
-    collisionAlgorithm::ConstraintProximity::SPtr m_p2;
+        ConstraintNormal(defaulttype::Vector3 n1,defaulttype::Vector3 n2,defaulttype::Vector3 n3) {
+            m_dirs.push_back(n1.normalized());
+            m_dirs.push_back(n2.normalized());
+            m_dirs.push_back(n3.normalized());
+        }
+
+        static ConstraintNormal createFrame(defaulttype::Vector3 N1 = defaulttype::Vector3()) {
+            if (N1.norm() == 0) N1 = defaulttype::Vector3(1,0,0);
+            defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(0,1,0)))>0.99) ? defaulttype::Vector3(0,0,1) : defaulttype::Vector3(0,1,0)));
+            defaulttype::Vector3 N3 = cross(N1,N2);
+
+            return ConstraintNormal(N1,N2,N3);
+        }
+
+        static ConstraintNormal createFromDetection(const collisionAlgorithm::DetectionOutput & d) {
+//            defaulttype::Vector3 mainDir = d.getSecondProximity()->getPosition() - d.getFirstProximity()->getPosition();
+
+////            if (mainDir.norm()>0.00000001) return ConstraintNormal(mainDir);
+
+//            defaulttype::Vector3 firstDir = -d.getFirstProximity()->getNormal().normalized();
+//            defaulttype::Vector3 secondDir = d.getSecondProximity()->getNormal().normalized();
+
+//            return ConstraintNormal(firstDir + secondDir);
+
+
+            defaulttype::Vector3 mainDir = d.getSecondProximity()->getNormal();//pair.first->getPosition() - pair.second->getPosition();
+            defaulttype::Vector3 secondDir = -d.getFirstProximity()->getNormal();
+
+            if (mainDir.norm()<0.01) mainDir = secondDir;
+            else {
+                mainDir.normalize();
+                if (dot(mainDir,secondDir) < 0) mainDir = secondDir;
+            }
+
+            return ConstraintNormal(mainDir);
+        }
+
+        static ConstraintNormal createFrameFromDetection(const collisionAlgorithm::DetectionOutput & d) {
+            return createFrame(ConstraintNormal::createFromDetection(d).m_dirs[0]);
+        }
+
+        unsigned size() {
+            return m_dirs.size();
+        }
+
+    protected:
+        helper::vector<defaulttype::Vector3> m_dirs;
+    };
+
+    class InternalConstraint {
+    public:
+        InternalConstraint(collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2,ConstraintNormal normals,sofa::core::behavior::ConstraintResolution * resolution)
+        : m_p1(p1)
+        , m_p2(p2)
+        , m_resolution(resolution)
+        , m_normals(normals) {
+            if (m_normals.size() != m_resolution->getNbLines()) {
+                std::cerr << "ERROR you provided a ConstraintResolution and a Constraint normals with different size" << std::endl;
+
+//                m_normals = normals.resize()
+            }
+        }
+
+        void buildConstraintMatrix(core::MultiMatrixDerivId cId, unsigned int & constraintId) {
+            m_p1->buildJacobianConstraint(cId, m_normals.m_dirs,  1.0, constraintId);
+            m_p2->buildJacobianConstraint(cId, m_normals.m_dirs, -1.0, constraintId);
+
+            constraintId += m_normals.size();
+        }
+
+        void getConstraintViolation(defaulttype::BaseVector *v,unsigned & cid) {
+            defaulttype::Vector3 PFree = m_p1->getPosition(core::VecCoordId::freePosition());
+            defaulttype::Vector3 QFree = m_p2->getPosition(core::VecCoordId::freePosition());
+            defaulttype::Vector3 PQFree = PFree - QFree;
+
+            for (unsigned i=0;i<m_normals.size();i++) {
+                v->set(cid+i,dot(PQFree,m_normals.m_dirs[i]));
+            }
+
+            cid += m_normals.size();
+        }
+
+        void getConstraintResolution(std::vector<core::behavior::ConstraintResolution*>& resTab, unsigned & offset) {
+            resTab[offset] = m_resolution;
+            offset += m_normals.size();
+        }
+
+        void draw(const core::visual::VisualParams* vparams,double scale) {
+            if (m_normals.size()>0)
+                vparams->drawTool()->drawArrow(m_p1->getPosition(), m_p2->getPosition() + m_normals.m_dirs[0] * scale, scale * 0.1, defaulttype::Vector4(1,0,0,1));
+
+            if (m_normals.size()>1)
+                vparams->drawTool()->drawArrow(m_p1->getPosition(), m_p2->getPosition() + m_normals.m_dirs[1] * scale, scale * 0.1, defaulttype::Vector4(0,1,0,1));
+
+            if (m_normals.size()>2)
+                vparams->drawTool()->drawArrow(m_p1->getPosition(), m_p2->getPosition() + m_normals.m_dirs[2] * scale, scale * 0.1, defaulttype::Vector4(0,0,1,1));
+        }
+
+        collisionAlgorithm::ConstraintProximity::SPtr getFirstProximity() const {
+            return m_p1;
+        }
+
+        collisionAlgorithm::ConstraintProximity::SPtr getSecondProximity() const {
+            return m_p2;
+        }
+
+     private:
+        collisionAlgorithm::ConstraintProximity::SPtr m_p1;
+        collisionAlgorithm::ConstraintProximity::SPtr m_p2;
+        sofa::core::behavior::ConstraintResolution * m_resolution;
+        ConstraintNormal m_normals;
+    };
+
+    virtual InternalConstraint createConstraint(const collisionAlgorithm::DetectionOutput & out) = 0;
+
 };
 
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/constraintGeometry/BaseConstraint.h>
+#include <sofa/constraintGeometry/Constraint.h>
 #include <sofa/constraintGeometry/BaseResponse.h>
 #include <math.h>
 
@@ -8,9 +8,9 @@ namespace sofa {
 
 namespace constraintGeometry {
 
-class UnilateralConstraintResolution : public ConstraintReponse {
+class UnilateralConstraintResolution : public sofa::core::behavior::ConstraintResolution {
 public:
-    UnilateralConstraintResolution(const ConstraintNormal & n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m) : ConstraintReponse(n,p1,p2), m_maxForce(m){}
+    UnilateralConstraintResolution(double m) : sofa::core::behavior::ConstraintResolution(1), m_maxForce(m){}
 
     virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/) {
         force[line] -= d[line] / w[line][line];
@@ -22,9 +22,9 @@ public:
     double m_maxForce;
 };
 
-class UnilateralFrictionResolution : public ConstraintReponse {
+class UnilateralFrictionResolution : public sofa::core::behavior::ConstraintResolution {
 public:
-    UnilateralFrictionResolution(const ConstraintNormal & n, collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2, double m,double f) : ConstraintReponse(n,p1,p2), m_maxForce(m), m_friction(f) {}
+    UnilateralFrictionResolution(double m,double f) : sofa::core::behavior::ConstraintResolution(3), m_maxForce(m), m_friction(f) {}
 
     virtual void init(int line, double** w, double * /*force*/) {
         sofa::defaulttype::Mat<3,3,double> temp;

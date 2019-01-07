@@ -48,13 +48,14 @@
 	<Node name="Plane">
 		<MeshObjLoader name="loader" filename="mesh/box_inside.obj"/>
 		<MeshTopology name="Topology1" triangles="@loader.triangles" />
-		<MechanicalObject name="State3D1" position="@loader.position" />
+		<MechanicalObject name="State3D1" dy="1" position="@loader.position" />
 		<OglModel name="OglModel" color="1 1 1 0.8"/>
 		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0"/>
 <!-- 		<PhongNormalHandler /> -->
     </Node>
 	
-	<ConstraintUFF name="contact" algo="@algo" mu="0.2" />
+	<ResponseUFF name="response" mu="0.0001" />
+	<Constraint name="contact" detection="@algo" response="@response" />
 <!-- 	<PairConstraint algo.first="@algo.first" algo.second="@algo.second"  response="@response" /> -->
 <!-- 	<SingleConstraint algo.first="@algo.first" algo.second="@algo.second"  response="@response" /> -->
 
