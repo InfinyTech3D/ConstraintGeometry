@@ -81,7 +81,7 @@ public:
 
     class InternalConstraint {
     public:
-        InternalConstraint(collisionAlgorithm::ConstraintProximity::SPtr p1,collisionAlgorithm::ConstraintProximity::SPtr p2,ConstraintNormal normals,sofa::core::behavior::ConstraintResolution * resolution)
+        InternalConstraint(collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2,ConstraintNormal normals,sofa::core::behavior::ConstraintResolution * resolution)
         : m_p1(p1)
         , m_p2(p2)
         , m_resolution(resolution)
@@ -128,17 +128,17 @@ public:
                 vparams->drawTool()->drawArrow(m_p1->getPosition(), m_p2->getPosition() + m_normals.m_dirs[2] * scale, scale * 0.1, defaulttype::Vector4(0,0,1,1));
         }
 
-        collisionAlgorithm::ConstraintProximity::SPtr getFirstProximity() const {
+        collisionAlgorithm::BaseProximity::SPtr getFirstProximity() const {
             return m_p1;
         }
 
-        collisionAlgorithm::ConstraintProximity::SPtr getSecondProximity() const {
+        collisionAlgorithm::BaseProximity::SPtr getSecondProximity() const {
             return m_p2;
         }
 
      private:
-        collisionAlgorithm::ConstraintProximity::SPtr m_p1;
-        collisionAlgorithm::ConstraintProximity::SPtr m_p2;
+        collisionAlgorithm::BaseProximity::SPtr m_p1;
+        collisionAlgorithm::BaseProximity::SPtr m_p2;
         sofa::core::behavior::ConstraintResolution * m_resolution;
         ConstraintNormal m_normals;
     };

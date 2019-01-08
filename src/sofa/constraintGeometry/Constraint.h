@@ -18,7 +18,9 @@ public:
     Constraint()
     : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
     , l_detection(initLink("detection", "Link to Detection Algorithm"))
-    , l_response(initLink("response", "Link to Response")) {}
+    , l_response(initLink("response", "Link to Response")) {
+        l_response.setPath("@.");
+    }
 
     void processGeometricalData() {
         //each component of this vector will be deleted by sofa at each time step so we don't have to delete each component
