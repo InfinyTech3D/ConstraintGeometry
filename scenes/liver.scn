@@ -9,7 +9,7 @@
 	<FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
 	<GenericConstraintSolver maxIterations="1000" tolerance="0.0001" />
 	
-	<CollisionDetectionAlgorithm name="algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" angle="0" dist="0.5" />
+	<CollisionDetectionAlgorithm name="algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" angle="0"  />
 
 	<Node name="Liver">
 		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
@@ -21,19 +21,19 @@
 		<MechanicalObject name="State3D" position="@loader.position" />
 		
 		<TetrahedronFEMForceField name="TetrahedronFEMForceField" poissonRatio="0.4" youngModulus="50" />
-<!--         <BoxConstraint name="BoxConstraint" box="0 -10 -10 10 10 10"/> -->
-        <UniformMass name="UniformMass" totalMass="1"/>
+
+		<UniformMass name="UniformMass" totalMass="1"/>
 
 		<Node name="Collision">
 			<TriangleSetTopologyContainer name="Container" position="@../loader.position"   />
 			<TriangleSetTopologyModifier name="Modifier"/>
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="true"/>
-            <MechanicalObject name="state" />
+			<MechanicalObject name="state" />
 			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" />
-<!-- 			<PhongNormalHandler /> -->
-			<AABBDecorator name="AABBDecorator" />
+			<AABBGeometry name="AABBDecorator" geometry="@TriangleGeometry" nbox="16 16 16" color="1 0 0 1" />
+<!-- 			<Triangle/> -->
 			<BarycentricMapping name="BarycentricMapping"/>
-        </Node>
+		</Node>
 		
 		<Node name="Surface">
 			<MeshObjLoader name="loader" filename="mesh/liver-smooth.obj"/>
@@ -51,13 +51,10 @@
 		<MechanicalObject name="State3D1" dy="1" position="@loader.position" />
 		<OglModel name="OglModel" color="1 1 1 0.8"/>
 		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0"/>
-<!-- 		<PhongNormalHandler /> -->
     </Node>
 	
-	<ResponseUFF name="response" mu="0.0001" />
-	<Constraint name="contact" detection="@algo" response="@response" />
-<!-- 	<PairConstraint algo.first="@algo.first" algo.second="@algo.second"  response="@response" /> -->
-<!-- 	<SingleConstraint algo.first="@algo.first" algo.second="@algo.second"  response="@response" /> -->
+<!-- 	<ResponseU name="response" mu="0.0001" /> -->
+<!-- 	<Constraint name="contact" detection="@algo" response="@response" /> -->
 
 	
 	
