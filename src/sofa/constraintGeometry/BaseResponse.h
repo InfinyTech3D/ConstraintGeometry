@@ -45,26 +45,27 @@ public:
         }
 
         static ConstraintNormal createFromDetection(const collisionAlgorithm::DetectionOutput & d) {
-//            defaulttype::Vector3 mainDir = d.getSecondProximity()->getPosition() - d.getFirstProximity()->getPosition();
+            defaulttype::Vector3 mainDir = d.getFirstProximity()->getPosition() - d.getSecondProximity()->getPosition();
 
 ////            if (mainDir.norm()>0.00000001) return ConstraintNormal(mainDir);
 
-//            defaulttype::Vector3 firstDir = -d.getFirstProximity()->getNormal().normalized();
-//            defaulttype::Vector3 secondDir = d.getSecondProximity()->getNormal().normalized();
+            defaulttype::Vector3 firstDir = -d.getFirstProximity()->getNormal().normalized();
+            defaulttype::Vector3 secondDir = d.getSecondProximity()->getNormal().normalized();
 
-//            return ConstraintNormal(firstDir + secondDir);
+//            return ConstraintNormal(mainDir.normalized() + firstDir + secondDir);
+            return ConstraintNormal(firstDir);
 
 
-            defaulttype::Vector3 mainDir = d.getSecondProximity()->getNormal();//pair.first->getPosition() - pair.second->getPosition();
-            defaulttype::Vector3 secondDir = -d.getFirstProximity()->getNormal();
+//            defaulttype::Vector3 mainDir = d.getSecondProximity()->getNormal();//pair.first->getPosition() - pair.second->getPosition();
+//            defaulttype::Vector3 secondDir = -d.getFirstProximity()->getNormal();
 
-            if (mainDir.norm()<0.01) mainDir = secondDir;
-            else {
-                mainDir.normalize();
-                if (dot(mainDir,secondDir) < 0) mainDir = secondDir;
-            }
+//            if (mainDir.norm()<0.01) mainDir = secondDir;
+//            else {
+//                mainDir.normalize();
+//                if (dot(mainDir,secondDir) < 0) mainDir = secondDir;
+//            }
 
-            return ConstraintNormal(mainDir);
+//            return ConstraintNormal(mainDir);
         }
 
         static ConstraintNormal createFrameFromDetection(const collisionAlgorithm::DetectionOutput & d) {
@@ -119,13 +120,13 @@ public:
 
         void draw(const core::visual::VisualParams* vparams,double scale) {
             if (m_normals.size()>0)
-                vparams->drawTool()->drawArrow(m_p1->getPosition(), m_p2->getPosition() + m_normals.m_dirs[0] * scale, scale * 0.1, defaulttype::Vector4(1,0,0,1));
+                vparams->drawTool()->drawArrow(m_p1->getPosition(), m_p1->getPosition() + m_normals.m_dirs[0] * scale, scale * 0.1, defaulttype::Vector4(1,0,0,1));
 
             if (m_normals.size()>1)
-                vparams->drawTool()->drawArrow(m_p1->getPosition(), m_p2->getPosition() + m_normals.m_dirs[1] * scale, scale * 0.1, defaulttype::Vector4(0,1,0,1));
+                vparams->drawTool()->drawArrow(m_p1->getPosition(), m_p1->getPosition() + m_normals.m_dirs[1] * scale, scale * 0.1, defaulttype::Vector4(0,1,0,1));
 
             if (m_normals.size()>2)
-                vparams->drawTool()->drawArrow(m_p1->getPosition(), m_p2->getPosition() + m_normals.m_dirs[2] * scale, scale * 0.1, defaulttype::Vector4(0,0,1,1));
+                vparams->drawTool()->drawArrow(m_p1->getPosition(), m_p1->getPosition() + m_normals.m_dirs[2] * scale, scale * 0.1, defaulttype::Vector4(0,0,1,1));
         }
 
         collisionAlgorithm::BaseProximity::SPtr getFirstProximity() const {

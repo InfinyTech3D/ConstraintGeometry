@@ -9,7 +9,7 @@
 	<FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
 	<GenericConstraintSolver maxIterations="1000" tolerance="0.0001" />
 	
-	<CollisionDetectionAlgorithm name="algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" angle="0"  />
+	<CollisionDetectionAlgorithm name="algo" dest="@Liver/Collision/TriangleGeometry" from="@Plane/AABBDecorator" angle="0"  />
 
 	<Node name="Liver">
 		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
@@ -30,7 +30,7 @@
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="true"/>
 			<MechanicalObject name="state" />
 			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" />
-			<AABBGeometry name="AABBDecorator" geometry="@TriangleGeometry" nbox="16 16 16" color="1 0 0 1" />
+<!-- 			<AABBGeometry name="AABBDecorator" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" /> -->
 <!-- 			<Triangle/> -->
 			<BarycentricMapping name="BarycentricMapping"/>
 		</Node>
@@ -51,10 +51,11 @@
 		<MechanicalObject name="State3D1" dy="1" position="@loader.position" />
 		<OglModel name="OglModel" color="1 1 1 0.8"/>
 		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0"/>
+		<AABBGeometry name="AABBDecorator" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" /> 
     </Node>
 	
-<!-- 	<ResponseU name="response" mu="0.0001" /> -->
-<!-- 	<Constraint name="contact" detection="@algo" response="@response" /> -->
+	<ResponseU name="response" mu="0.0001" />
+	<Constraint name="contact" detection="@algo" response="@response" />
 
 	
 	
