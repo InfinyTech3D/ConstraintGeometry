@@ -55,7 +55,7 @@
     </Node>
 	
 	<ResponseUFF name="response" mu="0.6" />
-	<Constraint name="contact" detection="@algo" response="@response" />
+	<Constraint name="contact" input="@algo.output" response="@response" />
 
 	
 	

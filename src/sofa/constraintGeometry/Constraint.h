@@ -14,9 +14,11 @@ public:
     SOFA_CLASS(Constraint, sofa::core::behavior::BaseConstraint);
 
     Data<double> d_drawScale;
+    Data<collisionAlgorithm::DetectionOutput> d_input;
 
     Constraint()
     : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
+    , d_input(initData(&d_input, "input" , "this"))
     , l_detection(initLink("detection", "Link to Detection Algorithm"))
     , l_response(initLink("response", "Link to Response")) {
         l_response.setPath("@.");
@@ -26,8 +28,8 @@ public:
         //each component of this vector will be deleted by sofa at each time step so we don't have to delete each component
         m_constraints.clear();
 
-        for (unsigned i=0;i<l_detection->getOutput().size();i++) {
-            m_constraints.push_back(l_response->createConstraint(l_detection->getOutput()[i]));
+        for (unsigned i=0;i<d_input.getValue().size();i++) {
+            m_constraints.push_back(l_response->createConstraint(d_input.getValue()[i]));
         }
     }
 

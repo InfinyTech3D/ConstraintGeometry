@@ -44,13 +44,13 @@ public:
             return ConstraintNormal(N1,N2,N3);
         }
 
-        static ConstraintNormal createFromDetection(const collisionAlgorithm::DetectionOutput & d) {
+        static ConstraintNormal createFromDetection(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
 //            defaulttype::Vector3 mainDir = d.getFirstProximity()->getPosition() - d.getSecondProximity()->getPosition();
 
 //////            if (mainDir.norm()>0.00000001) return ConstraintNormal(mainDir);
 
 //            defaulttype::Vector3 firstDir = -d.getFirstProximity()->getNormal().normalized();
-            defaulttype::Vector3 secondDir = d.getSecondProximity()->getNormal().normalized();
+            defaulttype::Vector3 secondDir = d.second->getNormal().normalized();
 
 //            return ConstraintNormal(mainDir.normalized() + firstDir + secondDir);
 //            return ConstraintNormal(firstDir);
@@ -69,7 +69,7 @@ public:
 //            return ConstraintNormal(mainDir);
         }
 
-        static ConstraintNormal createFrameFromDetection(const collisionAlgorithm::DetectionOutput & d) {
+        static ConstraintNormal createFrameFromDetection(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
             return createFrame(ConstraintNormal::createFromDetection(d).m_dirs[0]);
         }
 
@@ -145,7 +145,7 @@ public:
         ConstraintNormal m_normals;
     };
 
-    virtual InternalConstraint createConstraint(const collisionAlgorithm::DetectionOutput & out) = 0;
+    virtual InternalConstraint createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & out) = 0;
 
 };
 
