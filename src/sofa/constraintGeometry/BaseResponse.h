@@ -45,15 +45,16 @@ public:
         }
 
         static ConstraintNormal createFromDetection(const collisionAlgorithm::DetectionOutput & d) {
-            defaulttype::Vector3 mainDir = d.getFirstProximity()->getPosition() - d.getSecondProximity()->getPosition();
+//            defaulttype::Vector3 mainDir = d.getFirstProximity()->getPosition() - d.getSecondProximity()->getPosition();
 
-////            if (mainDir.norm()>0.00000001) return ConstraintNormal(mainDir);
+//////            if (mainDir.norm()>0.00000001) return ConstraintNormal(mainDir);
 
-            defaulttype::Vector3 firstDir = -d.getFirstProximity()->getNormal().normalized();
+//            defaulttype::Vector3 firstDir = -d.getFirstProximity()->getNormal().normalized();
             defaulttype::Vector3 secondDir = d.getSecondProximity()->getNormal().normalized();
 
 //            return ConstraintNormal(mainDir.normalized() + firstDir + secondDir);
-            return ConstraintNormal(firstDir);
+//            return ConstraintNormal(firstDir);
+            return ConstraintNormal(secondDir);
 
 
 //            defaulttype::Vector3 mainDir = d.getSecondProximity()->getNormal();//pair.first->getPosition() - pair.second->getPosition();
