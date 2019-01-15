@@ -1,21 +1,20 @@
 #pragma once
 
+#include <sofa/constraintGeometry/BaseConstraint.h>
 #include <sofa/constraintGeometry/resolution/UnilateralResolution.h>
-#include <sofa/constraintGeometry/Constraint.h>
-#include <math.h>
 
 namespace sofa {
 
 namespace constraintGeometry {
 
-class ResponseUFF : public BaseResponse {
+class ConstraintUFF : public BaseConstraint {
 public:
-    SOFA_CLASS(ResponseUFF , BaseResponse);
+    SOFA_CLASS(ConstraintUFF , BaseConstraint);
 
     Data<double> d_maxForce;
     Data<double> d_friction;
 
-    ResponseUFF()
+    ConstraintUFF()
     : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
     , d_friction(initData(&d_friction, 0.0, "mu", "Friction")) {}
 

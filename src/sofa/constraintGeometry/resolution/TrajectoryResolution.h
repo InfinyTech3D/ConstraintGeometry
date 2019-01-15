@@ -1,11 +1,7 @@
 #pragma once
 
-#include <sofa/defaulttype/SolidTypes.h>
-#include <sofa/core/behavior/BaseController.h>
-#include <sofa/core/behavior/MechanicalState.h>
-#include <sofa/core/behavior/PairInteractionConstraint.h>
-#include <math.h>
-#include <sofa/defaulttype/Vec.h>
+#include <sofa/core/behavior/BaseConstraint.h>
+#include <sofa/defaulttype/Mat.h>
 
 namespace sofa {
 

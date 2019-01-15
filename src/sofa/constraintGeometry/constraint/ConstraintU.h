@@ -1,21 +1,20 @@
 #pragma once
 
 #include <sofa/constraintGeometry/resolution/UnilateralResolution.h>
-#include <sofa/constraintGeometry/Constraint.h>
-#include <sofa/constraintGeometry/BaseResponse.h>
+#include <sofa/constraintGeometry/BaseConstraint.h>
 #include <math.h>
 
 namespace sofa {
 
 namespace constraintGeometry {
 
-class ResponseU : public BaseResponse {
+class ConstraintU : public BaseConstraint {
 public:
-    SOFA_CLASS(ResponseU , BaseResponse);
+    SOFA_CLASS(ConstraintU , BaseConstraint);
 
     Data<double> d_maxForce;
 
-    ResponseU()
+    ConstraintU()
     : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force")) {}
 
     virtual InternalConstraint createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & d) {

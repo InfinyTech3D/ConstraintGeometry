@@ -3,33 +3,32 @@
 #include <sofa/collisionAlgorithm/BaseCollisionAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/behavior/BaseConstraint.h>
-#include <sofa/constraintGeometry/BaseResponse.h>
+#include <sofa/constraintGeometry/ConstraintNormal.h>
+#include <sofa/constraintGeometry/InternalConstraint.h>
 
 namespace sofa {
 
 namespace constraintGeometry {
 
-class Constraint : public sofa::core::behavior::BaseConstraint {
+class BaseConstraint : public sofa::core::behavior::BaseConstraint {
 public:
-    SOFA_CLASS(Constraint, sofa::core::behavior::BaseConstraint);
+    SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseConstraint);
 
     Data<double> d_drawScale;
     Data<collisionAlgorithm::DetectionOutput> d_input;
 
-    Constraint()
+    BaseConstraint()
     : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
-    , d_input(initData(&d_input, "input" , "this"))
-    , l_detection(initLink("detection", "Link to Detection Algorithm"))
-    , l_response(initLink("response", "Link to Response")) {
-        l_response.setPath("@.");
-    }
+    , d_input(initData(&d_input, "input" , "this")) {}
+
+    virtual InternalConstraint createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & out) = 0;
 
     void processGeometricalData() {
         //each component of this vector will be deleted by sofa at each time step so we don't have to delete each component
         m_constraints.clear();
 
         for (unsigned i=0;i<d_input.getValue().size();i++) {
-            m_constraints.push_back(l_response->createConstraint(d_input.getValue()[i]));
+            m_constraints.push_back(createConstraint(d_input.getValue()[i]));
         }
     }
 
@@ -75,10 +74,7 @@ public:
 
 protected:    
     unsigned m_cid;
-    std::vector<BaseResponse::InternalConstraint> m_constraints;
-    core::objectmodel::SingleLink<Constraint,collisionAlgorithm::BaseCollisionAlgorithm,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_detection;
-    core::objectmodel::SingleLink<Constraint,BaseResponse,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_response;
-
+    std::vector<InternalConstraint> m_constraints;
 };
 
 }

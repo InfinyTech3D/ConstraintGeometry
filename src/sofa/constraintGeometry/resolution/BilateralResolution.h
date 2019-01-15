@@ -1,8 +1,7 @@
 #pragma once
 
-#include <sofa/constraintGeometry/Constraint.h>
-#include <sofa/constraintGeometry/BaseResponse.h>
-#include <math.h>
+#include <sofa/core/behavior/BaseConstraint.h>
+#include <sofa/defaulttype/Mat.h>
 
 namespace sofa {
 

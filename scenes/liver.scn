@@ -40,7 +40,7 @@
 			<MeshTopology name="Topology1" triangles="@loader.triangles" />
 			<OglModel name="OglModel" color="0 1 0"  src='@loader'/>			
 			<BarycentricMapping name="BarycentricMapping"/>
-        </Node>
+		</Node>
 		
 		<LinearSolverConstraintCorrection solverName="precond" />
 	</Node>
@@ -54,9 +54,6 @@
 <!-- 		<AABBGeometry name="AABBDecorator" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />  -->
     </Node>
 	
-	<ResponseUFF name="response" mu="0.6" />
-	<Constraint name="contact" input="@algo.output" response="@response" />
-
-	
+    <ConstraintUFF input="@algo.output" mu="0.6" />
 	
 </Node>
