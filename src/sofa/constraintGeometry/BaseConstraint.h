@@ -32,17 +32,15 @@ public:
         }
     }
 
-    void buildConstraintMatrix(const core::ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned int &constraintId) {
-        m_cid = constraintId;
+    virtual void buildConstraintMatrix(const core::ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned int &constraintId) {
         for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i].buildConstraintMatrix(cId,constraintId);
     }
 
-    void getConstraintViolation(const core::ConstraintParams* /*cParams*/, defaulttype::BaseVector *v,unsigned cid) {
-        cid = m_cid;
-        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i].getConstraintViolation(v, cid);
+    virtual void getConstraintViolation(const core::ConstraintParams* /*cParams*/, defaulttype::BaseVector *v,unsigned /*cid*/) {
+        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i].getConstraintViolation(v);
     }
 
-    void getConstraintResolution(const core::ConstraintParams* /*cParams*/, std::vector<core::behavior::ConstraintResolution*>& resTab, unsigned int& offset) {
+    virtual void getConstraintResolution(const core::ConstraintParams* /*cParams*/, std::vector<core::behavior::ConstraintResolution*>& resTab, unsigned int& offset) {
         for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i].getConstraintResolution(resTab,offset);
     }
 
@@ -52,28 +50,15 @@ public:
         for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i].draw(vparams,d_drawScale.getValue());
     }
 
-    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
+    virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
         if (! cParams) return;
 
-        std::set<sofa::core::behavior::BaseMechanicalState*> processed_states;
-
-        for (unsigned i=0;i<m_constraints.size();i++) {
-            if (processed_states.find(m_constraints[i].getFirstProximity()->getState()) == processed_states.end()) {
-                m_constraints[i].getFirstProximity()->storeLambda(cParams, res, lambda);
-                processed_states.insert(m_constraints[i].getFirstProximity()->getState());
-            }
-
-            if (processed_states.find(m_constraints[i].getSecondProximity()->getState()) == processed_states.end()) {
-                m_constraints[i].getSecondProximity()->storeLambda(cParams, res, lambda);
-                processed_states.insert(m_constraints[i].getSecondProximity()->getState());
-            }
-        }
+        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i].storeLambda(cParams,res,lambda);
     }
 
     void updateForceMask() {}
 
 protected:    
-    unsigned m_cid;
     std::vector<InternalConstraint> m_constraints;
 };
 

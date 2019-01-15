@@ -37,9 +37,6 @@ public:
     }
 
     virtual void resolution(int line, double** /*w*/, double* d, double* force, double * /*dFree*/) {
-        double bforce[3];
-        for(int i=0; i<3; i++) bforce[line+i] = bforce[line+i];
-
         //we solve the first constraint as if there was no friction
         force[line+0] -= invW[0][0] * d[line+0] +
                          invW[0][1] * d[line+1] +
