@@ -7,7 +7,8 @@ namespace sofa {
 namespace constraintGeometry {
 
 int ConstraintPFFClass = core::RegisterObject("ConstraintPFF")
-.add< ConstraintPFF >();
+.add< ConstraintPFF >()
+.addAlias("ConstraintPenetration");
 
 }
 

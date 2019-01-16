@@ -30,7 +30,7 @@
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="true"/>
 			<MechanicalObject name="state" />
 			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" />
-			<AABBDecorator name="AABBDecorator" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />
+			<AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />
 <!-- 			<Triangle/> -->
 			<BarycentricMapping name="BarycentricMapping"/>
 		</Node>
@@ -51,7 +51,7 @@
 		<MechanicalObject name="State3D1" dy="1" position="@loader.position" />
 		<OglModel name="OglModel" color="1 1 1 0.8"/>
 		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0"/>
-<!-- 		<AABBGeometry name="AABBDecorator" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />  -->
+<!-- 		<AABBGeometry name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />  -->
     </Node>
 	
     <ConstraintUFF input="@algo.output" mu="0.6" />

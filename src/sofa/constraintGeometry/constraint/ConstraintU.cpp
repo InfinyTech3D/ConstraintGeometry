@@ -7,7 +7,7 @@ namespace constraintGeometry {
 
 int ConstraintUClass = core::RegisterObject("ConstraintU")
 .add< ConstraintU >()
-.addAlias("ConstraintU");
+.addAlias("ConstraintUnilateral");
 
 }
 

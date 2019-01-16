@@ -2,7 +2,7 @@
 
 #include <sofa/constraintGeometry/ConstraintNormal.h>
 #include <sofa/core/behavior/BaseConstraint.h>
-#include <sofa/collisionAlgorithm/BaseCollisionAlgorithm.h>
+#include <sofa/collisionAlgorithm/BaseGeometryAlgorithm.h>
 #include <sofa/helper/vector.h>
 
 namespace sofa {
