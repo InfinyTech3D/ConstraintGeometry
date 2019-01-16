@@ -9,7 +9,9 @@
 	<FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
 	<GenericConstraintSolver maxIterations="1000" tolerance="0.0001" />
 	
-	<CollisionDetectionAlgorithm name="algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" angle="0" dist="0.1"  />
+	<CollisionDetectionAlgorithm name="algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />
+<!-- 	<NormalFilter algo="@algo" angle="0.5" /> -->
+	<DistanceFilter algo="@algo" distance="0.1" />
 
 	<Node name="Liver">
 		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
@@ -52,7 +54,7 @@
 		<OglModel name="OglModel" color="1 1 1 0.8"/>
 		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0"/>
 <!-- 		<AABBGeometry name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />  -->
-    </Node>
+	</Node>
 	
     <ConstraintUFF input="@algo.output" mu="0.6" />
 	

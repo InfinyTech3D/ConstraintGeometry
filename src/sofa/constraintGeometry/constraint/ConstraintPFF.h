@@ -24,6 +24,7 @@ public:
 
 
     InternalConstraint createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
+
 //        return InternalConstraint(d.first,
 //                                  d.second,
 //                                  ConstraintNormal::createFromDetection(d),
