@@ -31,7 +31,7 @@
 			<TriangleSetTopologyModifier name="Modifier"/>
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="true"/>
 			<MechanicalObject name="state" />
-			<PhongTriangleGeometry name="TriangleGeometry" color="0 1 0 1" />
+			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" />
 			<AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />
 <!-- 			<Triangle/> -->
 			<BarycentricMapping name="BarycentricMapping"/>
@@ -46,7 +46,7 @@
 		
 		<LinearSolverConstraintCorrection solverName="precond" />
 	</Node>
-	
+
 	<Node name="Plane">
 		<MeshObjLoader name="loader" filename="mesh/box_inside.obj"/>
 		<MeshTopology name="Topology1" triangles="@loader.triangles" />
