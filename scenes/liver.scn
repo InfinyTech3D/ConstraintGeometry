@@ -9,9 +9,9 @@
 	<FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
 	<GenericConstraintSolver maxIterations="1000" tolerance="0.0001" />
 	
-	<CollisionDetectionAlgorithm name="algo" from="@Liver/Collision/TriangleGeometry.triangles" dest="@Plane/TriangleGeometry.triangles" />
+	<CollisionDetectionAlgorithm name="algo" dest="@Liver/Collision/TriangleGeometry.triangles" from="@Plane/TriangleGeometry.triangles" />
 <!-- 	<NormalFilter algo="@algo" angle="0.5" /> -->
-	<DistanceFilter algo="@algo" distance="0.1" />
+<!-- 	<DistanceFilter algo="@algo" distance="0.1" /> -->
 
 	<Node name="Liver">
 		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
@@ -32,6 +32,7 @@
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="true"/>
 			<MechanicalObject name="state" />
 			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" />
+			<PhongTriangleGeometry name="phong" color="0 1 0 1" triangles="@TriangleGeometry.triangles" />
 			<AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />
 <!-- 			<Triangle/> -->
 			<BarycentricMapping name="BarycentricMapping"/>
