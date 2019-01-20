@@ -33,7 +33,7 @@
 			<MechanicalObject name="state" />
 			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" />
 			<PhongTriangleGeometry name="phong" color="0 1 0 1" triangles="@TriangleGeometry.triangles" />
-			<AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />
+			<AABBBroadPhase name="AABBBroadPhase" elements="@TriangleGeometry.triangles" nbox="8 8 8" color="1 0 0 0.3" />
 <!-- 			<Triangle/> -->
 			<BarycentricMapping name="BarycentricMapping"/>
 		</Node>
@@ -53,7 +53,7 @@
 		<MeshTopology name="Topology1" triangles="@loader.triangles" />
 		<MechanicalObject name="State3D1" dy="1" position="@loader.position" />
 		<OglModel name="OglModel" color="1 1 1 0.8"/>
-		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0" triangles="@Container.triangles" />
+		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0" triangles="@Topology1.triangles" />
 <!-- 		<AABBGeometry name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />  -->
 	</Node>
 	
