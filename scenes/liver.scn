@@ -9,7 +9,7 @@
 	<FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
 	<GenericConstraintSolver maxIterations="1000" tolerance="0.0001" />
 	
-	<CollisionDetectionAlgorithm name="algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />
+	<CollisionDetectionAlgorithm name="algo" from="@Liver/Collision/TriangleGeometry.triangles" dest="@Plane/TriangleGeometry.triangles" />
 <!-- 	<NormalFilter algo="@algo" angle="0.5" /> -->
 	<DistanceFilter algo="@algo" distance="0.1" />
 
@@ -31,7 +31,7 @@
 			<TriangleSetTopologyModifier name="Modifier"/>
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="true"/>
 			<MechanicalObject name="state" />
-			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" />
+			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" />
 			<AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />
 <!-- 			<Triangle/> -->
 			<BarycentricMapping name="BarycentricMapping"/>
@@ -52,7 +52,7 @@
 		<MeshTopology name="Topology1" triangles="@loader.triangles" />
 		<MechanicalObject name="State3D1" dy="1" position="@loader.position" />
 		<OglModel name="OglModel" color="1 1 1 0.8"/>
-		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0"/>
+		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0" triangles="@Container.triangles" />
 <!-- 		<AABBGeometry name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />  -->
 	</Node>
 	
