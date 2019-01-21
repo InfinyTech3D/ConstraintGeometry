@@ -9,9 +9,13 @@
 	<FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
 	<GenericConstraintSolver maxIterations="1000" tolerance="0.0001" />
 	
-	<CollisionDetectionAlgorithm name="algo" dest="@Liver/Collision/TriangleGeometry.triangles" from="@Plane/TriangleGeometry.triangles" />
-<!-- 	<NormalFilter algo="@algo" angle="0.5" /> -->
-<!-- 	<DistanceFilter algo="@algo" distance="0.1" /> -->
+	
+	<NormalFilter name="normal" angle="0.5" />
+	<DistanceFilter name="distance" distance="0.1" />
+	
+	<FindClosestPointAlgorithm name="algo" from="@Liver/Collision/phong.triangles" dest="@Plane/TriangleGeometry.triangles" filters="@distance" />
+
+	
 
 	<Node name="Liver">
 		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
@@ -31,9 +35,9 @@
 			<TriangleSetTopologyModifier name="Modifier"/>
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="true"/>
 			<MechanicalObject name="state" />
-			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" />
-			<PhongTriangleGeometry name="phong" color="0 1 0 1" triangles="@TriangleGeometry.triangles" />
-			<AABBBroadPhase name="AABBBroadPhase" elements="@TriangleGeometry.triangles" nbox="8 8 8" color="1 0 0 0.3" />
+<!-- 			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" /> -->
+			<PhongTriangleGeometry name="phong" color="0 1 0 1" triangles="@Container.triangles" />
+			<AABBBroadPhase name="AABBBroadPhase" elements="@phong.triangles" nbox="8 8 8" color="1 0 0 0.3" />
 <!-- 			<Triangle/> -->
 			<BarycentricMapping name="BarycentricMapping"/>
 		</Node>
