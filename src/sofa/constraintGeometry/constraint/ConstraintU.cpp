@@ -5,9 +5,9 @@ namespace sofa {
 
 namespace constraintGeometry {
 
-int ConstraintUClass = core::RegisterObject("ConstraintU")
-.add< ConstraintU >()
-.addAlias("ConstraintUnilateral");
+int ConstraintUnilateralClass = core::RegisterObject("ConstraintUnilateral")
+.add< ConstraintUnilateral >()
+.addAlias("ConstraintUnilateralnilateral");
 
 }
 

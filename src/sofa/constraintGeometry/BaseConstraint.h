@@ -21,7 +21,9 @@ public:
     : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
     , d_input(initData(&d_input, "input" , "this")) {}
 
-    virtual InternalConstraint createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & out) = 0;
+    virtual InternalConstraint::SPtr createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & out) = 0;
+
+    virtual core::behavior::ConstraintResolution* createConstraintResolution() = 0;
 
     void processGeometricalData() {
         //each component of this vector will be deleted by sofa at each time step so we don't have to delete each component
@@ -33,33 +35,36 @@ public:
     }
 
     virtual void buildConstraintMatrix(const core::ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned int &constraintId) {
-        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i].buildConstraintMatrix(cId,constraintId);
+        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i]->buildConstraintMatrix(cId,constraintId);
     }
 
     virtual void getConstraintViolation(const core::ConstraintParams* /*cParams*/, defaulttype::BaseVector *v,unsigned /*cid*/) {
-        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i].getConstraintViolation(v);
+        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i]->getConstraintViolation(v);
     }
 
     virtual void getConstraintResolution(const core::ConstraintParams* /*cParams*/, std::vector<core::behavior::ConstraintResolution*>& resTab, unsigned int& offset) {
-        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i].getConstraintResolution(resTab,offset);
+        for (unsigned i=0;i<m_constraints.size();i++) {
+            resTab[offset] = createConstraintResolution();
+            offset += m_constraints.size();
+        }
     }
 
     void draw(const core::visual::VisualParams* vparams) {
         if (! vparams->displayFlags().getShowInteractionForceFields()) return;
 
-        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i].draw(vparams,d_drawScale.getValue());
+        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i]->draw(vparams,d_drawScale.getValue());
     }
 
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
         if (! cParams) return;
 
-        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i].storeLambda(cParams,res,lambda);
+        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i]->storeLambda(cParams,res,lambda);
     }
 
     void updateForceMask() {}
 
 protected:    
-    std::vector<InternalConstraint> m_constraints;
+    std::vector<InternalConstraint::SPtr> m_constraints;
 };
 
 }

@@ -11,17 +11,12 @@ namespace constraintGeometry {
 
 class InternalConstraint {
 public:
-    InternalConstraint(collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2,ConstraintNormal normals,sofa::core::behavior::ConstraintResolution * resolution)
+    typedef std::shared_ptr<InternalConstraint> SPtr;
+
+    InternalConstraint(collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2,const ConstraintNormal & normals)
     : m_p1(p1)
     , m_p2(p2)
-    , m_resolution(resolution)
-    , m_normals(normals) {
-        if (m_normals.size() != m_resolution->getNbLines()) {
-            std::cerr << "ERROR you provided a ConstraintResolution and a Constraint normals with different size" << std::endl;
-
-//                m_normals = normals.resize()
-        }
-    }
+    , m_normals(normals) {}
 
     void buildConstraintMatrix(core::MultiMatrixDerivId cId, unsigned int & constraintId) {
         m_cid = constraintId;
@@ -40,11 +35,6 @@ public:
         for (unsigned i=0;i<m_normals.size();i++) {
             v->set(m_cid+i,dot(PQFree,m_normals.m_dirs[i]));
         }
-    }
-
-    void getConstraintResolution(std::vector<core::behavior::ConstraintResolution*>& resTab, unsigned & offset) {
-        resTab[offset] = m_resolution;
-        offset += m_normals.size();
     }
 
     void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
@@ -73,10 +63,13 @@ public:
         return m_p2;
     }
 
+    static InternalConstraint::SPtr create(const collisionAlgorithm::DetectionOutput::PairDetection & d, const ConstraintNormal & N) {
+        return SPtr(new InternalConstraint(d.first,d.second,N));
+    }
+
  private:
     collisionAlgorithm::BaseProximity::SPtr m_p1;
     collisionAlgorithm::BaseProximity::SPtr m_p2;
-    sofa::core::behavior::ConstraintResolution * m_resolution;
     ConstraintNormal m_normals;
     unsigned m_cid;
 };

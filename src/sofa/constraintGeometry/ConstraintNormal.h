@@ -36,35 +36,6 @@ public:
         return ConstraintNormal(N1,N2,N3);
     }
 
-    static ConstraintNormal createFromDetection(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
-//            defaulttype::Vector3 mainDir = d.getFirstProximity()->getPosition() - d.getSecondProximity()->getPosition();
-
-//////            if (mainDir.norm()>0.00000001) return ConstraintNormal(mainDir);
-
-//            defaulttype::Vector3 firstDir = -d.getFirstProximity()->getNormal().normalized();
-        defaulttype::Vector3 secondDir = d.second->getNormal().normalized();
-
-//            return ConstraintNormal(mainDir.normalized() + firstDir + secondDir);
-//            return ConstraintNormal(firstDir);
-        return ConstraintNormal(secondDir);
-
-
-//            defaulttype::Vector3 mainDir = d.getSecondProximity()->getNormal();//pair.first->getPosition() - pair.second->getPosition();
-//            defaulttype::Vector3 secondDir = -d.getFirstProximity()->getNormal();
-
-//            if (mainDir.norm()<0.01) mainDir = secondDir;
-//            else {
-//                mainDir.normalize();
-//                if (dot(mainDir,secondDir) < 0) mainDir = secondDir;
-//            }
-
-//            return ConstraintNormal(mainDir);
-    }
-
-    static ConstraintNormal createFrameFromDetection(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
-        return createFrame(ConstraintNormal::createFromDetection(d).m_dirs[0]);
-    }
-
     unsigned size() {
         return m_dirs.size();
     }
