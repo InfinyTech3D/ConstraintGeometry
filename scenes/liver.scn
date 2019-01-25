@@ -13,7 +13,7 @@
 	<NormalFilter name="normal" angle="0.5" />
 	<DistanceFilter name="distance" distance="0.1" />
 	
-	<FindClosestPointAlgorithm name="algo" from="@Liver/Collision/phong.triangles" dest="@Plane/TriangleGeometry.triangles" filters="@distance" />
+	<FindClosestPointAlgorithm name="algo" from="@Liver/Collision/geo" dest="@Plane/TriangleGeometry" filters="@distance @normal" />
 
 	
 
@@ -36,8 +36,8 @@
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="true"/>
 			<MechanicalObject name="state" />
 <!-- 			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" /> -->
-			<PhongTriangleGeometry name="phong" color="0 1 0 1" triangles="@Container.triangles" />
-			<AABBBroadPhase name="AABBBroadPhase" elements="@phong.triangles" nbox="8 8 8" color="1 0 0 0.3" />
+			<PhongTriangleGeometry name="geo" color="0 0 1 1" triangles="@Container.triangles" />
+<!-- 			<AABBBroadPhase name="AABBBroadPhase" elements="@geo" nbox="8 8 8" color="1 0 0 0.3" /> -->
 <!-- 			<Triangle/> -->
 			<BarycentricMapping name="BarycentricMapping"/>
 		</Node>
@@ -61,6 +61,6 @@
 <!-- 		<AABBGeometry name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />  -->
 	</Node>
 	
-    <ConstraintUFF input="@algo.output" mu="0.6" />
+    <ConstraintUFF input="@algo.output" mu="0.9" />
 	
 </Node>

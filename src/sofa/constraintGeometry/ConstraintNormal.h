@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/helper/vector_device.h>
+#include <sofa/helper/vector.h>
 #include <sofa/defaulttype/VecTypes.h>
 
 namespace sofa {
