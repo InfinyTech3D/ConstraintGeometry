@@ -21,8 +21,8 @@ public:
         return new BilateralConstraintResolution3(d_maxForce.getValue());
     }
 
-    virtual InternalConstraint::SPtr createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
-        return InternalConstraint::create(this, d, ConstraintNormal::createFrame(), &ConstraintBBB::createConstraintResolution);
+    virtual void createConstraints(ConstraintContainer & constraints) {
+//        return InternalConstraint::create(this, d, ConstraintNormal::createFrame(), &ConstraintBBB::createConstraintResolution);
     }
 };
 

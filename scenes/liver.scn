@@ -13,9 +13,7 @@
 	<NormalFilter name="normal" angle="0.5" />
 	<DistanceFilter name="distance" distance="0.1" />
 	
-	<FindClosestPointAlgorithm name="algo" from="@Liver/Collision/geo" dest="@Plane/TriangleGeometry" filters="@distance @normal" />
-
-	
+	<FindClosestPointAlgorithm name="algo" filters="@distance @normal" />
 
 	<Node name="Liver">
 		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
@@ -61,6 +59,6 @@
 <!-- 		<AABBGeometry name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />  -->
 	</Node>
 	
-	<ConstraintUFF input="@algo.output" mu="0.9" />
+	<ConstraintUFF algo="@algo" from="@Liver/Collision/geo" dest="@Plane/TriangleGeometry" mu="0.9" />
 	
 </Node>

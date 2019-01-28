@@ -13,9 +13,15 @@ public:
     SOFA_CLASS(ConstraintUnilateral , BaseConstraint);
 
     Data<double> d_maxForce;
+    core::objectmodel::SingleLink<ConstraintUnilateral,collisionAlgorithm::BaseGeometryAlgorithm,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_algo;
+    core::objectmodel::SingleLink<ConstraintUnilateral,collisionAlgorithm::BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
+    core::objectmodel::SingleLink<ConstraintUnilateral,collisionAlgorithm::BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
 
     ConstraintUnilateral()
-    : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force")) {}
+    : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
+    , l_algo(initLink("algo", "link to from geometry elments"))
+    , l_from(initLink("from", "link to from geometry elments"))
+    , l_dest(initLink("dest", "link to dest geometry elments")) {}
 
     defaulttype::Vector3 getUnilateralNormal(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
     //            defaulttype::Vector3 mainDir = d.getFirstProximity()->getPosition() - d.getSecondProximity()->getPosition();
@@ -42,14 +48,23 @@ public:
     //            return ConstraintNormal(mainDir);
     }
 
-    core::behavior::ConstraintResolution* createConstraintResolution() const {
+    core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint * /*cst*/) const {
         return new UnilateralConstraintResolution(d_maxForce.getValue());
     }
 
+    virtual void createConstraints(ConstraintContainer & constraints) {
+        collisionAlgorithm::DetectionOutput output;
+        l_algo->doDetection(l_from.get(),l_dest.get(), output);
 
-    virtual InternalConstraint::SPtr createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
-        return InternalConstraint::create(this, d, ConstraintNormal(getUnilateralNormal(d)), &ConstraintUnilateral::createConstraintResolution);
+        for (unsigned i=0;i<output.size();i++) {
+            const collisionAlgorithm::DetectionOutput::PairDetection & d = output[i];
+            ConstraintNormal CN(getUnilateralNormal(d));
+            constraints.add(this, d, CN, &ConstraintUnilateral::createConstraintResolution);
+        }
     }
+
+
+
 
 };
 

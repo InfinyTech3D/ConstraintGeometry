@@ -10,46 +10,84 @@ namespace sofa {
 
 namespace constraintGeometry {
 
+class ConstraintContainer {
+public:
+
+    void clear() {
+        m_constraints.clear();
+    }
+
+    const InternalConstraint::SPtr & operator[](int i) const {
+        return m_constraints[i];
+    }
+
+    unsigned size() const {
+        return m_constraints.size();
+    }
+
+    template<class FwdObject,class FwdFunction>
+    void add(const FwdObject * obj, const collisionAlgorithm::DetectionOutput::PairDetection & d, const ConstraintNormal & N, FwdFunction f) {
+        m_constraints.push_back(InternalConstraint::SPtr(new InternalConstraint(d.first, d.second, N,
+                                                               std::unique_ptr<InternalConstraint::ResolutionCreator>(new InternalConstraint::ResolutionCreatorImpl<FwdObject,FwdFunction>(obj,f)))));
+    }
+
+    template<class FwdObject,class FwdFunction>
+    void add(const FwdObject * obj, collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2, const ConstraintNormal & N, FwdFunction f) {
+        m_constraints.push_back(InternalConstraint::SPtr(new InternalConstraint(p1,p2, N,
+                                                               std::unique_ptr<InternalConstraint::ResolutionCreator>(new InternalConstraint::ResolutionCreatorImpl<FwdObject,FwdFunction>(obj,f)))));
+    }
+
+protected:
+    std::vector<InternalConstraint::SPtr> m_constraints;
+};
+
 class BaseConstraint : public sofa::core::behavior::BaseConstraint {
 public:
     SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseConstraint);
 
     Data<double> d_drawScale;
-    Data<collisionAlgorithm::DetectionOutput> d_input;
 
     BaseConstraint()
-    : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
-    , d_input(initData(&d_input, "input" , "this")) {}
+    : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale")) {}
 
-    virtual InternalConstraint::SPtr createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & out) = 0;
+    virtual void createConstraints(ConstraintContainer & constraints) = 0;
 
     void processGeometricalData() {
-        m_constraints.clear();
-
-        for (unsigned i=0;i<d_input.getValue().size();i++) {
-            m_constraints.push_back(createConstraint(d_input.getValue()[i]));
-        }
+        m_container.clear();
+        createConstraints(m_container);
     }
 
     virtual void buildConstraintMatrix(const core::ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned int &constraintId) {
-        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i]->buildConstraintMatrix(cId,constraintId);
+        for (unsigned i=0;i<m_container.size();i++) m_container[i]->buildConstraintMatrix(cId,constraintId);
     }
 
     virtual void getConstraintViolation(const core::ConstraintParams* /*cParams*/, defaulttype::BaseVector *v,unsigned /*cid*/) {
-        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i]->getConstraintViolation(v);
+        for (unsigned i=0;i<m_container.size();i++) m_container[i]->getConstraintViolation(v);
     }
 
     virtual void getConstraintResolution(const core::ConstraintParams* /*cParams*/, std::vector<core::behavior::ConstraintResolution*>& resTab, unsigned int& offset) {
-        for (unsigned i=0;i<m_constraints.size();i++) {
-            resTab[offset] = m_constraints[i]->createConstraintResolution();
-            offset += m_constraints[i]->size();
+        for (unsigned i=0;i<m_container.size();i++) {
+            resTab[offset] = m_container[i]->createConstraintResolution();
+            offset += m_container[i]->size();
         }
     }
 
     void draw(const core::visual::VisualParams* vparams) {
-        if (! vparams->displayFlags().getShowInteractionForceFields()) return;
+        if (vparams->displayFlags().getShowInteractionForceFields()) {
+            for (unsigned i=0;i<m_container.size();i++) m_container[i]->draw(vparams,d_drawScale.getValue());
+        }
 
-        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i]->draw(vparams,d_drawScale.getValue());
+        if (vparams->displayFlags().getShowCollisionModels()) {
+            glDisable(GL_LIGHTING);
+            glColor4f(0,1,0,1);
+
+            glBegin(GL_LINES);
+            for (unsigned i=0;i<m_container.size();i++) {
+                glVertex3dv(m_container[i]->getFirstProximity()->getPosition().data());
+                glVertex3dv(m_container[i]->getSecondProximity()->getPosition().data());
+            }
+            glEnd();
+        }
     }
 
     virtual void storeLambda(InternalConstraint::SPtr cst, const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
@@ -59,13 +97,13 @@ public:
     void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
         if (! cParams) return;
 
-        for (unsigned i=0;i<m_constraints.size();i++) storeLambda(m_constraints[i],cParams,res,lambda);
+        for (unsigned i=0;i<m_container.size();i++) storeLambda(m_container[i],cParams,res,lambda);
     }
 
     void updateForceMask() {}
 
-protected:    
-    std::vector<InternalConstraint::SPtr> m_constraints;
+protected:
+    ConstraintContainer m_container;
 };
 
 }

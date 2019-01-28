@@ -10,24 +10,16 @@ namespace sofa {
 namespace constraintGeometry {
 
 class InternalConstraint {
-private:
+public :
+
+    typedef std::shared_ptr<InternalConstraint> SPtr;
+
     class ResolutionCreator {
     public:
         virtual ~ResolutionCreator() {}
 
-        virtual core::behavior::ConstraintResolution* create() const = 0;
+        virtual core::behavior::ConstraintResolution* create(const InternalConstraint * cst) const = 0;
     };
-
-    // create function should be used
-    InternalConstraint(collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2,const ConstraintNormal normals, std::unique_ptr<ResolutionCreator> creator)
-    : m_p1(p1)
-    , m_p2(p2)
-    , m_normals(normals)
-    , m_creator(std::move(creator))
-    , m_cid(0) {}
-
-public:
-    typedef std::shared_ptr<InternalConstraint> SPtr;
 
     template<class FwdObject,class FwdFunction>
     class ResolutionCreatorImpl : public ResolutionCreator {
@@ -35,19 +27,21 @@ public:
 
         ResolutionCreatorImpl(const FwdObject * obj,FwdFunction f) : m_object(obj), m_function(f) {}
 
-        core::behavior::ConstraintResolution* create() const {
-            return (m_object->*m_function)();
+        core::behavior::ConstraintResolution* create(const InternalConstraint * cst) const {
+            return (m_object->*m_function)(cst);
         }
 
         const FwdObject * m_object;
         FwdFunction m_function;
     };
 
-    template<class FwdObject,class FwdFunction>
-    static InternalConstraint::SPtr create(const FwdObject * obj, const collisionAlgorithm::DetectionOutput::PairDetection & d, const ConstraintNormal N, FwdFunction f) {
-        return InternalConstraint::SPtr(new InternalConstraint(d.first, d.second, N,
-                                                               std::unique_ptr<ResolutionCreator>(new ResolutionCreatorImpl<FwdObject,FwdFunction>(obj,f))));
-    }
+    // create function should be used
+    InternalConstraint(collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2,const ConstraintNormal & normals, std::unique_ptr<ResolutionCreator> creator)
+    : m_p1(p1)
+    , m_p2(p2)
+    , m_normals(normals)
+    , m_creator(std::move(creator))
+    , m_cid(0) {}
 
     void buildConstraintMatrix(core::MultiMatrixDerivId cId, unsigned int & constraintId) {
         m_cid = constraintId;
@@ -69,7 +63,7 @@ public:
     }
 
     core::behavior::ConstraintResolution* createConstraintResolution() {
-        return m_creator->create();
+        return m_creator->create(this);
     }
 
     void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
@@ -84,14 +78,20 @@ public:
     }
 
     void draw(const core::visual::VisualParams* vparams,double scale) {
-        if (m_normals.size()>0)
+        if (m_normals.size()>0) {
             vparams->drawTool()->drawArrow(m_p1->getPosition(), m_p1->getPosition() + m_normals.m_dirs[0] * scale, scale * 0.1, defaulttype::Vector4(1,0,0,1));
+//            vparams->drawTool()->drawArrow(m_p2->getPosition(), m_p2->getPosition() - m_normals.m_dirs[0] * scale, scale * 0.1, defaulttype::Vector4(1,0,0,1));
+        }
 
-        if (m_normals.size()>1)
+        if (m_normals.size()>1) {
             vparams->drawTool()->drawArrow(m_p1->getPosition(), m_p1->getPosition() + m_normals.m_dirs[1] * scale, scale * 0.1, defaulttype::Vector4(0,1,0,1));
+//            vparams->drawTool()->drawArrow(m_p2->getPosition(), m_p2->getPosition() - m_normals.m_dirs[1] * scale, scale * 0.1, defaulttype::Vector4(0,1,0,1));
+        }
 
-        if (m_normals.size()>2)
+        if (m_normals.size()>2) {
             vparams->drawTool()->drawArrow(m_p1->getPosition(), m_p1->getPosition() + m_normals.m_dirs[2] * scale, scale * 0.1, defaulttype::Vector4(0,0,1,1));
+//            vparams->drawTool()->drawArrow(m_p2->getPosition(), m_p2->getPosition() - m_normals.m_dirs[2] * scale, scale * 0.1, defaulttype::Vector4(0,0,1,1));
+        }
     }
 
     collisionAlgorithm::BaseProximity::SPtr getFirstProximity() const {

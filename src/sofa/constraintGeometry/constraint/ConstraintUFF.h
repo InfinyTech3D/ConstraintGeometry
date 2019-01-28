@@ -11,23 +11,32 @@ class ConstraintUFF : public ConstraintUnilateral {
 public:
     SOFA_CLASS(ConstraintUFF , ConstraintUnilateral);
 
-    Data<double> d_maxForce;
     Data<double> d_friction;
 
     ConstraintUFF()
-    : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
-    , d_friction(initData(&d_friction, 0.0, "mu", "Friction")) {}
+    : d_friction(initData(&d_friction, 0.0, "mu", "Friction")) {}
 
-    core::behavior::ConstraintResolution* createConstraintResolutionWithFriction() const {
+    core::behavior::ConstraintResolution* createConstraintResolutionWithFriction(const InternalConstraint * /*cst*/) const {
         return new UnilateralFrictionResolution(d_maxForce.getValue(),d_friction.getValue());
     }
 
-    virtual InternalConstraint::SPtr createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
-        if (d_friction.getValue() == 0.0) return ConstraintUnilateral::createConstraint(d);
+    virtual void createConstraints(ConstraintContainer & constraints) {
+        collisionAlgorithm::DetectionOutput output;
+        l_algo->doDetection(l_from.get(),l_dest.get(), output);
 
-        return InternalConstraint::create(this, d,
-                                          ConstraintNormal::createFrame(getUnilateralNormal(d)),
-                                          &ConstraintUFF::createConstraintResolutionWithFriction);
+        if (d_friction.getValue() == 0.0) {
+            for (unsigned i=0;i<output.size();i++) {
+                const collisionAlgorithm::DetectionOutput::PairDetection & d = output[i];
+                ConstraintNormal CN = ConstraintNormal(getUnilateralNormal(d));
+                constraints.add(this, d, CN, &ConstraintUFF::createConstraintResolution);
+            }
+        } else {
+            for (unsigned i=0;i<output.size();i++) {
+                const collisionAlgorithm::DetectionOutput::PairDetection & d = output[i];
+                ConstraintNormal CN = ConstraintNormal::createFrame(getUnilateralNormal(d));
+                constraints.add(this, d, CN, &ConstraintUFF::createConstraintResolutionWithFriction);
+            }
+        }
     }
 
 
