@@ -10,13 +10,44 @@ namespace sofa {
 namespace constraintGeometry {
 
 class InternalConstraint {
+private:
+    class ResolutionCreator {
+    public:
+        virtual ~ResolutionCreator() {}
+
+        virtual core::behavior::ConstraintResolution* create() const = 0;
+    };
+
+    // create function should be used
+    InternalConstraint(collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2,const ConstraintNormal normals, std::unique_ptr<ResolutionCreator> creator)
+    : m_p1(p1)
+    , m_p2(p2)
+    , m_normals(normals)
+    , m_creator(std::move(creator))
+    , m_cid(0) {}
+
 public:
     typedef std::shared_ptr<InternalConstraint> SPtr;
 
-    InternalConstraint(collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2,const ConstraintNormal & normals)
-    : m_p1(p1)
-    , m_p2(p2)
-    , m_normals(normals) {}
+    template<class FwdObject,class FwdFunction>
+    class ResolutionCreatorImpl : public ResolutionCreator {
+    public:
+
+        ResolutionCreatorImpl(const FwdObject * obj,FwdFunction f) : m_object(obj), m_function(f) {}
+
+        core::behavior::ConstraintResolution* create() const {
+            return (m_object->*m_function)();
+        }
+
+        const FwdObject * m_object;
+        FwdFunction m_function;
+    };
+
+    template<class FwdObject,class FwdFunction>
+    static InternalConstraint::SPtr create(const FwdObject * obj, const collisionAlgorithm::DetectionOutput::PairDetection & d, const ConstraintNormal N, FwdFunction f) {
+        return InternalConstraint::SPtr(new InternalConstraint(d.first, d.second, N,
+                                                               std::unique_ptr<ResolutionCreator>(new ResolutionCreatorImpl<FwdObject,FwdFunction>(obj,f))));
+    }
 
     void buildConstraintMatrix(core::MultiMatrixDerivId cId, unsigned int & constraintId) {
         m_cid = constraintId;
@@ -37,11 +68,19 @@ public:
         }
     }
 
+    core::behavior::ConstraintResolution* createConstraintResolution() {
+        return m_creator->create();
+    }
+
     void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
         for (unsigned i=0;i<m_normals.size();i++) {
             m_p1->storeLambda(cParams,res,m_cid+i,lambda);
             m_p2->storeLambda(cParams,res,m_cid+i,lambda);
         }
+    }
+
+    double getLambda(const sofa::defaulttype::BaseVector* lambda, unsigned id) {
+        return lambda->element(m_cid+id);
     }
 
     void draw(const core::visual::VisualParams* vparams,double scale) {
@@ -63,14 +102,15 @@ public:
         return m_p2;
     }
 
-    static InternalConstraint::SPtr create(const collisionAlgorithm::DetectionOutput::PairDetection & d, const ConstraintNormal & N) {
-        return SPtr(new InternalConstraint(d.first,d.second,N));
+    unsigned size() const {
+        return m_normals.size();
     }
 
- private:
+ protected:
     collisionAlgorithm::BaseProximity::SPtr m_p1;
     collisionAlgorithm::BaseProximity::SPtr m_p2;
     ConstraintNormal m_normals;
+    std::unique_ptr<ResolutionCreator> m_creator;
     unsigned m_cid;
 };
 

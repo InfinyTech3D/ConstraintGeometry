@@ -17,13 +17,14 @@ public:
     ConstraintB()
     : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force")) {}
 
-    InternalConstraint::SPtr createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
-        return InternalConstraint::create(d,ConstraintNormal::createFrame());
-    }
-
-    virtual core::behavior::ConstraintResolution* createConstraintResolution() {
+    core::behavior::ConstraintResolution* createConstraintResolution() const {
         return new BilateralConstraintResolution1(d_maxForce.getValue());
     }
+
+    InternalConstraint::SPtr createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
+        return InternalConstraint::create(this, d, ConstraintNormal::createFrame(), &ConstraintB::createConstraintResolution);
+    }
+
 };
 
 }

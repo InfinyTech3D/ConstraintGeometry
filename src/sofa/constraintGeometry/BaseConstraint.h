@@ -23,10 +23,7 @@ public:
 
     virtual InternalConstraint::SPtr createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & out) = 0;
 
-    virtual core::behavior::ConstraintResolution* createConstraintResolution() = 0;
-
     void processGeometricalData() {
-        //each component of this vector will be deleted by sofa at each time step so we don't have to delete each component
         m_constraints.clear();
 
         for (unsigned i=0;i<d_input.getValue().size();i++) {
@@ -44,8 +41,8 @@ public:
 
     virtual void getConstraintResolution(const core::ConstraintParams* /*cParams*/, std::vector<core::behavior::ConstraintResolution*>& resTab, unsigned int& offset) {
         for (unsigned i=0;i<m_constraints.size();i++) {
-            resTab[offset] = createConstraintResolution();
-            offset += m_constraints.size();
+            resTab[offset] = m_constraints[i]->createConstraintResolution();
+            offset += m_constraints[i]->size();
         }
     }
 
@@ -55,10 +52,14 @@ public:
         for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i]->draw(vparams,d_drawScale.getValue());
     }
 
-    virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
+    virtual void storeLambda(InternalConstraint::SPtr cst, const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
+        cst->storeLambda(cParams,res,lambda);
+    }
+
+    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
         if (! cParams) return;
 
-        for (unsigned i=0;i<m_constraints.size();i++) m_constraints[i]->storeLambda(cParams,res,lambda);
+        for (unsigned i=0;i<m_constraints.size();i++) storeLambda(m_constraints[i],cParams,res,lambda);
     }
 
     void updateForceMask() {}

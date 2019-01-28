@@ -36,7 +36,7 @@ public:
         return ConstraintNormal(N1,N2,N3);
     }
 
-    unsigned size() {
+    unsigned size() const {
         return m_dirs.size();
     }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Node name="Root" gravity="0 -9 0" >
-    <RequiredPlugin pluginName="CollisionAlgorithm"/>
+	<RequiredPlugin pluginName="CollisionAlgorithm"/>
 	<RequiredPlugin pluginName="ConstraintGeometry"/>
 	<RequiredPlugin pluginName="SofaCUDASolvers"/>
 	<RequiredPlugin pluginName="SofaAsyncSolvers"/>
@@ -61,6 +61,6 @@
 <!-- 		<AABBGeometry name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />  -->
 	</Node>
 	
-    <ConstraintUFF input="@algo.output" mu="0.9" />
+	<ConstraintUFF input="@algo.output" mu="0.9" />
 	
 </Node>

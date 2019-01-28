@@ -42,13 +42,13 @@ public:
     //            return ConstraintNormal(mainDir);
     }
 
-
-    virtual InternalConstraint::SPtr createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
-        return InternalConstraint::create(d,ConstraintNormal(getUnilateralNormal(d)));
+    core::behavior::ConstraintResolution* createConstraintResolution() const {
+        return new UnilateralConstraintResolution(d_maxForce.getValue());
     }
 
-    virtual core::behavior::ConstraintResolution* createConstraintResolution() {
-        return new UnilateralConstraintResolution(d_maxForce.getValue());
+
+    virtual InternalConstraint::SPtr createConstraint(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
+        return InternalConstraint::create(this, d, ConstraintNormal(getUnilateralNormal(d)), &ConstraintUnilateral::createConstraintResolution);
     }
 
 };
