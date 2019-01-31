@@ -31,7 +31,7 @@
 		<Node name="Collision">
 			<TriangleSetTopologyContainer name="Container" position="@../loader.position"   />
 			<TriangleSetTopologyModifier name="Modifier"/>
-			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="true"/>
+			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="false"/>
 			<MechanicalObject name="state" />
 <!-- 			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" /> -->
 			<PhongTriangleGeometry name="geo" color="0 0 1 1" triangles="@Container.triangles" />
