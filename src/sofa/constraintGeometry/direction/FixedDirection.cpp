@@ -16,11 +16,11 @@ public:
     : d_directions(initData(&d_directions, "directions", "list of directions")) {}
 
 
-    ConstraintNormal createConstraintNormal(unsigned /*size*/, const collisionAlgorithm::DetectionOutput::PairDetection & d) {
+    ConstraintNormal createConstraintNormal(unsigned /*size*/, const collisionAlgorithm::DetectionOutput::PairDetection & /*d*/) {
         return ConstraintNormal(d_directions.getValue());
     }
 
-    ConstraintNormal createConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
+    ConstraintNormal createConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & /*d*/) {
         return ConstraintNormal(d_directions.getValue());
     }
 };
