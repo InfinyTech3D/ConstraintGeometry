@@ -57,7 +57,9 @@
 		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0" triangles="@Topology1.triangles" />
 <!-- 		<AABBGeometry name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />  -->
 	</Node>
-	
-	<ConstraintContact input="@algo.output" mu="0.9" />
+
+        <ContactDirection />
+
+        <ContactConstraint input="@algo.output" direction="@contact" mu="0.9" />
 	
 </Node>

@@ -18,6 +18,35 @@ public:
     double m_maxForce;
 };
 
+class BilateralConstraintResolution2 : public sofa::core::behavior::ConstraintResolution {
+public:
+    BilateralConstraintResolution2(double m) : sofa::core::behavior::ConstraintResolution(2), m_maxForce(m) {}
+
+    virtual void init(int line, double** w, double * /*force*/)
+    {
+        sofa::defaulttype::Mat<2,2,double> temp;
+        for (unsigned j=0;j<2;j++) {
+            for (unsigned i=0;i<2;i++) {
+                temp[j][i] = w[line+j][line+i];
+            }
+        }
+
+        sofa::defaulttype::invertMatrix(invW,temp);
+    }
+
+    virtual void resolution(int line, double** /*w*/, double* d, double* force, double * /*dFree*/)
+    {
+        for(int i=0; i<2; i++) {
+            for(int j=0; j<2; j++)
+                force[line+i] -= d[line+j] * invW[i][j];
+        }
+    }
+
+    double m_maxForce;
+    sofa::defaulttype::Mat<2,2,double> invW;
+};
+
+
 class BilateralConstraintResolution3 : public sofa::core::behavior::ConstraintResolution {
 public:
     BilateralConstraintResolution3(double m) : sofa::core::behavior::ConstraintResolution(3), m_maxForce(m) {}

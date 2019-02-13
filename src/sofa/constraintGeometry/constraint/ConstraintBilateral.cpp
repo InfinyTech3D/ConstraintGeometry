@@ -1,4 +1,4 @@
-#include <sofa/constraintGeometry/constraint/ConstraintBBB.h>
+#include <sofa/constraintGeometry/constraint/ConstraintBilateral.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa {
