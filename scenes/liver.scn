@@ -9,11 +9,11 @@
 	<FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
 	<GenericConstraintSolver maxIterations="1000" tolerance="0.0001" />
 		
-	<NormalFilter name="normal" angle="0.5" />
-	<DistanceFilter name="distance" distance="0.1" />
+<!--	<NormalFilter name="normal" angle="0.5" />
+	<DistanceFilter name="distance" distance="0.1" />-->
 	
 	<FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/geo" dest="@Plane/TriangleGeometry" />
-
+</Node>
 	<Node name="Liver">
 		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
 <!--         <CGLinearSolver name="CGLinearSolver" tolerance="1e-09" threshold="1e-09" /> -->
