@@ -12,7 +12,7 @@
 	<NormalFilter name="normal" angle="0.5" />
 	<DistanceFilter name="distance" distance="0.1" />
 	
-	<FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/geo" dest="@Plane/TriangleGeometry" />
+	<FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />
 
 	<Node name="Liver">
 		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
@@ -32,8 +32,8 @@
 			<TriangleSetTopologyModifier name="Modifier"/>
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="false"/>
 			<MechanicalObject name="state" />
-<!-- 			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" /> -->
-			<PhongTriangleGeometry name="geo" color="0 0 1 1" triangles="@Container.triangles" />
+			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" />
+			<PhongTriangleGeometry name="geo" color="0 0 1 1" geometry="@TriangleGeometry" />
 <!-- 			<AABBBroadPhase name="AABBBroadPhase" elements="@geo" nbox="8 8 8" color="1 0 0 0.3" /> -->
 <!-- 			<Triangle/> -->
 			<BarycentricMapping name="BarycentricMapping"/>
