@@ -9,15 +9,15 @@
 	<FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
 	<GenericConstraintSolver maxIterations="1000" tolerance="0.0001" />
 		
-<!--	<NormalFilter name="normal" angle="0.5" />
-	<DistanceFilter name="distance" distance="0.1" />-->
+	<NormalFilter name="normal" angle="0.5" />
+	<DistanceFilter name="distance" distance="0.1" />
 	
 	<FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/geo" dest="@Plane/TriangleGeometry" />
-</Node>
+
 	<Node name="Liver">
 		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
 <!--         <CGLinearSolver name="CGLinearSolver" tolerance="1e-09" threshold="1e-09" /> -->
-		<SparseLDLSolver name="precond" template="CompressedRowSparseMatrix3f" />
+		<CudaSparseLDLSolver name="precond" template="CompressedRowSparseMatrix3f" />
 		
 		<MeshGmshLoader name="loader" filename="mesh/liver.msh"/>
 		<MeshTopology name="Topology" tetrahedra="@loader.tetrahedra" />
@@ -58,8 +58,8 @@
 <!-- 		<AABBGeometry name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />  -->
 	</Node>
 
-        <ContactDirection />
+        <ContactDirection name="contact" />
 
-        <ContactConstraint input="@algo.output" direction="@contact" mu="0.9" />
+        <ConstraintContact input="@algo.output" direction="@contact" mu="0.9" />
 	
 </Node>
