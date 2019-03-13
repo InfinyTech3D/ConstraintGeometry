@@ -5,9 +5,8 @@ namespace sofa {
 
 namespace constraintGeometry {
 
-int ConstraintUFFClass = core::RegisterObject("ConstraintUFF")
-.add< ConstraintUFF >()
-.addAlias("ConstraintContact");
+int ConstraintContactClass = core::RegisterObject("ConstraintContact")
+.add< ConstraintContact >();
 
 }
 

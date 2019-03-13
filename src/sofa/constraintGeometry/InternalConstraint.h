@@ -2,7 +2,7 @@
 
 #include <sofa/constraintGeometry/ConstraintNormal.h>
 #include <sofa/core/behavior/BaseConstraint.h>
-#include <sofa/collisionAlgorithm/BaseGeometryAlgorithm.h>
+#include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/helper/vector.h>
 
 namespace sofa {
@@ -36,7 +36,7 @@ public :
     };
 
     // create function should be used
-    InternalConstraint(collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2,const ConstraintNormal & normals, std::unique_ptr<ResolutionCreator> creator)
+    InternalConstraint(collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2,const ConstraintNormal normals, std::unique_ptr<ResolutionCreator> creator)
     : m_p1(p1)
     , m_p2(p2)
     , m_normals(normals)
@@ -104,6 +104,10 @@ public :
 
     unsigned size() const {
         return m_normals.size();
+    }
+
+    unsigned id() const {
+        return m_cid;
     }
 
  protected:

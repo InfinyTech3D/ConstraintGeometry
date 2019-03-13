@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseGeometryAlgorithm.h>
+#include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/behavior/BaseConstraint.h>
 #include <sofa/constraintGeometry/ConstraintNormal.h>
@@ -26,13 +26,13 @@ public:
     }
 
     template<class FwdObject,class FwdFunction>
-    void add(const FwdObject * obj, const collisionAlgorithm::DetectionOutput::PairDetection & d, const ConstraintNormal & N, FwdFunction f) {
+    void push_back(const FwdObject * obj, const collisionAlgorithm::PairDetection & d, const ConstraintNormal & N, FwdFunction f) {
         m_constraints.push_back(InternalConstraint::SPtr(new InternalConstraint(d.first, d.second, N,
                                                                std::unique_ptr<InternalConstraint::ResolutionCreator>(new InternalConstraint::ResolutionCreatorImpl<FwdObject,FwdFunction>(obj,f)))));
     }
 
     template<class FwdObject,class FwdFunction>
-    void add(const FwdObject * obj, collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2, const ConstraintNormal & N, FwdFunction f) {
+    void push_back(const FwdObject * obj, collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2, const ConstraintNormal & N, FwdFunction f) {
         m_constraints.push_back(InternalConstraint::SPtr(new InternalConstraint(p1,p2, N,
                                                                std::unique_ptr<InternalConstraint::ResolutionCreator>(new InternalConstraint::ResolutionCreatorImpl<FwdObject,FwdFunction>(obj,f)))));
     }
