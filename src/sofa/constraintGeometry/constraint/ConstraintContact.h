@@ -40,9 +40,9 @@ public:
 
         if (l_algo == NULL) {
             collisionAlgorithm::FindClosestPointAlgorithm algo;
-            algo.processAlgorithm(l_from->begin(),l_dest.get(),detection);
+            algo.processAlgorithm(l_from.get(),l_dest.get(),detection);
         } else {
-            l_algo->processAlgorithm(l_from->begin(),l_dest.get(),detection);
+            l_algo->processAlgorithm(l_from.get(),l_dest.get(),detection);
         }
 
         for (unsigned i=0;i<detection.size();i++) {

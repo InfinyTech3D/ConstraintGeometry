@@ -17,12 +17,14 @@ class ContactNormal : public ConstraintNormal {
 public:
 
     ContactNormal(const collisionAlgorithm::PairDetection & d) {
-        defaulttype::Vector3 mainDir = d.first->getPosition() - d.second->getPosition();
+        defaulttype::Vector3 mainDir = (d.first->getPosition() - d.second->getPosition()).normalized();
 
     //            defaulttype::Vector3 firstDir = -d.getFirstProximity()->getNormal().normalized();
-    //            defaulttype::Vector3 secondDir = d.second->getNormal().normalized();
+        defaulttype::Vector3 secondDir = d.second->getNormal().normalized();
 
-        m_dirs.push_back(mainDir.normalized());
+        if (dot(mainDir,secondDir)) mainDir=secondDir;
+
+        m_dirs.push_back(secondDir);
     //            return ConstraintNormal::createFrame(secondDir, size);
         //            return ConstraintNormal(mainDir.normalized() + firstDir + secondDir);
         //            return ConstraintNormal(firstDir);

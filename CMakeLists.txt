@@ -35,5 +35,5 @@ set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DPLUGIN_DATA_DI
 target_link_libraries(${PROJECT_NAME} SofaCore CollisionAlgorithm)
 
 ## Install rules for the library and headers; CMake package configurations files
-sofa_generate_package(NAME ${PROJECT_NAME} VERSION 0.1 TARGETS ${PROJECT_NAME} INCLUDE_ROOT_DIR ${${PROJECT_NAME}_INCLUDE_DIRS})
+sofa_generate_package(NAME ${PROJECT_NAME} VERSION 0.1 TARGETS ${PROJECT_NAME} INCLUDE_INSTALL_DIR ${${PROJECT_NAME}_INCLUDE_DIRS})
 
