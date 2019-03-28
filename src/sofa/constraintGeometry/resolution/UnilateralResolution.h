@@ -7,20 +7,45 @@ namespace sofa {
 
 namespace constraintGeometry {
 
+/*!
+ * \brief The UnilateralConstraintResolution class solves unilateral constraints
+ */
 class UnilateralConstraintResolution : public sofa::core::behavior::ConstraintResolution {
 public:
-    UnilateralConstraintResolution(double m) : sofa::core::behavior::ConstraintResolution(1), m_maxForce(m){}
 
+    /*!
+     * \brief UnilateralConstraintResolution Constructor
+     * \param m : double, maxForce value
+     */
+    UnilateralConstraintResolution(double m) :
+        sofa::core::behavior::ConstraintResolution(1),
+        m_maxForce(m)
+    {}
+
+    /*!
+     * \brief resolution : updates and keeps the force applied on 'line'
+     * in the interval [0, maxForce]
+     * \param line
+     * \param w
+     * \param d
+     * \param force
+     */
     virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/) {
         force[line] -= d[line] / w[line][line];
 
-        if (force[line]>m_maxForce) force[line] = m_maxForce;
-        else if (force[line]<0) force[line] = 0.0;
+        if (force[line]>m_maxForce)
+            force[line] = m_maxForce;
+        else if (force[line]<0)
+            force[line] = 0.0;
     }
 
     double m_maxForce;
 };
 
+/*!
+ * \brief The UnilateralFrictionResolution class
+ * Solves unilateral friction constraints
+ */
 class UnilateralFrictionResolution : public sofa::core::behavior::ConstraintResolution {
 public:
     UnilateralFrictionResolution(double m,double f) : sofa::core::behavior::ConstraintResolution(3), m_maxForce(m), m_friction(f) {}

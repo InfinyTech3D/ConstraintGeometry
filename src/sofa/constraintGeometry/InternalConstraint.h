@@ -14,6 +14,10 @@ public :
 
     typedef std::shared_ptr<InternalConstraint> SPtr;
 
+    /*!
+     * \brief The ResolutionCreator class
+     * offers interface for constraint solvers
+     */
     class ResolutionCreator {
     public:
         virtual ~ResolutionCreator() {}
@@ -21,12 +25,26 @@ public :
         virtual core::behavior::ConstraintResolution* create(const InternalConstraint * cst) const = 0;
     };
 
+    /*!
+     * \brief Templated implementation of constraint solvers
+     * Generates ConstraintResolutions using InternalConstraints
+     */
     template<class FwdObject,class FwdFunction>
     class ResolutionCreatorImpl : public ResolutionCreator {
     public:
 
+        /*!
+         * \brief ResolutionCreatorImpl Constructor
+         * \param obj : object used in factory for ConstraintResolution generation
+         * \param f : method used in object factory to generate ConstraintResolutions
+         */
         ResolutionCreatorImpl(const FwdObject * obj,FwdFunction f) : m_object(obj), m_function(f) {}
 
+        /*!
+         * \brief create : Returns a constraint resolution generated using cst internal constraint
+         * \param cst : InternalConstraint used to generate the result
+         * \return ConstraintResolution
+         */
         core::behavior::ConstraintResolution* create(const InternalConstraint * cst) const {
             return (m_object->*m_function)(cst);
         }
@@ -36,6 +54,13 @@ public :
     };
 
     // create function should be used
+    /*!
+     * \brief InternalConstraint Constructor
+     * \param p1 : 1st proximity
+     * \param p2 : second proximity
+     * \param normals : ConstraintNormals
+     * \param creator : resolutionCreator (factory)
+     */
     InternalConstraint(collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2,const ConstraintNormal normals, std::unique_ptr<ResolutionCreator> creator)
     : m_p1(p1)
     , m_p2(p2)
@@ -43,6 +68,12 @@ public :
     , m_creator(std::move(creator))
     , m_cid(0) {}
 
+    /*!
+     * \brief buildConstraintMatrix
+     * Builds proximities p1 & p2's Jacobian Constraints
+     * \param cId
+     * \param constraintId
+     */
     void buildConstraintMatrix(core::MultiMatrixDerivId cId, unsigned int & constraintId) {
         m_cid = constraintId;
 
@@ -62,10 +93,20 @@ public :
         }
     }
 
+    /*!
+     * \brief createConstraintResolution, creates ConstraintResolution using creator's factory
+     * \return ConstraintResolution*
+     */
     core::behavior::ConstraintResolution* createConstraintResolution() {
         return m_creator->create(this);
     }
 
+    /*!
+     * \brief storeLambda, calls storeLambda on p1 and p2 proximities' storeLambda
+     * \param cParams
+     * \param res
+     * \param lambda
+     */
     void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
         for (unsigned i=0;i<m_normals.size();i++) {
             m_p1->storeLambda(cParams,res,m_cid+i,lambda);
@@ -73,6 +114,12 @@ public :
         }
     }
 
+    /*!
+     * \brief getLambda
+     * \param lambda : const BaseVector*
+     * \param id : unsigned
+     * \return lambda element @ cid+id
+     */
     double getLambda(const sofa::defaulttype::BaseVector* lambda, unsigned id) {
         return lambda->element(m_cid+id);
     }

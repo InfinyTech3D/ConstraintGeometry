@@ -54,10 +54,11 @@
 		<AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" /> 
 	</Node>
 
+
 	<NormalFilter name="normal" angle="0.5" />
 	<DistanceFilter name="distance" distance="0.1" />
 	<FindClosestPointAlgorithm name="algo" filters="@distance @normal" />
-
-        <ConstraintContact algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" mu="0.9" />
+	<ConstraintContact algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" mu="0.9" />
 	
+
 </Node>

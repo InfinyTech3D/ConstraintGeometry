@@ -43,7 +43,13 @@ public:
 
     void addFriction() {
         const defaulttype::Vector3 & N1 = m_dirs[0];
-        const defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(0,1,0)))>0.99) ? defaulttype::Vector3(0,0,1) : defaulttype::Vector3(0,1,0)));
+        const defaulttype::Vector3 N2 = cross(
+            N1,
+            ((fabs(dot(N1,defaulttype::Vector3(0,1,0)))>0.99) ?
+                 defaulttype::Vector3(0,0,1) :
+                 defaulttype::Vector3(0,1,0)
+            )
+        );
         const defaulttype::Vector3 N3 = cross(N1,N2);
 
         m_dirs.push_back(N2);
