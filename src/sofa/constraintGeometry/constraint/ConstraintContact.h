@@ -9,6 +9,10 @@ namespace sofa {
 
 namespace constraintGeometry {
 
+/*!
+ * \brief The ConstraintContact class
+ * Applies specified algorithm on 'from' and 'dest' geometry
+ */
 class ConstraintContact : public BaseConstraint {
 public:
     SOFA_CLASS(ConstraintContact , BaseConstraint);
@@ -20,6 +24,9 @@ public:
     core::objectmodel::SingleLink<ConstraintContact,collisionAlgorithm::BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
     core::objectmodel::SingleLink<ConstraintContact,collisionAlgorithm::BaseAlgorithm,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_algo;
 
+    /*!
+     * \brief ConstraintContact constructor
+     */
     ConstraintContact()
     : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
     , d_friction(initData(&d_friction, 0.0, "mu", "Friction"))
@@ -27,11 +34,23 @@ public:
     , l_dest(initLink("dest", "Link to dst geometry"))
     , l_algo(initLink("algo", "Link to detection output")) {}
 
+    /*!
+     * \brief createConstraintResolution : factory method for constraint solvers
+     * \param cst : InternalConstraint
+     * \return (UnilateralConstraint|UnilateralFriction)Resolution => abstract ConstraintResolution ptr
+     */
     core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint * cst) const {
-        if (cst->size() == 1) return new UnilateralConstraintResolution(d_maxForce.getValue());
-        else return new UnilateralFrictionResolution(d_maxForce.getValue(),d_friction.getValue());
+        if (cst->size() == 1)
+            return new UnilateralConstraintResolution(d_maxForce.getValue());
+        else
+            return new UnilateralFrictionResolution(d_maxForce.getValue(),d_friction.getValue());
     }
 
+    /*!
+     * \brief createConstraints
+     * processes from and dest geometries using specified algorith;
+     * \param[out] constraints : ConstraintContainer
+     */
     virtual void createConstraints(ConstraintContainer & constraints) {
         if (l_from == NULL) return;
         if (l_dest == NULL) return;
@@ -45,6 +64,7 @@ public:
             l_algo->processAlgorithm(l_from.get(),l_dest.get(),detection);
         }
 
+        //solves contactNormal for each detected collision
         for (unsigned i=0;i<detection.size();i++) {
             const collisionAlgorithm::PairDetection & d = detection[i];
 
