@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Node name="Root" gravity="0 -9 0" >
+<Node name="Root" gravity="0 -90 0" >
 	<RequiredPlugin pluginName="CollisionAlgorithm"/>
 	<RequiredPlugin pluginName="ConstraintGeometry"/>
 	<RequiredPlugin pluginName="SofaCUDASolvers"/>
@@ -28,9 +28,9 @@
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="false"/>
 			<MechanicalObject name="state" />
 <!--			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" />-->
-                        <PhongTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" />
+                        <PhongTriangleGeometry name="TriangleGeometry" color="0 0 1 1" />
 <!--                        <BezierTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" />-->
-			<AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />
+<!-- <!-- 			<AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" /> --> -->
 <!-- 			<Triangle/> -->
 			<BarycentricMapping name="BarycentricMapping"/>
 		</Node>
