@@ -44,17 +44,17 @@ public:
      * \param[out] constraints : ConstraintContainer
      */
     virtual void createConstraints(ConstraintContainer & constraints) {
-        if (l_from == NULL) return;
-        if (l_dest == NULL) return;
+//        if (l_from == NULL) return;
+//        if (l_dest == NULL) return;
 
-        helper::vector<collisionAlgorithm::PairDetection> detection;
+//        helper::vector<collisionAlgorithm::PairDetection> detection;
 
-        if (l_algo == NULL) {
-            collisionAlgorithm::FindClosestPointAlgorithm algo;
-            algo.processAlgorithm(l_from.get(),l_dest.get(),detection);
-        } else {
-            l_algo->processAlgorithm(l_from.get(),l_dest.get(),detection);
-        }
+//        if (l_algo == NULL) {
+//            collisionAlgorithm::FindClosestPointAlgorithm algo;
+//            algo.processAlgorithm(l_from.get(),l_dest.get(),detection);
+//        } else {
+//            l_algo->processAlgorithm(l_from.get(),l_dest.get(),detection);
+//        }
     }
 
 
