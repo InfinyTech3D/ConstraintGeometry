@@ -1,10 +1,10 @@
 <Node name="msofaTest" >
 
-	<Test filename="example/liver.scn" >
-		<Data name="Liver/State3D.position" />
+	<Test filename="scenes/liver.scn" steps="1000" >
+		<VectorDataCompare name="Liver/State3D" data="@Liver/State3D.position" />
 	</Test>
-
-    <Test filename="example/liver_mapped.scn" >
-	        <Data name="Liver/State3D.position" />
+	
+	<Test filename="scenes/beamContact.scn" >
+		<VectorDataCompare name="Liver/State3D" data="@Needle/ms.position" />
 	</Test>
 </Node>
