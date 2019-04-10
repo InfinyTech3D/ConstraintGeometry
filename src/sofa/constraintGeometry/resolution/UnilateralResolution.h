@@ -48,7 +48,7 @@ public:
  */
 class UnilateralFrictionResolution : public sofa::core::behavior::ConstraintResolution {
 public:
-    UnilateralFrictionResolution(double m,double f) :
+    UnilateralFrictionResolution(double f, double m = std::numeric_limits<double>::max()) :
         sofa::core::behavior::ConstraintResolution(3),
         m_maxForce(m),
         m_friction(f) {}

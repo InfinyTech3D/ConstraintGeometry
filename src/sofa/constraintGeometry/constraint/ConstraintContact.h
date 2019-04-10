@@ -39,7 +39,7 @@ public:
         if (cst->size() == 1)
             return new UnilateralConstraintResolution(d_maxForce.getValue());
         else
-            return new UnilateralFrictionResolution(d_maxForce.getValue(),d_friction.getValue());
+            return new UnilateralFrictionResolution(d_friction.getValue(),d_maxForce.getValue());
     }
 
     /*!
