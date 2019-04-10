@@ -17,7 +17,7 @@ public:
      * \brief UnilateralConstraintResolution Constructor
      * \param m : double, maxForce value
      */
-    UnilateralConstraintResolution(double m) :
+    UnilateralConstraintResolution(double m = std::numeric_limits<double>::max()) :
         sofa::core::behavior::ConstraintResolution(1),
         m_maxForce(m)
     {}

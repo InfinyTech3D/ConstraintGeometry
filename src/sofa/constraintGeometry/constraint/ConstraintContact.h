@@ -35,11 +35,12 @@ public:
      * \param cst : InternalConstraint
      * \return (UnilateralConstraint|UnilateralFriction)Resolution => abstract ConstraintResolution ptr
      */
-    core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint * cst) const {
-        if (cst->size() == 1)
-            return new UnilateralConstraintResolution(d_maxForce.getValue());
-        else
-            return new UnilateralFrictionResolution(d_friction.getValue(),d_maxForce.getValue());
+    core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint * /*cst*/) const {
+        return new UnilateralConstraintResolution(d_maxForce.getValue());
+    }
+
+    core::behavior::ConstraintResolution* createConstraintFrictionResolution(const InternalConstraint * /*cst*/) const {
+        return new UnilateralFrictionResolution(d_friction.getValue(),d_maxForce.getValue());
     }
 
     /*!
@@ -55,10 +56,12 @@ public:
 
             ContactNormal CN(d);
 
-            if (d_friction.getValue() != 0.0)
+            if (d_friction.getValue() != 0.0) {
                 CN.addFriction();
-
-            constraints.push_back(this, d, CN, &ConstraintContact::createConstraintResolution);
+                constraints.push_back(this, d, CN, &ConstraintContact::createConstraintFrictionResolution);
+            } else {
+                constraints.push_back(this, d, CN, &ConstraintContact::createConstraintResolution);
+            }
         }
     }
 
