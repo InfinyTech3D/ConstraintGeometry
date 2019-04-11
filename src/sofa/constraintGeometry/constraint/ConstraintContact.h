@@ -2,7 +2,7 @@
 
 #include <sofa/constraintGeometry/BaseConstraint.h>
 #include <sofa/constraintGeometry/resolution/UnilateralResolution.h>
-#include <sofa/collisionAlgorithm/algorithm/FindClosestPointAlgorithm.h>
+//#include <sofa/collisionAlgorithm/algorithm/FindClosestPointAlgorithm.h>
 #include <sofa/constraintGeometry/normals/ContactNormal.h>
 
 namespace sofa {
@@ -17,8 +17,8 @@ class ConstraintContact : public BaseConstraint {
 public:
     SOFA_CLASS(ConstraintContact , BaseConstraint);
 
-    Data<double> d_maxForce;
     Data<double> d_friction;
+    Data<double> d_maxForce;
     Data<collisionAlgorithm::DetectionOutput> d_input;
 
 

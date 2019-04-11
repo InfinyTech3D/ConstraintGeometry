@@ -4,7 +4,7 @@
 	<RequiredPlugin pluginName="ConstraintGeometry"/>
 	<RequiredPlugin pluginName="SofaCUDASolvers"/>
 	<RequiredPlugin pluginName="SofaAsyncSolvers"/>
-	
+
 <!--         <DefaultAnimationLoop /> -->
 	<FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
 	<GenericConstraintSolver maxIterations="1000" tolerance="0.0001" />
@@ -27,10 +27,11 @@
 			<TriangleSetTopologyModifier name="Modifier"/>
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="false"/>
 			<MechanicalObject name="state" />
-<!--			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" />-->
+			
+			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" />
+<!-- 		<PhongTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" /> -->
+<!--		<BezierTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" />-->
 
-			<PhongTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" />
-<!--			<BezierTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" />-->
 			<AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />
 
 			<BarycentricMapping name="BarycentricMapping"/>
@@ -58,7 +59,7 @@
 	<NormalFilter name="normal" angle="0.5" />
 	<DistanceFilter name="distance" distance="0.1" />
 	<FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />
-	<ConstraintContact input="@algo.output"  mu="0.9" />
+	<ConstraintBilateral input="@algo.output"  maxForce="0.22" />
 <!--	<Constraintless algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />-->
 
 
