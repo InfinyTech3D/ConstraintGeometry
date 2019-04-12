@@ -59,6 +59,7 @@
 	<NormalFilter name="normal" angle="0.5" />
 	<DistanceFilter name="distance" distance="0.1" />
 	<FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />
+<!--	<ConstraintContact input="@algo.output"  maxForce="0.22" />-->
 	<ConstraintBilateral input="@algo.output"  maxForce="0.22" />
 <!--	<Constraintless algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />-->
 

@@ -21,13 +21,15 @@ public:
     : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
     , d_input(initData(&d_input, "input", "Link to detection output")) {}
 
-    virtual void createConstraints(ConstraintContainer & constraints) {
-        /*
+    void createConstraints(ConstraintContainer & constraints) {
+        //*
         const collisionAlgorithm::DetectionOutput & input = d_input.getValue();
 
         for (unsigned i=0;i<input.size();i++) {
             const collisionAlgorithm::DetectionOutput::PairDetection & d = input[i];
+
             defaulttype::Vector3 dir = (d.first->getPosition() - d.second->getPosition()).normalized();
+
             ConstraintNormal CN (dir);
 
             if (CN.size() == 1) {
