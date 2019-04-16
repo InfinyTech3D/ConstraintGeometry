@@ -37,7 +37,8 @@ public:
     }
 
     /*!
-     * \brief createFrame creates a frame from a vector3 using dot product
+     * \brief createFrame creates a frame from a vector3
+     *  using dot & cross product
      * \param N1 : vector3
      * \return ConstraintNormal
      */

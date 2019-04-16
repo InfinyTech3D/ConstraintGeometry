@@ -17,9 +17,21 @@ public:
     Data<double> d_maxForce;
     Data<collisionAlgorithm::DetectionOutput> d_input;
 
+    Data<std::vector<defaulttype::Vec3> > d_directions ;
+
+//    core::objectmodel::SingleLink<
+//        ConstraintBilateral,
+//        BaseDirectionGenerator,
+//        BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_direction_generator;
+
     ConstraintBilateral()
     : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
-    , d_input(initData(&d_input, "input", "Link to detection output")) {}
+    , d_input(initData(&d_input, "input", "Link to detection output"))
+    , d_directions(initData(&d_directions, "directions", "static constraint directions for each pair of proximities")) {}
+
+    void init () {
+
+    }
 
     void createConstraints(ConstraintContainer & constraints) {
         //*
