@@ -25,7 +25,8 @@ public :
                 defaulttype::Vec<4,float>(0.0,1.0,0.0,0.0),
                 defaulttype::Vec<4,float>(0.0,0.0,1.0,0.0)),
             "projectionMatrix",
-            "Projection Matrix")) {}
+            "Projection Matrix"))
+    {}
 
     void init () {
         defaulttype::Vector3 T;

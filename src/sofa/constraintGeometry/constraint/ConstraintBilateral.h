@@ -5,6 +5,10 @@
 #include <sofa/constraintGeometry/normals/ContactNormal.h>
 #include <sofa/constraintGeometry/ConstraintNormal.h>
 #include <math.h>
+#include <memory>
+#include <functional>
+#include <iostream>
+#include <algorithm>
 
 namespace sofa {
 
@@ -16,6 +20,7 @@ public:
 
     Data<double> d_maxForce;
     Data<collisionAlgorithm::DetectionOutput> d_input;
+    Data<DataConstraintNormal> d_direction;
 
     Data<std::vector<defaulttype::Vec3> > d_directions ;
 
@@ -25,24 +30,18 @@ public:
 //        BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_direction_generator;
 
     ConstraintBilateral()
-    : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
-    , d_input(initData(&d_input, "input", "Link to detection output"))
-    , d_directions(initData(&d_directions, "directions", "static constraint directions for each pair of proximities")) {}
-
-    void init () {
-
-    }
+        : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
+        , d_input(initData(&d_input, "input", "Link to detection output"))
+        , d_direction(initData(&d_direction, DataConstraintNormal(), "directions", "Link to detection output"))
+    {}
 
     void createConstraints(ConstraintContainer & constraints) {
-        //*
         const collisionAlgorithm::DetectionOutput & input = d_input.getValue();
 
         for (unsigned i=0;i<input.size();i++) {
             const collisionAlgorithm::DetectionOutput::PairDetection & d = input[i];
 
-            defaulttype::Vector3 dir = (d.first->getPosition() - d.second->getPosition()).normalized();
-
-            ConstraintNormal CN (dir);
+            ConstraintNormal CN = d_direction.getValue().getConstraintNormal(d);
 
             if (CN.size() == 1) {
                 constraints.push_back(this, d, CN, &ConstraintBilateral::createConstraintResolution1);
@@ -52,7 +51,6 @@ public:
                 constraints.push_back(this, d, CN, &ConstraintBilateral::createConstraintResolution3);
             }
         }
-        //*/
     }
 
 protected:
