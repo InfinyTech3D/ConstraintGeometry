@@ -5,7 +5,10 @@ namespace sofa {
 
 namespace constraintGeometry {
 
-int ConstraintConstraintB3Class = core::RegisterObject("ConstraintBilateral")
+int TestConstraintBilateralClass = core::RegisterObject("TestConstraintBilateral")
+.add< TestConstraintBilateral >();
+
+int ConstraintBilateralClass = core::RegisterObject("ConstraintBilateral")
 .add< ConstraintBilateral >();
 
 }
