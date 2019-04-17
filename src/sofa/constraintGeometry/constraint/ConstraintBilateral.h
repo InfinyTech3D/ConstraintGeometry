@@ -14,43 +14,6 @@ namespace sofa {
 
 namespace constraintGeometry {
 
-
-class DataConstraintNormal : public helper::vector<defaulttype::Vector3> {
-public :
-    typedef std::function<ConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & d)> GeneratorFunction;
-    typedef std::pair<collisionAlgorithm::BaseProximity::SPtr,collisionAlgorithm::BaseProximity::SPtr> PairDetection;
-
-    // std::placeholders::_1 is the first parameter
-    DataConstraintNormal(GeneratorFunction fct = std::bind(&defaultGetNormals, std::placeholders::_1)) : m_functor(fct) {}
-
-    ConstraintNormal getConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & d) const {
-        if (size() == 0) return m_functor(d); // return the functor value
-        return ConstraintNormal(*this); //use helper::vector Constructor
-    }
-
-private:
-    static ConstraintNormal defaultGetNormals(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
-        return ConstraintNormal((d.first->getPosition() - d.second->getPosition()).normalized());
-    }
-
-    GeneratorFunction m_functor;
-};
-
-class TestConstraintBilateral : public sofa::core::objectmodel::BaseObject {
-public:
-    Data<DataConstraintNormal> d_direction;
-
-    TestConstraintBilateral()
-    : d_direction(initData(&d_direction, DataConstraintNormal(std::bind(advancedGetNormals, std::placeholders::_1)), "directions", "Link to detection output")){}
-
-private:
-    //this is a specific function that will replace the default behavior. It can be defined anywhere (even eventually be a lambda function)
-    static ConstraintNormal advancedGetNormals(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
-        std::cout << "Advanced" << std::endl;
-        return ConstraintNormal((d.first->getPosition() - d.second->getPosition()).normalized());
-    }
-};
-
 class ConstraintBilateral : public BaseConstraint {
 public:
     SOFA_CLASS(ConstraintBilateral , BaseConstraint);
@@ -62,7 +25,7 @@ public:
     ConstraintBilateral()
     : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
     , d_input(initData(&d_input, "input", "Link to detection output"))
-    , d_direction(initData(&d_direction, "directions", "Link to detection output")){}
+    , d_direction(initData(&d_direction, DataConstraintNormal(), "directions", "Link to detection output")){}
 
     void createConstraints(ConstraintContainer & constraints) {
         const collisionAlgorithm::DetectionOutput & input = d_input.getValue();
