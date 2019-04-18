@@ -5,6 +5,8 @@ namespace sofa {
 
 namespace constraintGeometry {
 
+SOFA_DECL_CLASS(ConstraintContact);
+
 int ConstraintContactClass = core::RegisterObject("ConstraintContact")
 .add< ConstraintContact >();
 

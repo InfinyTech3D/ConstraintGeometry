@@ -20,7 +20,6 @@ class InternalConstraint;
 class DataConstraintNormal : public helper::vector<defaulttype::Vector3> {
 public :
     typedef std::function<ConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & d)> GeneratorFunction;
-    typedef std::pair<collisionAlgorithm::BaseProximity::SPtr,collisionAlgorithm::BaseProximity::SPtr> PairDetection;
 
     // std::placeholders::_1 is the first parameter
     DataConstraintNormal(GeneratorFunction fct = std::bind(&defaultGetNormals, std::placeholders::_1))
