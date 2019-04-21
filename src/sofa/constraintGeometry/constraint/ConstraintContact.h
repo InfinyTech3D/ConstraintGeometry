@@ -18,7 +18,6 @@ public:
     SOFA_CLASS(ConstraintContact , BaseConstraint);
 
     Data<double> d_friction;
-    Data<double> d_maxForce;
     Data<collisionAlgorithm::DetectionOutput> d_input;
 
 
@@ -26,8 +25,7 @@ public:
      * \brief ConstraintContact constructor
      */
     ConstraintContact()
-    : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
-    , d_friction(initData(&d_friction, 0.0, "mu", "Friction"))
+    : d_friction(initData(&d_friction, 0.0, "mu", "Friction"))
     , d_input(initData(&d_input, "input", "Link to detection output")) {}
 
     /*!
@@ -36,11 +34,11 @@ public:
      * \return (UnilateralConstraint|UnilateralFriction)Resolution => abstract ConstraintResolution ptr
      */
     core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint * /*cst*/) const {
-        return new UnilateralConstraintResolution(d_maxForce.getValue());
+        return new UnilateralConstraintResolution();
     }
 
     core::behavior::ConstraintResolution* createConstraintFrictionResolution(const InternalConstraint * /*cst*/) const {
-        return new UnilateralFrictionResolution(d_friction.getValue(),d_maxForce.getValue());
+        return new UnilateralFrictionResolution(d_friction.getValue());
     }
 
     /*!
