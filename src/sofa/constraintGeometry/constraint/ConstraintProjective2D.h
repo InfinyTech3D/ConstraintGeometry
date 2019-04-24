@@ -47,35 +47,33 @@ public :
 
     /*!
      * \brief createConstraints (called in update() method in baseConstraint => called by sofa or forced)
-     * processes from and dest geometries using specified algorith;
+     * processes from and dest geometries using specified algorithm
      * \param[out] constraints : ConstraintContainer
      */
     void createConstraints(ConstraintContainer & constraints) {
         //*
-        std::cout << "IN CREATECST PROJ2D" << std::endl ;
         const collisionAlgorithm::DetectionOutput & input = d_input.getValue();
 
         for (unsigned i=0;i<input.size();i++) {
             const collisionAlgorithm::DetectionOutput::PairDetection & d = input[i];
 
             // project data from 3D => 2D
-//            defaulttype::Vector3 N1 = d.first->getPosition() - d.second->getPosition() ;
-//            defaulttype::Vector3 P = d.second->getPosition() ;
-//            defaulttype::Vector3 Y = cross (P-m_A,N1);
-//            Y.normalized();
-//            defaulttype::Vector3 N2 = cross(m_A-P,Y);
-//            N2.normalized();
-//            ConstraintNormal CN (N2);
+            defaulttype::Vector3 N1 = d.first->getPosition() - d.second->getPosition() ;
+            defaulttype::Vector3 P = d.second->getPosition() ;
+            defaulttype::Vector3 Y = cross (P-m_A,N1);
+            Y.normalized();
+            defaulttype::Vector3 N2 = cross(m_A-P,Y);
+            N2.normalized();
+            ConstraintNormal CN (N2);
 
-//            if (CN.size() == 1) {
-//                constraints.push_back(this, d, CN, &ConstraintProjective2D::createConstraintResolution1);
-//            } else if (CN.size() == 2) {
-//                constraints.push_back(this, d, CN, &ConstraintProjective2D::createConstraintResolution2);
-//            } else if (CN.size() == 3) {
-//                constraints.push_back(this, d, CN, &ConstraintProjective2D::createConstraintResolution3);
-//            }
+            if (CN.size() == 1) {
+                constraints.push_back(this, d, CN, &ConstraintProjective2D::createConstraintResolution1);
+            } else if (CN.size() == 2) {
+                constraints.push_back(this, d, CN, &ConstraintProjective2D::createConstraintResolution2);
+            } else if (CN.size() == 3) {
+                constraints.push_back(this, d, CN, &ConstraintProjective2D::createConstraintResolution3);
+            }
         }
-        std::cout << "OUT CREATECST PROJ2D" << std::endl ;
         //*/
     }
 
