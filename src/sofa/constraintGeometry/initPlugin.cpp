@@ -13,6 +13,12 @@
 #define PLUGIN_DATA_DIR_ QUOTE(PLUGIN_DATA_DIR)
 #endif
 
+#ifndef PLUGIN_GIT_INFO
+#define PLUGIN_GIT_INFO_ ""
+#else
+#define PLUGIN_GIT_INFO_ QUOTE(PLUGIN_GIT_INFO)
+#endif
+
 namespace sofa {
 
 namespace constraintGeometry {
@@ -55,10 +61,17 @@ namespace constraintGeometry {
 		return "LGPL";
 	}
 
-	const char* getModuleDescription()
-	{
-		return "a simple example of a plugin component module";
-	}
+    const char* getModuleDescription()
+    {
+        std::ostringstream oss;
+        oss << "<MODULE_DESCRIPTION>" << std::endl
+            << "<GIT>" << PLUGIN_GIT_INFO_ ;
+
+        char* desc = new char[oss.str().size()];
+        strcpy(desc, oss.str().c_str());
+
+        return desc;
+    }
 
 	const char* getModuleComponentList()
 	{

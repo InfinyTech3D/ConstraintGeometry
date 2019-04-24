@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sofa/constraintGeometry/constraint/ConstraintBilateral.h>
-#include <sofa/collisionAlgorithm/DataDetectionOutput.h>
+#include <sofa/collisionAlgorithm/data/DataDetectionOutput.h>
 #include <sofa/defaulttype/Mat.h>
 #include <sofa/defaulttype/VecTypes.h>
 
