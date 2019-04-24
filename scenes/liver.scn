@@ -28,11 +28,11 @@
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="false"/>
 			<MechanicalObject name="state" />
 			
-			<TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" />
-<!-- 		<PhongTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" /> -->
-<!--		<BezierTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" />-->
+                        <TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" />
+<!--                        <PhongTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" />-->
+<!--                        <BezierTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" />-->
 
-			<AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />
+<!--                        <AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />-->
 
 			<BarycentricMapping name="BarycentricMapping"/>
 		</Node>
@@ -53,15 +53,15 @@
 		<MechanicalObject name="State3D1" dy="1" position="@loader.position" />
 		<OglModel name="OglModel" color="1 1 1 0.8"/>
 		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0" triangles="@Topology1.triangles" />
-<!-- 		<AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />  -->
+<!--                <AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />-->
 	</Node>
 
-	<NormalFilter name="normal" angle="0.5" />
-	<DistanceFilter name="distance" distance="0.1" />
-	<FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />
-<!--	<ConstraintContact input="@algo.output"  maxForce="0.22" />-->
+        <NormalFilter name="normal" angle="0.5" />
+        <DistanceFilter name="distance" distance="0.1" />
+        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />
+        <ConstraintContact input="@algo.output" />
 <!--        <TestConstraintBilateral name="test" />-->
-		<ConstraintBilateral input="@algo.output" />
+<!--		<ConstraintBilateral input="@algo.output" />-->
 <!--	<Constraintless algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />-->
 
 
