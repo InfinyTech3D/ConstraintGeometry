@@ -16,6 +16,8 @@ class ConstraintNormal {
     friend class InternalConstraint;
 
 public:
+    ConstraintNormal() {}
+
     ConstraintNormal(const helper::vector<defaulttype::Vector3> & vec) {
         for (unsigned i=0;i<vec.size();i++)
             m_dirs.push_back(vec[i]);
@@ -36,6 +38,11 @@ public:
         m_dirs.push_back(n3.normalized());
     }
 
+    /// returns ConstraintNormal vector's (m_dirs) size
+    unsigned size() const {
+        return m_dirs.size();
+    }
+
     /*!
      * \brief createFrame creates a frame from a vector3
      *  using dot & cross product
@@ -54,15 +61,8 @@ public:
         return ConstraintNormal(N1,N2,N3);
     }
 
-    /// returns ConstraintNormal vector's (m_dirs) size
-    unsigned size() const {
-        return m_dirs.size();
-    }
-
 protected:
     helper::vector<defaulttype::Vector3> m_dirs;
-
-    ConstraintNormal() {}
 };
 
 }

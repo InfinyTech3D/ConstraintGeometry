@@ -64,5 +64,18 @@
 <!--		<ConstraintBilateral input="@algo.output" />-->
 <!--	<Constraintless algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />-->
 
+<Node>
+
+        <MState name="mstate" template="Vec2d" />
+
+        <PointGeometry name="imagepoints" />
+        <FileReader filename="" />
+</Node>
+
+        <ProjectiveDistance name="proj" projectionMatrix="@..." />
+        <FindClosestPointAlgorithm name="algo" from="@imagepoints" dest="@catether" distance="@proj.distance" />
+
+        <ProjectiveNormal name="normal" />
+        <ConstraintBilateral input="@algo.output" direction="@normal.direction"  />
 
 </Node>

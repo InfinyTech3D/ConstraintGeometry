@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/constraintGeometry/ConstraintNormal.h>
+#include <sofa/constraintGeometry/normals/ConstraintNormal.h>
 #include <sofa/core/behavior/BaseConstraint.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/helper/vector.h>
