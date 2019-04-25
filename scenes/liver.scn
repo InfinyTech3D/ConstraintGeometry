@@ -9,6 +9,10 @@
 	<FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
 	<GenericConstraintSolver maxIterations="1000" tolerance="0.0001" />
 		
+        <NormalFilter name="normal" angle="0.5" />
+        <DistanceFilter name="distance" distance="0.1" />
+        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />
+
 	<Node name="Liver">
 		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
 <!--         <CGLinearSolver name="CGLinearSolver" tolerance="1e-09" threshold="1e-09" /> -->
@@ -28,11 +32,11 @@
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="false"/>
 			<MechanicalObject name="state" />
 			
-                        <TriangleGeometry name="TriangleGeometry" color="0 1 0 1" triangles="@Container.triangles" />
+                        <TriangleGeometry name="TriangleGeometry" color="0 1 0 1" />
 <!--                        <PhongTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" />-->
 <!--                        <BezierTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" />-->
 
-<!--                        <AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />-->
+                        <AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />
 
 			<BarycentricMapping name="BarycentricMapping"/>
 		</Node>
@@ -53,29 +57,13 @@
 		<MechanicalObject name="State3D1" dy="1" position="@loader.position" />
 		<OglModel name="OglModel" color="1 1 1 0.8"/>
 		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0" triangles="@Topology1.triangles" />
-<!--                <AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />-->
+                <AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />
 	</Node>
 
-        <NormalFilter name="normal" angle="0.5" />
-        <DistanceFilter name="distance" distance="0.1" />
-        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />
-        <ConstraintContact input="@algo.output" />
+        <ConstraintUnilateral input="@algo.output" />
 <!--        <TestConstraintBilateral name="test" />-->
 <!--		<ConstraintBilateral input="@algo.output" />-->
 <!--	<Constraintless algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />-->
 
-<Node>
-
-        <MState name="mstate" template="Vec2d" />
-
-        <PointGeometry name="imagepoints" />
-        <FileReader filename="" />
-</Node>
-
-        <ProjectiveDistance name="proj" projectionMatrix="@..." />
-        <FindClosestPointAlgorithm name="algo" from="@imagepoints" dest="@catether" distance="@proj.distance" />
-
-        <ProjectiveNormal name="normal" />
-        <ConstraintBilateral input="@algo.output" direction="@normal.direction"  />
 
 </Node>
