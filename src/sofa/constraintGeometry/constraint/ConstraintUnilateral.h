@@ -54,7 +54,7 @@ public:
 
             ConstraintNormal CN = d_direction.getValue().getConstraintNormal(d);
 
-            constraints.push_back(this, d, CN, &ConstraintUnilateral::createConstraintResolution);
+            constraints.push_back(d, CN, std::bind(&ConstraintUnilateral::createConstraintResolution,this,std::placeholders::_1));
         }
     }
 

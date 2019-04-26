@@ -48,9 +48,11 @@ public:
  */
 class UnilateralFrictionResolution : public sofa::core::behavior::ConstraintResolution {
 public:
-    UnilateralFrictionResolution(double f, double m = std::numeric_limits<double>::max()) :
+    UnilateralFrictionResolution(double f, double m0 = std::numeric_limits<double>::max(), double m1 = std::numeric_limits<double>::max(), double m2 = std::numeric_limits<double>::max()) :
         sofa::core::behavior::ConstraintResolution(3),
-        m_maxForce(m),
+        m_maxForce0(m0),
+        m_maxForce1(m1),
+        m_maxForce2(m2),
         m_friction(f) {}
 
 
@@ -80,7 +82,7 @@ public:
         }
 
         //we clamp the force is needed
-        if (force[line]>m_maxForce) force[line] = m_maxForce;
+        if (force[line]>m_maxForce0) force[line] = m_maxForce0;
 
         //now we compute tangential forces
         force[line+1] -= invW[1][0] * d[line+0] +
@@ -99,9 +101,12 @@ public:
 
         if (force[line+2] >  slip_force) force[line+2] = slip_force;
         else if (force[line+2] < -slip_force) force[line+2] = -slip_force;
+
+        if (force[line+1]>m_maxForce1) force[line+1] = m_maxForce1;
+        if (force[line+2]>m_maxForce2) force[line+2] = m_maxForce2;
     }
 
-    double m_maxForce;
+    double m_maxForce0,m_maxForce1,m_maxForce2;
     double m_friction;
     sofa::defaulttype::Mat<3,3,double> invW;
 };

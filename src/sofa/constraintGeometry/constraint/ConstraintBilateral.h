@@ -29,7 +29,7 @@ public:
 
             ConstraintNormal CN = d_direction.getValue().getConstraintNormal(d);
 
-            constraints.push_back(this, d, CN, &ConstraintBilateral::createConstraintResolution);
+            constraints.push_back(d, CN, std::bind(&ConstraintBilateral::createConstraintResolution,this,std::placeholders::_1));
         }
     }
 
