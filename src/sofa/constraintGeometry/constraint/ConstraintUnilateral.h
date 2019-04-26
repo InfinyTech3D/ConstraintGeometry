@@ -3,7 +3,6 @@
 #include <sofa/constraintGeometry/BaseConstraint.h>
 #include <sofa/constraintGeometry/resolution/UnilateralResolution.h>
 #include <sofa/constraintGeometry/normals/DataConstraintDirection.h>
-#include <sofa/constraintGeometry/normals/ContactNormal.h>
 
 namespace sofa {
 
@@ -62,8 +61,18 @@ public:
      * \brief The ContactNormal class is the container class for direction constraints
      */
     ConstraintNormal defaultGetNormals(const collisionAlgorithm::PairDetection & d) {
-        ContactNormal CN(d);
-        if (d_friction.getValue() != 0.0) CN.addFriction();
+        defaulttype::Vector3 mainDir = (d.first->getPosition() - d.second->getPosition()).normalized();
+
+    //            defaulttype::Vector3 firstDir = -d.getFirstProximity()->getNormal().normalized();
+        defaulttype::Vector3 secondDir = d.second->getNormal().normalized();
+
+        if (mainDir.norm() < std::numeric_limits<double>::epsilon()) mainDir = secondDir;
+        if (dot(mainDir,secondDir)<0) mainDir*=-1.0;
+
+        ConstraintNormal CN(mainDir);
+
+        if (d_friction.getValue() != 0.0) CN.addFrame();
+
         return CN;
     }
 

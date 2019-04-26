@@ -5,13 +5,16 @@
 	<RequiredPlugin pluginName="SofaCUDASolvers"/>
 	<RequiredPlugin pluginName="SofaAsyncSolvers"/>
 
+        <VisualStyle displayFlags="showVisualModels hideBehaviorModels showCollisionModels hideMappings hideForceFields showWireframe showInteractionForceFields" />
 <!--         <DefaultAnimationLoop /> -->
 	<FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
 	<GenericConstraintSolver maxIterations="1000" tolerance="0.0001" />
-		
+
+<!--        <ContactDistance name="dist" />-->
         <NormalFilter name="normal" angle="0.5" />
         <DistanceFilter name="distance" distance="0.1" />
-        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />
+        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
+<!--        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" distance="@dist.distance" dest="@Liver/Collision/TriangleGeometry" from="@Plane/TriangleGeometry" />-->
 
 	<Node name="Liver">
 		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
@@ -32,11 +35,12 @@
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="false"/>
 			<MechanicalObject name="state" />
 			
-                        <TriangleGeometry name="TriangleGeometry" color="0 1 0 1" />
-<!--                        <PhongTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" />-->
-<!--                        <BezierTriangleGeometry name="TriangleGeometry" color="0 0 1 1" geometry="@TriangleGeometry" />-->
+<!--                        <TriangleGeometry name="Geometry" color="0 1 0 1" />-->
+<!--                        <PhongTriangleGeometry name="Geometry" color="0 0 1 1" />-->
+<!--                        <PointGeometry name="Geometry" color="0 0 1 1" drawRadius="0.1" />-->
+                        <BezierTriangleGeometry name="Geometry" color="0 0 1 1" geometry="@TriangleGeometry" />
 
-                        <AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />
+<!--                        <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" />-->
 
 			<BarycentricMapping name="BarycentricMapping"/>
 		</Node>
@@ -56,11 +60,12 @@
 		<MeshTopology name="Topology1" triangles="@loader.triangles" />
 		<MechanicalObject name="State3D1" dy="1" position="@loader.position" />
 		<OglModel name="OglModel" color="1 1 1 0.8"/>
-		<TriangleGeometry name="TriangleGeometry" color="1 1 1 0" triangles="@Topology1.triangles" />
-                <AABBBroadPhase name="AABBBroadPhase" geometry="@TriangleGeometry" nbox="8 8 8" color="1 0 0 0.3" />
+                <TriangleGeometry name="Geometry" color="1 1 1 0.6" triangles="@Topology1.triangles" />
+                <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" />
 	</Node>
 
-        <ConstraintUnilateral input="@algo.output" />
+<!--        <SecondNormalDirection name="dir" />-->
+        <ConstraintUnilateral input="@algo.output" mu="0.0" directions="@dir.directions"/>
 <!--        <TestConstraintBilateral name="test" />-->
 <!--		<ConstraintBilateral input="@algo.output" />-->
 <!--	<Constraintless algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />-->
