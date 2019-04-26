@@ -23,9 +23,9 @@ public:
     //            defaulttype::Vector3 firstDir = -d.getFirstProximity()->getNormal().normalized();
         defaulttype::Vector3 secondDir = d.second->getNormal().normalized();
 
-        if (dot(mainDir,secondDir)) mainDir=secondDir;
+        if (dot(mainDir,secondDir)<0) mainDir=secondDir;
 
-        m_dirs.push_back(secondDir);
+        m_dirs.push_back(mainDir);
     //            return ConstraintNormal::createFrame(secondDir, size);
         //            return ConstraintNormal(mainDir.normalized() + firstDir + secondDir);
         //            return ConstraintNormal(firstDir);
@@ -51,10 +51,10 @@ public:
                  defaulttype::Vector3(0,1,0)
             )
         );
-        const defaulttype::Vector3 N3 = cross(N1,N2);
 
-        m_dirs.push_back(N2);
-        m_dirs.push_back(N3);
+        const defaulttype::Vector3 N3 = cross(N1,N2);
+        m_dirs.push_back(N2.normalized());
+        m_dirs.push_back(N3.normalized());
     }
 };
 
