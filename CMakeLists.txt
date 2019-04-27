@@ -15,7 +15,7 @@ file(GLOB_RECURSE SOURCE_FILES
 
 file(GLOB_RECURSE SCENES_FILES
     "scenes/*.scn"
-    "scenes/*.xml"
+    "*.xml"
 )
 
 file(GLOB_RECURSE IGNORED_FILES
@@ -24,9 +24,9 @@ file(GLOB_RECURSE IGNORED_FILES
     "src/ignored/*.cpp"
 )
 
-#if(COMMAND setupGitInfo)
-#    setupGitInfo()
-#endif()
+if(COMMAND setupGitInfo)
+    setupGitInfo()
+endif()
 
 set_source_files_properties(${IGNORED_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${README_FILES} )

@@ -4,6 +4,8 @@
 	<RequiredPlugin pluginName="ConstraintGeometry"/>
 	<RequiredPlugin pluginName="SofaCUDASolvers"/>
 	<RequiredPlugin pluginName="SofaAsyncSolvers"/>
+        <RequiredPlugin pluginName='SofaPreconditioner'/>
+        <RequiredPlugin pluginName='SofaSparseSolver'/>
 
         <VisualStyle displayFlags="showVisualModels hideBehaviorModels showCollisionModels hideMappings hideForceFields showWireframe showInteractionForceFields" />
 <!--         <DefaultAnimationLoop /> -->
@@ -19,7 +21,8 @@
 	<Node name="Liver">
 		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
 <!--         <CGLinearSolver name="CGLinearSolver" tolerance="1e-09" threshold="1e-09" /> -->
-		<CudaSparseLDLSolver name="precond" template="CompressedRowSparseMatrix3f" />
+                <ShewchukPCGLinearSolver name="solver" preconditioners="precond" update_step="20" />
+                <CudaSparseLDLSolver name="precond" template="CompressedRowSparseMatrix3f" />
 		
 		<MeshGmshLoader name="loader" filename="mesh/liver.msh"/>
 		<MeshTopology name="Topology" tetrahedra="@loader.tetrahedra" />
@@ -35,10 +38,10 @@
 			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="false"/>
 			<MechanicalObject name="state" />
 			
-<!--                        <TriangleGeometry name="Geometry" color="0 1 0 1" />-->
+                        <TriangleGeometry name="Geometry" color="0 1 0 1" />
 <!--                        <PhongTriangleGeometry name="Geometry" color="0 0 1 1" />-->
 <!--                        <PointGeometry name="Geometry" color="0 0 1 1" drawRadius="0.1" />-->
-                        <BezierTriangleGeometry name="Geometry" color="0 0 1 1" geometry="@TriangleGeometry" />
+<!--                        <BezierTriangleGeometry name="Geometry" color="0 0 1 1" />-->
 
 <!--                        <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" />-->
 
@@ -60,12 +63,12 @@
 		<MeshTopology name="Topology1" triangles="@loader.triangles" />
 		<MechanicalObject name="State3D1" dy="1" position="@loader.position" />
 		<OglModel name="OglModel" color="1 1 1 0.8"/>
-                <TriangleGeometry name="Geometry" color="1 1 1 0.6" triangles="@Topology1.triangles" />
+                <TriangleGeometry name="Geometry" color="1 1 1 0.6" />
                 <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" />
 	</Node>
 
 <!--        <SecondNormalDirection name="dir" />-->
-        <ConstraintUnilateral input="@algo.output" mu="0.0" directions="@dir.directions"/>
+        <ConstraintUnilateral input="@algo.output" mu="0.8" />
 <!--        <TestConstraintBilateral name="test" />-->
 <!--		<ConstraintBilateral input="@algo.output" />-->
 <!--	<Constraintless algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />-->

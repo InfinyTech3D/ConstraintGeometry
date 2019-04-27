@@ -1,0 +1,7 @@
+<Node name="ConstraintGeometry" >
+
+        <Test filename="scenes/liver.scn" iterations="1000" steps="20" >
+                <VectorDataCompare data="@Liver/State3D.position" tolerance="1e-5" />
+	</Test>
+
+</Node>

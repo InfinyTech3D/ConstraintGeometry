@@ -1,0 +1,6 @@
+CollisionAlgorithm a48b217 1556300825 hadrien Fri Apr 26 19:47:05 2019 +0200 "fix bugs + add new components"
+ConstraintGeometry 74cf8b4 1556300823 hadrien Fri Apr 26 19:47:03 2019 +0200 "fix bugs + add new components"
+SofaAsyncSolvers 
+SofaCUDASolvers 
+SofaPreconditioner 
+SofaSparseSolver 
