@@ -53,6 +53,8 @@ public:
 
             ConstraintNormal CN = d_direction.getValue().getConstraintNormal(d);
 
+            if (d_friction.getValue() != 0.0) CN.addFrame();
+
             constraints.push_back(d, CN, std::bind(&ConstraintUnilateral::createConstraintResolution,this,std::placeholders::_1));
         }
     }
@@ -69,11 +71,7 @@ public:
         if (mainDir.norm() < std::numeric_limits<double>::epsilon()) mainDir = secondDir;
         if (dot(mainDir,secondDir)<0) mainDir*=-1.0;
 
-        ConstraintNormal CN(mainDir);
-
-        if (d_friction.getValue() != 0.0) CN.addFrame();
-
-        return CN;
+        return ConstraintNormal(mainDir);
     }
 
 };
