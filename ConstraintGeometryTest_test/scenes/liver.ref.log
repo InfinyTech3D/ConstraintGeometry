@@ -1,8 +1,0 @@
-[WARNING] [SofaSimulationCommon] the library has not been initialized (sofa::simulation::common::init() has never been called, see sofa/helper/init.h)
-[WARNING] [SofaSimulationGraph] the library has not been initialized (sofa::simulation::graph::init() has never been called, see sofa/helper/init.h)
-[INFO]    [PluginManager] Loaded plugin: /home/hadrien/travail/build-sofa-Debug/lib/libCollisionAlgorithm.so
-[INFO]    [PluginManager] Loaded plugin: /home/hadrien/travail/build-sofa-Debug/lib/libConstraintGeometry.so
-[INFO]    [PluginManager] Loaded plugin: /home/hadrien/travail/build-sofa-Debug/lib/libSofaCUDASolvers.so
-[INFO]    [PluginManager] Loaded plugin: /home/hadrien/travail/build-sofa-Debug/lib/libSofaAsyncSolvers.so
-[INFO]    [PluginManager] Loaded plugin: /home/hadrien/travail/build-sofa-Debug/lib/libSofaPreconditioner.so
-[INFO]    [PluginManager] Loaded plugin: /home/hadrien/travail/build-sofa-Debug/lib/libSofaSparseSolver.so
