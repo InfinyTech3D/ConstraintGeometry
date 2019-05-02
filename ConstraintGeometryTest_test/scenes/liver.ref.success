@@ -1,5 +1,5 @@
 CollisionAlgorithm a48b217 1556300825 hadrien Fri Apr 26 19:47:05 2019 +0200 "fix bugs + add new components"
-ConstraintGeometry 0e7631c 1556611695 hadrien Tue Apr 30 10:08:15 2019 +0200 nolog
+ConstraintGeometry 8e01e1d 1556803153 hadrien Thu May 2 15:19:13 2019 +0200 "up tests"
 SofaAsyncSolvers 
 SofaCUDASolvers 
 SofaPreconditioner 

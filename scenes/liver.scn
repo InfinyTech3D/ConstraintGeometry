@@ -22,7 +22,7 @@
 		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
 <!--         <CGLinearSolver name="CGLinearSolver" tolerance="1e-09" threshold="1e-09" /> -->
                 <ShewchukPCGLinearSolver name="solver" preconditioners="precond" update_step="20" />
-                <CudaSparseLDLSolver name="precond" template="CompressedRowSparseMatrix3f" />
+                <SparseLDLSolver name="precond" template="CompressedRowSparseMatrix3f" />
 		
 		<MeshGmshLoader name="loader" filename="mesh/liver.msh"/>
 		<MeshTopology name="Topology" tetrahedra="@loader.tetrahedra" />
