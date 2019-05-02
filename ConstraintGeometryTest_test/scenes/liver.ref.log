@@ -3,10 +3,11 @@
 [INFO]    [PluginManager] Loaded plugin: /home/hadrien/travail/build-sofa-Desktop-Release with Debug Information/lib/libCollisionAlgorithm.so
 [INFO]    [PluginManager] Loaded plugin: /home/hadrien/travail/build-sofa-Desktop-Release with Debug Information/lib/libConstraintGeometry.so
 CUDA: 1 device(s) found.
-CUDA:  0 : "GeForce RTX 2070", 7332/7979 MB, 288 cores at 1.620 GHz, revision 7.5, timeout enabled
+CUDA:  0 : "GeForce RTX 2070", 7337/7979 MB, 288 cores at 1.620 GHz, revision 7.5, timeout enabled
 CUDA: Using device 0 : "GeForce RTX 2070"
 [INFO]    [PluginManager] Loaded plugin: /home/hadrien/travail/build-sofa-Desktop-Release with Debug Information/lib/libSofaCUDASolvers.so
 [INFO]    [PluginManager] Loaded plugin: /home/hadrien/travail/build-sofa-Desktop-Release with Debug Information/lib/libSofaAsyncSolvers.so
 [INFO]    [PluginManager] Loaded plugin: /home/hadrien/travail/build-sofa-Desktop-Release with Debug Information/lib/libSofaPreconditioner.so
 [INFO]    [PluginManager] Loaded plugin: /home/hadrien/travail/build-sofa-Desktop-Release with Debug Information/lib/libSofaSparseSolver.so
-[WARNING] [SparseLDLSolver(precond)] Template CompressedRowSparseMatrix3f incorrect, used CompressedRowSparseMatrixd
+[INFO]    [RegressionTest] nsteps=20, data={unnamed,}
+
