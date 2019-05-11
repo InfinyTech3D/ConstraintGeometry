@@ -65,7 +65,7 @@ namespace constraintGeometry {
     {
         std::ostringstream oss;
         oss << "<MODULE_DESCRIPTION>" << std::endl
-            << "<GIT>" << PLUGIN_GIT_INFO_ ;
+            << "<GIT>" << PLUGIN_GIT_INFO_  << std::endl;
 
         char* desc = new char[oss.str().size()];
         strcpy(desc, oss.str().c_str());

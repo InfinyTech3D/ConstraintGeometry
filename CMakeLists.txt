@@ -25,7 +25,7 @@ file(GLOB_RECURSE IGNORED_FILES
 )
 
 if(COMMAND setupGitInfo)
-    setupGitInfo()
+    setupGitInfo(PLUGIN_GIT_INFO)
 endif()
 
 set_source_files_properties(${IGNORED_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
