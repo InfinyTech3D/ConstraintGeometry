@@ -1,6 +1,6 @@
 <Node name="ConstraintGeometry" >
 
-        <Test filename="scenes/liver.scn" iterations="1000" steps="20" >
+        <Test filename="scenes/liver.scn" time="3" ellapsed="0.1" _log="true" compress="true" _write="true" >
                 <VectorDataCompare data="@Liver/State3D.position" tolerance="1e-5" />
 	</Test>
 

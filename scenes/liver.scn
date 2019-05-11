@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Node name="Root" gravity="0 -9 0" dt="0.05">
-	<RequiredPlugin pluginName="CollisionAlgorithm"/>
-	<RequiredPlugin pluginName="ConstraintGeometry"/>
-	<RequiredPlugin pluginName="SofaCUDASolvers"/>
-	<RequiredPlugin pluginName="SofaAsyncSolvers"/>
+<Node name="Root" gravity="0 -15 0" dt="0.05">
+        <RequiredPlugin pluginName="CollisionAlgorithm"/>
+        <RequiredPlugin pluginName="ConstraintGeometry"/>
+        <RequiredPlugin pluginName="SofaCUDASolvers"/>
+        <RequiredPlugin pluginName="SofaAsyncSolvers"/>
+        <RequiredPlugin pluginName='SofaExporter'/>
         <RequiredPlugin pluginName='SofaPreconditioner'/>
         <RequiredPlugin pluginName='SofaSparseSolver'/>
+<!--        <RequiredPlugin pluginName='RegressionTestPlugin'/>-->
+<!--        <TestManager filename="/home/hadrien/travail/ConstraintGeometry/ConstraintGeometryTest.xml" scene="scenes/liver.scn" drawScale="0.1" printLog="1" />-->
 
         <VisualStyle displayFlags="showVisualModels hideBehaviorModels showCollisionModels hideMappings hideForceFields showWireframe showInteractionForceFields" />
 <!--         <DefaultAnimationLoop /> -->
-	<FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
-	<GenericConstraintSolver maxIterations="1000" tolerance="0.0001" />
+        <FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
+        <GenericConstraintSolver maxIterations="200" tolerance="0.0001" />
 
 <!--        <ContactDistance name="dist" />-->
         <NormalFilter name="normal" angle="0.5" />
@@ -18,26 +21,26 @@
         <FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
 <!--        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" distance="@dist.distance" dest="@Liver/Collision/TriangleGeometry" from="@Plane/TriangleGeometry" />-->
 
-	<Node name="Liver">
-		<EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
-<!--         <CGLinearSolver name="CGLinearSolver" tolerance="1e-09" threshold="1e-09" /> -->
-<!--                <ShewchukPCGLinearSolver name="solver" preconditioners="precond" update_step="20" />-->
-                <CudaSparseLDLSolver name="precond" template="CompressedRowSparseMatrix3f" />
-		
-		<MeshGmshLoader name="loader" filename="mesh/liver.msh"/>
-		<MeshTopology name="Topology" tetrahedra="@loader.tetrahedra" />
-		<MechanicalObject name="State3D" position="@loader.position" />
-		
-		<TetrahedronFEMForceField name="TetrahedronFEMForceField" poissonRatio="0.4" youngModulus="50" />
+        <Node name="Liver">
+                <EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
+<!--                <CGLinearSolver name="CGLinearSolver" tolerance="1e-09" threshold="1e-09" />-->
+                <ShewchukPCGLinearSolver name="solver" tolerance="1e-5" iterations="20" preconditioners="precond" update_step="1" />
+                <SparseLDLSolver name="precond" template="AsyncCompressedRowSparseMatrix3f" />
 
-		<UniformMass name="UniformMass" totalMass="1"/>
+                <MeshGmshLoader name="loader" filename="mesh/liver.msh"/>
+                <MeshTopology name="Topology" tetrahedra="@loader.tetrahedra" />
+                <MechanicalObject name="State3D" position="@loader.position" />
 
-		<Node name="Collision">
-			<TriangleSetTopologyContainer name="Container" position="@../loader.position"   />
-			<TriangleSetTopologyModifier name="Modifier"/>
-			<Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="false"/>
-			<MechanicalObject name="state" />
-			
+                <TetrahedronFEMForceField name="TetrahedronFEMForceField" poissonRatio="0.4" youngModulus="50" />
+
+                <UniformMass name="UniformMass" totalMass="1"/>
+
+                <Node name="Collision">
+                        <TriangleSetTopologyContainer name="Container" position="@../loader.position"   />
+                        <TriangleSetTopologyModifier name="Modifier"/>
+                        <Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="false"/>
+                        <MechanicalObject name="state" />
+
                         <TriangleGeometry name="Geometry" color="0 1 0 1" />
 <!--                        <PhongTriangleGeometry name="Geometry" color="0 0 1 1" />-->
 <!--                        <PointGeometry name="Geometry" color="0 0 1 1" drawRadius="0.1" />-->
@@ -45,33 +48,32 @@
 
 <!--                        <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" />-->
 
-			<BarycentricMapping name="BarycentricMapping"/>
-		</Node>
-		
-		<Node name="Surface">
-			<MeshObjLoader name="loader" filename="mesh/liver-smooth.obj"/>
-			<MeshTopology name="Topology1" triangles="@loader.triangles" />
-			<OglModel name="OglModel" color="0 1 0"  src='@loader'/>			
-			<BarycentricMapping name="BarycentricMapping"/>
-		</Node>
-		
-		<LinearSolverConstraintCorrection solverName="precond" />
-	</Node>
+                        <BarycentricMapping name="BarycentricMapping"/>
+                </Node>
 
-	<Node name="Plane">
-		<MeshObjLoader name="loader" filename="mesh/box_inside.obj"/>
-		<MeshTopology name="Topology1" triangles="@loader.triangles" />
-		<MechanicalObject name="State3D1" dy="1" position="@loader.position" />
-		<OglModel name="OglModel" color="1 1 1 0.8"/>
+                <Node name="Surface">
+                        <MeshObjLoader name="loader" filename="mesh/liver-smooth.obj"/>
+                        <MeshTopology name="Topology1" triangles="@loader.triangles" />
+                        <OglModel name="OglModel" color="0 1 0"  src='@loader'/>
+                        <BarycentricMapping name="BarycentricMapping"/>
+                </Node>
+
+                <LinearSolverConstraintCorrection solverName="precond" />
+        </Node>
+
+        <Node name="Plane">
+                <MeshObjLoader name="loader" filename="mesh/box_inside.obj"/>
+                <MeshTopology name="Topology1" triangles="@loader.triangles" />
+                <MechanicalObject name="State3D1" dy="1" position="@loader.position" />
+                <OglModel name="OglModel" color="1 1 1 0.8"/>
                 <TriangleGeometry name="Geometry" color="1 1 1 0.6" />
                 <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" />
-	</Node>
+        </Node>
 
 <!--        <SecondNormalDirection name="dir" />-->
         <ConstraintUnilateral input="@algo.output" mu="0.8" />
 <!--        <TestConstraintBilateral name="test" />-->
 <!--		<ConstraintBilateral input="@algo.output" />-->
 <!--	<Constraintless algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />-->
-
 
 </Node>
