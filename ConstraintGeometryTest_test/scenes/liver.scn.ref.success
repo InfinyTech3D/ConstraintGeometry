@@ -1,0 +1,8 @@
+CollisionAlgorithm 958e4a4 1557583779 Hadrien Courtecuisse Sat May 11 16:09:39 2019 +0200 "new test"
+ConstraintGeometry 4cc8773 1557583778 Hadrien Courtecuisse Sat May 11 16:09:38 2019 +0200 "new test"
+RegressionTest 8806418 1557583781 Hadrien Courtecuisse Sat May 11 16:09:41 2019 +0200 "new test"
+SofaAsyncSolvers 
+SofaCUDASolvers 
+SofaExporter 
+SofaPreconditioner 
+SofaSparseSolver 
