@@ -18,7 +18,7 @@
 <!--        <ContactDistance name="dist" />-->
         <NormalFilter name="normal" angle="0.5" />
         <DistanceFilter name="distance" distance="0.1" />
-        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
+        <FindClosestProximityAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
 <!--        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" distance="@dist.distance" dest="@Liver/Collision/TriangleGeometry" from="@Plane/TriangleGeometry" />-->
 
         <Node name="Liver">
