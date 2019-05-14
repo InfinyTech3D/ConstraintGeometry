@@ -1,6 +1,6 @@
 Sofa	ceaf0e14c9 1557750621 mimesis-bot Mon May 13 14:30:21 2019 +0200 Merge remote-tracking branch 'mimesis-inria/sofabending' into mimesis
-CollisionAlgorithm	47ce675 1557762557 omarboukhris Mon May 13 17:49:17 2019 +0200 refactoring closestpoint
-ConstraintGeometry	250e64d 1557656599 hadrien Sun May 12 12:23:19 2019 +0200 "new ref files"
+CollisionAlgorithm	3584cbb 1557819499 Hadrien Courtecuisse Tue May 14 09:38:19 2019 +0200 "Fix bugs in UniqueClosestBinding"
+ConstraintGeometry	2cc2f24 1557771176 hadrien Mon May 13 20:12:56 2019 +0200 "modifications with id of elements iterator, the id is now store int the proximitydata"
 RegressionTest	740dae4 1557752065 omarboukhris Mon May 13 14:54:25 2019 +0200 removed write as an attribute to testmanager + some info dumping
 SofaAsyncSolvers
 SofaCUDASolvers

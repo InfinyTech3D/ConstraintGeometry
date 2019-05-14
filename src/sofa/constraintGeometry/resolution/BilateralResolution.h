@@ -13,6 +13,8 @@ public:
 
     virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/) {
         force[line] -= d[line] / w[line][line];
+        if (force[line] > m_maxForce) force[line]=m_maxForce;
+        if (force[line] < -m_maxForce) force[line]=-m_maxForce;
     }
 
     double m_maxForce;
@@ -68,6 +70,11 @@ public:
         for(int i=0; i<3; i++) {
             for(int j=0; j<3; j++)
                 force[line+i] -= d[line+j] * invW[i][j];
+        }
+
+        for(int i=0; i<3; i++) {
+            if (force[line+i] > m_maxForce) force[line+i]=m_maxForce;
+            if (force[line+i] < -m_maxForce) force[line+i]=-m_maxForce;
         }
     }
 

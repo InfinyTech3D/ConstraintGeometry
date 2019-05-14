@@ -34,10 +34,7 @@ public:
     }
 
     ConstraintNormal defaultGetNormals(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
-        return ConstraintNormal(
-            (d.first->getPosition() - d.second->getPosition())
-            .normalized()
-        );
+        return ConstraintNormal((d.first->getPosition() - d.second->getPosition()).normalized());
     }
 
     core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint * cst) const {
