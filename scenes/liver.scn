@@ -71,7 +71,7 @@
         </Node>
 
 <!--        <SecondNormalDirection name="dir" />-->
-        <ConstraintUnilateral input="@algo.output" directions="@dir.directions" mu="0.6" />
+        <ConstraintUnilateral input="@algo.output" mu="0.6" />
 <!--        <TestConstraintBilateral name="test" />-->
 <!--		<ConstraintBilateral input="@algo.output" />-->
 <!--	<Constraintless algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />-->

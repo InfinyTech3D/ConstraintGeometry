@@ -3,53 +3,14 @@
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/behavior/BaseConstraint.h>
-#include <sofa/constraintGeometry/normals/ConstraintNormal.h>
+#include <sofa/constraintGeometry/ConstraintNormal.h>
 #include <sofa/constraintGeometry/InternalConstraint.h>
+#include <sofa/constraintGeometry/ConstraintResponse.h>
+#include <sofa/constraintGeometry/ConstraintDirection.h>
 
 namespace sofa {
 
 namespace constraintGeometry {
-
-/*!
- * \brief The ConstraintContainer class is a generic Constraint Container
- */
-class ConstraintContainer {
-public:
-
-    /*!
-     * \brief clears constraint vector
-     */
-    void clear() {
-        m_constraints.clear();
-    }
-
-    const InternalConstraint& operator[](int i) const {
-        return m_constraints[i];
-    }
-
-    unsigned size() const {
-        return m_constraints.size();
-    }
-
-    /*!
-     * \fn push_back
-     * \brief adds a constraint to the list of constraints
-     */
-    void push_back(const collisionAlgorithm::PairDetection & d, const ConstraintNormal & N, InternalConstraint::ResolutionCreator f) {
-        m_constraints.push_back(InternalConstraint(d.first,d.second,N,f));
-    }
-
-    /*!
-     * \fn push_back
-     * \brief adds a constraint to the list of constraints
-     */
-    void push_back(collisionAlgorithm::BaseProximity::SPtr p1,collisionAlgorithm::BaseProximity::SPtr p2, const ConstraintNormal & N, InternalConstraint::ResolutionCreator f) {
-        m_constraints.push_back(InternalConstraint(p1,p2,N,f));
-    }
-
-protected:
-    std::vector<InternalConstraint> m_constraints;
-};
 
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseConstraint
@@ -59,19 +20,33 @@ public:
     SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseConstraint);
 
     Data<double> d_drawScale;
+    Data<collisionAlgorithm::DetectionOutput> d_input;
 
     BaseConstraint()
-    : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale")) {}
+    : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
+    , d_input(initData(&d_input, "input", "Link to detection output"))
+    {}
 
-    virtual void createConstraints(ConstraintContainer & constraints) = 0;
+    virtual ConstraintNormal createConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & detection) const = 0;
+
+    virtual core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint & cst) const = 0;
 
     /*!
      * \brief processGeometricalData
      * Clears constraint container and recreates constraints
      */
     void processGeometricalData() {
-        m_container.clear();
-        createConstraints(m_container);
+        m_container.clear();//clear previsou constraints
+
+        const collisionAlgorithm::DetectionOutput & input = d_input.getValue();
+        for (unsigned i=0;i<input.size();i++) {
+            ConstraintNormal CN = createConstraintNormal(input[i]);
+
+            if (CN.size() == 0) continue;
+
+            m_container.push_back(InternalConstraint(input[i],CN,
+                                                     std::bind(&BaseConstraint::createConstraintResolution, this, std::placeholders::_1)));
+        }
     }
 
     /*!
@@ -152,7 +127,7 @@ public:
     void updateForceMask() {}
 
 protected:
-    ConstraintContainer m_container;
+    std::vector<InternalConstraint>  m_container;
 };
 
 }

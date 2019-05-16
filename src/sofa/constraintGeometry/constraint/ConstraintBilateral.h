@@ -1,8 +1,8 @@
 #pragma once
 
-#include <sofa/constraintGeometry/resolution/BilateralResolution.h>
 #include <sofa/constraintGeometry/BaseConstraint.h>
-#include <sofa/constraintGeometry/normals/DataConstraintDirection.h>
+#include <sofa/constraintGeometry/directions/BindDirection.h>
+#include <sofa/constraintGeometry/constraint/BilateralResolution.h>
 
 namespace sofa {
 
@@ -13,35 +13,26 @@ public:
     SOFA_CLASS(ConstraintBilateral , BaseConstraint);
 
     Data<double> d_maxForce;
-    Data<collisionAlgorithm::DetectionOutput> d_input;
-    Data<ConstraintDirection> d_direction;
+    core::objectmodel::SingleLink<ConstraintBilateral,ConstraintDirection, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_directions;
 
     ConstraintBilateral()
     : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
-    , d_input(initData(&d_input, "input", "Link to detection output"))
-    , d_direction(initData(&d_direction, ConstraintDirection(std::bind(&ConstraintBilateral::defaultGetNormals, this, std::placeholders::_1)), "directions", "Link to detection output")){}
+    , l_directions(initLink("directions", "link to the default direction")) {}
 
-    void createConstraints(ConstraintContainer & constraints) {
-        const collisionAlgorithm::DetectionOutput & input = d_input.getValue();
-
-        for (unsigned i=0;i<input.size();i++) {
-            const collisionAlgorithm::DetectionOutput::PairDetection & d = input[i];
-
-            ConstraintNormal CN = d_direction.getValue().getConstraintNormal(d);
-
-            constraints.push_back(d, CN, std::bind(&ConstraintBilateral::createConstraintResolution,this,std::placeholders::_1));
-        }
+    void init() { // make sure we have a direction
+        if (this->l_directions == NULL) l_directions = sofa::core::objectmodel::New<BindDirection>();
+        this->addSlave(l_directions.get());
     }
 
-    ConstraintNormal defaultGetNormals(const collisionAlgorithm::DetectionOutput::PairDetection & d) {
-        return ConstraintNormal((d.first->getPosition() - d.second->getPosition()).normalized());
+    virtual ConstraintNormal createConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & detection) const override {
+        return l_directions->createConstraintsNormal(detection);
     }
 
-    core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint * cst) const {
-        if (cst->size() == 1) return new BilateralConstraintResolution1(d_maxForce.getValue());
-        else if (cst->size() == 2) return new BilateralConstraintResolution2(d_maxForce.getValue());
-        else if (cst->size() == 3) return new BilateralConstraintResolution3(d_maxForce.getValue());
-        std::cerr << "Error the size of the constraint is not correct in ConstraintBilateral" << std::endl;
+    core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint & cst) const {
+        if (cst.size() == 1) return new BilateralConstraintResolution1(d_maxForce.getValue());
+        else if (cst.size() == 2) return new BilateralConstraintResolution2(d_maxForce.getValue());
+        else if (cst.size() == 3) return new BilateralConstraintResolution3(d_maxForce.getValue());
+        std::cerr << "Error the size of the constraint is not correct in ConstraintBilateral size=" << cst.size() << std::endl;
         return NULL;
     }
 };
