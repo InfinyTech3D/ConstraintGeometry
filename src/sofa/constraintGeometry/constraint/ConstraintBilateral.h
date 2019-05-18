@@ -12,11 +12,11 @@ class ConstraintBilateral : public BaseConstraint {
 public:
     SOFA_CLASS(ConstraintBilateral , BaseConstraint);
 
-    Data<double> d_maxForce;
+    Data<helper::vector<double> > d_maxForce;
     core::objectmodel::SingleLink<ConstraintBilateral,ConstraintDirection, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_directions;
 
     ConstraintBilateral()
-    : d_maxForce(initData(&d_maxForce, std::numeric_limits<double>::max(), "maxForce", "Max force"))
+        : d_maxForce(initData(&d_maxForce, "maxForce", "Max force"))
     , l_directions(initLink("directions", "link to the default direction")) {}
 
     void init() { // make sure we have a direction

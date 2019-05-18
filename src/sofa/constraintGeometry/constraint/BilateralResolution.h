@@ -9,7 +9,10 @@ namespace constraintGeometry {
 
 class BilateralConstraintResolution1 : public sofa::core::behavior::ConstraintResolution {
 public:
-    BilateralConstraintResolution1(double m) : sofa::core::behavior::ConstraintResolution(1), m_maxForce(m) {}
+    BilateralConstraintResolution1(const helper::vector<double>& m) : sofa::core::behavior::ConstraintResolution(1) {
+        if (m.size() == 0) m_maxForce = std::numeric_limits<double>::max();
+        else m_maxForce = m[0];
+    }
 
     virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/) {
         force[line] -= d[line] / w[line][line];
@@ -22,7 +25,13 @@ public:
 
 class BilateralConstraintResolution2 : public sofa::core::behavior::ConstraintResolution {
 public:
-    BilateralConstraintResolution2(double m) : sofa::core::behavior::ConstraintResolution(2), m_maxForce(m) {}
+    BilateralConstraintResolution2(const helper::vector<double>& m) : sofa::core::behavior::ConstraintResolution(2) {
+        for (unsigned i=0.;i<2;i++) {
+            if (m.size() == 0) m_maxForce[i] = std::numeric_limits<double>::max();
+            else if (m.size()<=i) m_maxForce[i] = m[m.size()-1];
+            else m_maxForce[i] = m[i];
+        }
+    }
 
     virtual void init(int line, double** w, double * /*force*/)
     {
@@ -42,16 +51,27 @@ public:
             for(int j=0; j<2; j++)
                 force[line+i] -= d[line+j] * invW[i][j];
         }
+
+        for(int i=0; i<2; i++) {
+            if (force[line+i] > m_maxForce[i]) force[line+i]=m_maxForce[i];
+            else if (force[line+i] < -m_maxForce[i]) force[line+i]=-m_maxForce[i];
+        }
     }
 
-    double m_maxForce;
+    double m_maxForce[2];
     sofa::defaulttype::Mat<2,2,double> invW;
 };
 
 
 class BilateralConstraintResolution3 : public sofa::core::behavior::ConstraintResolution {
 public:
-    BilateralConstraintResolution3(double m) : sofa::core::behavior::ConstraintResolution(3), m_maxForce(m) {}
+    BilateralConstraintResolution3(const helper::vector<double>& m) : sofa::core::behavior::ConstraintResolution(3) {
+        for (unsigned i=0.;i<3;i++) {
+            if (m.size() == 0) m_maxForce[i] = std::numeric_limits<double>::max();
+            else if (m.size()<=i) m_maxForce[i] = m[m.size()-1];
+            else m_maxForce[i] = m[i];
+        }
+    }
 
     virtual void init(int line, double** w, double * /*force*/)
     {
@@ -73,12 +93,12 @@ public:
         }
 
         for(int i=0; i<3; i++) {
-            if (force[line+i] > m_maxForce) force[line+i]=m_maxForce;
-            if (force[line+i] < -m_maxForce) force[line+i]=-m_maxForce;
+            if (force[line+i] > m_maxForce[i]) force[line+i]=m_maxForce[i];
+            else if (force[line+i] < -m_maxForce[i]) force[line+i]=-m_maxForce[i];
         }
     }
 
-    double m_maxForce;
+    double m_maxForce[3];
     sofa::defaulttype::Mat<3,3,double> invW;
 };
 
