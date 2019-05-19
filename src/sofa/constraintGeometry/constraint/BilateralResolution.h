@@ -9,28 +9,31 @@ namespace constraintGeometry {
 
 class BilateralConstraintResolution1 : public sofa::core::behavior::ConstraintResolution {
 public:
-    BilateralConstraintResolution1(const helper::vector<double>& m) : sofa::core::behavior::ConstraintResolution(1) {
-        if (m.size() == 0) m_maxForce = std::numeric_limits<double>::max();
-        else m_maxForce = m[0];
+    BilateralConstraintResolution1(double maxf1 = std::numeric_limits<double>::max(), double comp1 = 0.0) : sofa::core::behavior::ConstraintResolution(1) {
+        m_maxForce = maxf1;
+
+        m_compliance = comp1;
     }
 
     virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/) {
-        force[line] -= d[line] / w[line][line];
+        force[line] -= d[line] / (w[line][line] + m_compliance);
         if (force[line] > m_maxForce) force[line]=m_maxForce;
         if (force[line] < -m_maxForce) force[line]=-m_maxForce;
     }
 
+    double m_compliance;
     double m_maxForce;
 };
 
 class BilateralConstraintResolution2 : public sofa::core::behavior::ConstraintResolution {
 public:
-    BilateralConstraintResolution2(const helper::vector<double>& m) : sofa::core::behavior::ConstraintResolution(2) {
-        for (unsigned i=0.;i<2;i++) {
-            if (m.size() == 0) m_maxForce[i] = std::numeric_limits<double>::max();
-            else if (m.size()<=i) m_maxForce[i] = m[m.size()-1];
-            else m_maxForce[i] = m[i];
-        }
+    BilateralConstraintResolution2(double maxf1 = std::numeric_limits<double>::max(),double maxf2 = std::numeric_limits<double>::max(),
+                                   double comp1 = 0.0,double comp2 = 0.0) : sofa::core::behavior::ConstraintResolution(2) {
+        m_maxForce[0] = maxf1;
+        m_maxForce[1] = maxf2;
+
+        m_compliance[0] = comp1;
+        m_compliance[1] = comp2;
     }
 
     virtual void init(int line, double** w, double * /*force*/)
@@ -39,6 +42,8 @@ public:
         for (unsigned j=0;j<2;j++) {
             for (unsigned i=0;i<2;i++) {
                 temp[j][i] = w[line+j][line+i];
+
+                if (i == j) temp[j][i]+=m_compliance[i];
             }
         }
 
@@ -59,18 +64,22 @@ public:
     }
 
     double m_maxForce[2];
+    double m_compliance[2];
     sofa::defaulttype::Mat<2,2,double> invW;
 };
 
 
 class BilateralConstraintResolution3 : public sofa::core::behavior::ConstraintResolution {
 public:
-    BilateralConstraintResolution3(const helper::vector<double>& m) : sofa::core::behavior::ConstraintResolution(3) {
-        for (unsigned i=0.;i<3;i++) {
-            if (m.size() == 0) m_maxForce[i] = std::numeric_limits<double>::max();
-            else if (m.size()<=i) m_maxForce[i] = m[m.size()-1];
-            else m_maxForce[i] = m[i];
-        }
+    BilateralConstraintResolution3(double maxf1 = std::numeric_limits<double>::max(),double maxf2 = std::numeric_limits<double>::max(),double maxf3 = std::numeric_limits<double>::max(),
+                                   double comp1 = 0.0,double comp2 = 0.0,double comp3 = 0.0) : sofa::core::behavior::ConstraintResolution(3) {
+        m_maxForce[0] = maxf1;
+        m_maxForce[1] = maxf2;
+        m_maxForce[2] = maxf3;
+
+        m_compliance[0] = comp1;
+        m_compliance[1] = comp2;
+        m_compliance[2] = comp3;
     }
 
     virtual void init(int line, double** w, double * /*force*/)
@@ -79,6 +88,8 @@ public:
         for (unsigned j=0;j<3;j++) {
             for (unsigned i=0;i<3;i++) {
                 temp[j][i] = w[line+j][line+i];
+
+                if (i == j) temp[j][i]+=m_compliance[i];
             }
         }
 
@@ -99,6 +110,7 @@ public:
     }
 
     double m_maxForce[3];
+    double m_compliance[3];
     sofa::defaulttype::Mat<3,3,double> invW;
 };
 
