@@ -5,7 +5,7 @@ namespace sofa {
 
 namespace constraintGeometry {
 
-SOFA_DECL_CLASS(ConstraintBilateral) ;
+SOFA_DECL_CLASS(ConstraintBilateral)
 
 int ConstraintBilateralClass = core::RegisterObject("ConstraintBilateral")
 .add< ConstraintBilateral >();

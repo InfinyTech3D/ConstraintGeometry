@@ -1,4 +1,4 @@
-#include <string>
+#include <string.h>
 #include <stdio.h>
 #include <sofa/helper/system/FileRepository.h>
 #include <sofa/helper/system/SetDirectory.h>

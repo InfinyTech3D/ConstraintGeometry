@@ -53,10 +53,10 @@ public:
 
         if (m_dirs.size() == 1) {
             //gram schmidt orthogonalization
-            defaulttype::Vector3 gramm_schmidt = defaulttype::Vector3(0,1,0) - dot(m_dirs[0],defaulttype::Vector3(0,1,0)) * m_dirs[0];
+            defaulttype::Vector3 gramm_schmidt = defaulttype::Vector3(0,1,0) - m_dirs[0] * dot(m_dirs[0],defaulttype::Vector3(0,1,0));
 
             //Change with othogonalization around Z if the initial direction is aligned with Y
-            if (gramm_schmidt.norm() < std::numeric_limits<double>::epsilon()) gramm_schmidt = defaulttype::Vector3(0,0,1) - dot(m_dirs[0],defaulttype::Vector3(0,0,1)) * m_dirs[0];
+            if (gramm_schmidt.norm() < std::numeric_limits<double>::epsilon()) gramm_schmidt = defaulttype::Vector3(0,0,1) - m_dirs[0] * dot(m_dirs[0],defaulttype::Vector3(0,0,1));
 
             m_dirs.push_back(gramm_schmidt.normalized());
             m_functions.push_back(f);

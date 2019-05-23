@@ -5,7 +5,7 @@ namespace sofa {
 
 namespace constraintGeometry {
 
-SOFA_DECL_CLASS(SecondDirection);
+SOFA_DECL_CLASS(SecondDirection)
 
 int SecondDirectionClass = core::RegisterObject("SecondDirection")
 .add< SecondDirection >();
