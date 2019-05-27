@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.1)
 project(ConstraintGeometry)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+if(COMMAND setupGitInfo)
+    setupGitInfo(PLUGIN_GIT_INFO)
+endif()
+
 
 file(GLOB_RECURSE HEADER_FILES
     "src/*.h"
@@ -18,28 +22,29 @@ file(GLOB_RECURSE SCENES_FILES
 )
 
 file(GLOB_RECURSE IGNORED_FILES
-    "src/ignored/*.h"
-    "src/ignored/*.inl"
-    "src/ignored/*.cpp"
+    "ignored/*.h"
+    "ignored/*.inl"
+    "ignored/*.cpp"
 )
 
-if(COMMAND setupGitInfo)
-    setupGitInfo(PLUGIN_GIT_INFO)
-endif()
+file(GLOB_RECURSE DEPRECATED_FILES
+    "deprecated/*.h"
+    "deprecated/*.inl"
+    "deprecated/*.cpp"
+)
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/ignored")
+#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deprecated")
 
 set_source_files_properties(${IGNORED_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${README_FILES} )
-set(${PROJECT_NAME}_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src")
-
-target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${${PROJECT_NAME}_INCLUDE_DIRS}>")
-target_include_directories(${PROJECT_NAME} PUBLIC "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
-
-add_dependencies(${PROJECT_NAME} CollisionAlgorithm)
-
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${IGNORED_FILES} ${DEPRECATED_FILES} ${README_FILES} )
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DPLUGIN_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\"")
 target_link_libraries(${PROJECT_NAME} CollisionAlgorithm )
 
 ## Install rules for the library and headers; CMake package configurations files
+set(${PROJECT_NAME}_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${${PROJECT_NAME}_INCLUDE_DIRS}>")
+target_include_directories(${PROJECT_NAME} PUBLIC "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 sofa_generate_package(NAME ${PROJECT_NAME} VERSION 0.1 TARGETS ${PROJECT_NAME} INCLUDE_INSTALL_DIR ${${PROJECT_NAME}_INCLUDE_DIRS})
 

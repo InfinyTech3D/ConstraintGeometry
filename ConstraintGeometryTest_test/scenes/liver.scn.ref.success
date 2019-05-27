@@ -1,6 +1,6 @@
-Sofa	13c685cd7e 1558951693 mimesis-bot Mon May 27 12:08:13 2019 +0200 Merge remote-tracking branch 'mimesis-inria/sofabending' into mimesis
-CollisionAlgorithm	a0681f4 1558909319 Hadrien Courtecuisse Mon May 27 00:21:59 2019 +0200 "clean code"
-ConstraintGeometry	13fe874 1558909314 Hadrien Courtecuisse Mon May 27 00:21:54 2019 +0200 "clean code"
+Sofa	e1a8d9e32e 1558973534 mimesis-bot Mon May 27 18:12:14 2019 +0200 Merge remote-tracking branch 'mimesis-inria/sofabending' into mimesis
+CollisionAlgorithm	a718b54 1558975062 hadrien Mon May 27 18:37:42 2019 +0200 "clean code"
+ConstraintGeometry	0d863e1 1558975060 hadrien Mon May 27 18:37:40 2019 +0200 "clean code"
 RegressionTest	a518a85 1558909329 Hadrien Courtecuisse Mon May 27 00:22:09 2019 +0200 "clean code"
 SofaAsyncSolvers
 SofaCUDASolvers
