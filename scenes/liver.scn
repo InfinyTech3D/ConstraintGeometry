@@ -7,6 +7,7 @@
         <RequiredPlugin pluginName='SofaExporter'/>
         <RequiredPlugin pluginName='SofaPreconditioner'/>
         <RequiredPlugin pluginName='SofaSparseSolver'/>
+<!--        <RequiredPlugin pluginName='SofaDefaultPlugin'/>-->
 <!--        <RequiredPlugin pluginName='RegressionTestPlugin'/>-->
 <!--        <TestManager filename="/home/hadrien/travail/ConstraintGeometry/ConstraintGeometryTest.xml" scene="scenes/liver.scn" drawScale="0.1" printLog="1" />-->
 
@@ -23,13 +24,14 @@
 
         <Node name="Liver">
                 <EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
+<!--                <SparseLDLSolver />-->
 <!--                <CGLinearSolver name="CGLinearSolver" tolerance="1e-09" threshold="1e-09" />-->
-                <ShewchukPCGLinearSolver name="solver" tolerance="1e-5" iterations="20" preconditioners="precond" update_step="1" />
-                <CudaSparseLDLSolver name="precond" template="AsyncCompressedRowSparseMatrix3f" />
+<!--                <ShewchukPCGLinearSolver name="solver" tolerance="1e-5" iterations="20" preconditioners="precond" update_step="1" />-->
+                <CudaSparseLDLSolver name="precond" template="CompressedRowSparseMatrix3f" />
 
                 <MeshGmshLoader name="loader" filename="mesh/liver.msh"/>
                 <MeshTopology name="Topology" tetrahedra="@loader.tetrahedra" />
-                <MechanicalObject name="State3D" position="@loader.position" />
+                <MechanicalObject name="State3D" position="@loader.position" rest_position="@loader.position"/>
 
                 <TetrahedronFEMForceField name="TetrahedronFEMForceField" poissonRatio="0.4" youngModulus="50" />
 
