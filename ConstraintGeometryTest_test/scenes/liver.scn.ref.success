@@ -1,7 +1,7 @@
-Sofa	409965f976 1558317615 mimesis-bot Mon May 20 04:00:15 2019 +0200 Merge remote-tracking branch 'mimesis-inria/graphMatching' into mimesis
-CollisionAlgorithm	b314a4f 1558037023 Hadrien Courtecuisse Thu May 16 22:03:43 2019 +0200 "Add working ALU"
-ConstraintGeometry	3df748b 1558291619 Hadrien Courtecuisse Sun May 19 20:46:59 2019 +0200 "current work on projective cst"
-RegressionTest	b022ab6 1558104103 omarboukhris Fri May 17 16:41:43 2019 +0200 slight adjustements to testmanager
+Sofa	13c685cd7e 1558951693 mimesis-bot Mon May 27 12:08:13 2019 +0200 Merge remote-tracking branch 'mimesis-inria/sofabending' into mimesis
+CollisionAlgorithm	a0681f4 1558909319 Hadrien Courtecuisse Mon May 27 00:21:59 2019 +0200 "clean code"
+ConstraintGeometry	13fe874 1558909314 Hadrien Courtecuisse Mon May 27 00:21:54 2019 +0200 "clean code"
+RegressionTest	a518a85 1558909329 Hadrien Courtecuisse Mon May 27 00:22:09 2019 +0200 "clean code"
 SofaAsyncSolvers
 SofaCUDASolvers
 SofaExporter
