@@ -44,9 +44,9 @@ public :
     }
 
     void getConstraintViolation(defaulttype::BaseVector *v) const {
-        for (unsigned i=0;i<m_normals.size();i++) {
+        //for (unsigned i=0;i<m_normals.size();i++) {
             m_normals.computeViolations(m_cid, m_detection, v);
-        }
+        //}
     }
 
     /*!
