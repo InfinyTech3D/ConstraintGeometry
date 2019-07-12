@@ -83,6 +83,17 @@ public:
         return m_dirs[i];
     }
 
+    ConstraintNormal& operator=(const ConstraintNormal& _CN)
+    {
+        if(&_CN == this)
+            return *this;
+        this->m_dirs = _CN.m_dirs;
+        this->m_functions = _CN.m_functions;
+
+        return *this;
+
+    }
+
 protected:
     //pai of directions (vec3) and function to compute the violation of a par proximity
     helper::vector<defaulttype::Vector3> m_dirs;

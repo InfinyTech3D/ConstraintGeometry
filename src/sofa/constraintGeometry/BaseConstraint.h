@@ -23,8 +23,8 @@ public:
     Data<collisionAlgorithm::DetectionOutput> d_input;
 
     BaseConstraint()
-    : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
-    , d_input(initData(&d_input, "input", "Link to detection output"))
+        : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
+        , d_input(initData(&d_input, "input", "Link to detection output"))
     {}
 
     virtual ConstraintNormal createConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & detection) const = 0;
@@ -81,21 +81,24 @@ public:
     }
 
     void draw(const core::visual::VisualParams* vparams) {
-        if (vparams->displayFlags().getShowInteractionForceFields()) {
-            for (unsigned i=0;i<m_container.size();i++)
-                m_container[i].draw(vparams,d_drawScale.getValue());
-        }
-
-        if (vparams->displayFlags().getShowCollisionModels()) {
-            glDisable(GL_LIGHTING);
-            glColor4f(0,1,0,1);
-
-            glBegin(GL_LINES);
-            for (unsigned i=0;i<m_container.size();i++) {
-                glVertex3dv(m_container[i].getFirstProximity()->getPosition().data());
-                glVertex3dv(m_container[i].getSecondProximity()->getPosition().data());
+        if(d_drawScale.getValue()>std::numeric_limits<double>::min())
+        {
+            if (vparams->displayFlags().getShowInteractionForceFields()) {
+                for (unsigned i=0;i<m_container.size();i++)
+                    m_container[i].draw(vparams,d_drawScale.getValue());
             }
-            glEnd();
+
+            if (vparams->displayFlags().getShowCollisionModels()) {
+                glDisable(GL_LIGHTING);
+                glColor4f(0,1,0,1);
+
+                glBegin(GL_LINES);
+                for (unsigned i=0;i<m_container.size();i++) {
+                    glVertex3dv(m_container[i].getFirstProximity()->getPosition().data());
+                    glVertex3dv(m_container[i].getSecondProximity()->getPosition().data());
+                }
+                glEnd();
+            }
         }
     }
 
