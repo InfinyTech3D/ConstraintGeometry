@@ -18,10 +18,16 @@ public:
     SOFA_CLASS(ConstraintUnilateral , BaseConstraint);
 
     Data<double> d_friction;
+    Data<double> d_maxforce0;
+    Data<double> d_maxforce1;
+    Data<double> d_maxforce2;
     core::objectmodel::SingleLink<ConstraintUnilateral,ConstraintDirection, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_directions;
 
     ConstraintUnilateral()
     : d_friction(initData(&d_friction, 0.0, "mu", "Friction"))
+    , d_maxforce0(initData(&d_maxforce0, std::numeric_limits<double>::max(), "maxForce0", "Max force applied on the first axis"))
+    , d_maxforce1(initData(&d_maxforce1, std::numeric_limits<double>::max(), "maxForce1", "Max force applied on the second axis"))
+    , d_maxforce2(initData(&d_maxforce2, std::numeric_limits<double>::max(), "maxForce2", "Max force applied on the third axis"))
     , l_directions(initLink("directions", "link to the default direction")) {}
 
     void init() { // make sure we have a direction
@@ -47,7 +53,7 @@ public:
      */
     core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint & cst) const {
         if (cst.size() == 1) return new UnilateralConstraintResolution();
-        else if (cst.size() == 3) return new UnilateralFrictionResolution(d_friction.getValue());
+        else if (cst.size() == 3) return new UnilateralFrictionResolution(d_friction.getValue(),d_maxforce0.getValue(),d_maxforce1.getValue(),d_maxforce2.getValue());
         std::cerr << "Error the size of the constraint is not correct in ConstraintUnilateral size=" << cst.size() << std::endl;
         return NULL;
     }
