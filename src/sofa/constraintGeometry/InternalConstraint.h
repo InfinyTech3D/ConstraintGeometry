@@ -65,8 +65,8 @@ public :
      */
     void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) const {
         for (unsigned i=0;i<m_normals.size();i++) {
-            m_detection.first->storeLambda(cParams,res,m_cid+i,lambda);
-            m_detection.second->storeLambda(cParams,res,m_cid+i,lambda);
+            m_detection.first->storeLambda(cParams,res,m_cid,i,lambda);
+            m_detection.second->storeLambda(cParams,res,m_cid,i,lambda);
         }
     }
 
