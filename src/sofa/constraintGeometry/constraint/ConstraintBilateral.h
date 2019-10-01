@@ -23,6 +23,7 @@ public:
 
     void init() { // make sure we have a direction
         if (this->l_directions == NULL) l_directions = sofa::core::objectmodel::New<BindDirection>();
+        l_directions->setName("defaultDirection");
         this->addSlave(l_directions.get());
     }
 
