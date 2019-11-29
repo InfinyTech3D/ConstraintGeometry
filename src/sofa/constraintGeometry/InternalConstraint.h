@@ -105,6 +105,10 @@ public :
         return m_detection.second;
     }
 
+    const ConstraintNormal getConstraintNormal() const {
+        return m_normals;
+    }
+
     unsigned size() const {
         return m_normals.size();
     }
