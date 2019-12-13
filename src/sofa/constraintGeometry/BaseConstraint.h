@@ -35,7 +35,7 @@ public:
      * \brief processGeometricalData
      * Clears constraint container and recreates constraints
      */
-    void processGeometricalData() {
+    virtual void processGeometricalData() {
         m_container.clear();//clear previsou constraints
 
         const collisionAlgorithm::DetectionOutput & input = d_input.getValue();
@@ -119,7 +119,7 @@ public:
      * \param res
      * \param lambda
      */
-    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
+     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
         if (! cParams)
             return;
 
