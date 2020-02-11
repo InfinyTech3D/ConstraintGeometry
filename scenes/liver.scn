@@ -17,7 +17,7 @@
         <GenericConstraintSolver maxIterations="200" tolerance="0.0001" />
 
 <!--        <ContactDistance name="dist" />-->
-        <NormalFilter name="normal" angle="0.5" />
+        <NormalFilter name="normal" angle="-1 0.5" />
         <DistanceFilter name="distance" distance="0.1" />
         <FindClosestProximityAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
 <!--        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" distance="@dist.distance" dest="@Liver/Collision/TriangleGeometry" from="@Plane/TriangleGeometry" />-->
@@ -44,7 +44,8 @@
                         <MechanicalObject name="state" />
 
                         <TriangleGeometry name="Geometry" color="0 1 0 1" />
-<!--                        <PhongTriangleGeometry name="Geometry" color="0 0 1 1" />-->
+                        <PhongTriangleNormalHandler />
+                        
 <!--                        <PointGeometry name="Geometry" color="0 0 1 1" drawRadius="0.1" />-->
 <!--                        <BezierTriangleGeometry name="Geometry" color="0 0 1 1" />-->
 
