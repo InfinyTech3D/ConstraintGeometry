@@ -16,10 +16,10 @@
         <FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
         <GenericConstraintSolver maxIterations="200" tolerance="0.0001" />
 
-<!--        <ContactDistance name="dist" />-->
+<!--        <ContactDistance name="dist" /> -->
+        <FindClosestProximityAlgorithm name="algo" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
         <NormalFilter name="normal" angle="-1 0.5" />
         <DistanceFilter name="distance" distance="0.1" />
-        <FindClosestProximityAlgorithm name="algo" filters="@distance @normal" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
 <!--        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" distance="@dist.distance" dest="@Liver/Collision/TriangleGeometry" from="@Plane/TriangleGeometry" />-->
 
         <Node name="Liver">
@@ -44,12 +44,12 @@
                         <MechanicalObject name="state" />
 
                         <TriangleGeometry name="Geometry" color="0 1 0 1" />
-                        <PhongTriangleNormalHandler />
+                        <PhongTriangleNormalHandler geometry="@Geometry" />
                         
 <!--                        <PointGeometry name="Geometry" color="0 0 1 1" drawRadius="0.1" />-->
 <!--                        <BezierTriangleGeometry name="Geometry" color="0 0 1 1" />-->
 
-<!--                        <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" />-->
+                       <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" />
 
                         <BarycentricMapping name="BarycentricMapping"/>
                 </Node>
