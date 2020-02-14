@@ -18,8 +18,9 @@
 
 <!--        <ContactDistance name="dist" /> -->
         <FindClosestProximityAlgorithm name="algo" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
-        <NormalFilter name="normal" angle="-1 0.5" />
-        <DistanceFilter name="distance" distance="0.1" />
+        <NormalFilter name="normal" algo="@algo" angle="-1 0.5" />
+        <DistanceFilter name="distance" algo="@algo" distance="0.1" />
+        <AABBSearchMethod algo="@algo" />
 <!--        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" distance="@dist.distance" dest="@Liver/Collision/TriangleGeometry" from="@Plane/TriangleGeometry" />-->
 
         <Node name="Liver">
@@ -49,7 +50,7 @@
 <!--                        <PointGeometry name="Geometry" color="0 0 1 1" drawRadius="0.1" />-->
 <!--                        <BezierTriangleGeometry name="Geometry" color="0 0 1 1" />-->
 
-                       <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" />
+                        <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" />
 
                         <BarycentricMapping name="BarycentricMapping"/>
                 </Node>
