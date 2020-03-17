@@ -117,6 +117,21 @@ public :
         return m_cid;
     }
 
+    void updateConstraintNormalFirstDirection(defaulttype::Vector3 dir){
+        m_normals.setFirstDirection(dir);
+    }
+
+    void printNormalDirections(){
+        for(int i=0; i<m_normals.size(); i++){
+            std::cout<<m_normals.m_dirs[i]<<std::endl;
+        }
+
+    }
+
+    void getConstraintMatrix_from(int cId, sofa::defaulttype::BaseMatrix * J_from){
+        m_detection.first->getConstraintMatrix(cId, J_from,  1.0);
+    }
+
  protected:
     collisionAlgorithm::PairDetection m_detection;
     ConstraintNormal m_normals;

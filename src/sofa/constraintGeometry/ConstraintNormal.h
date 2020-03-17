@@ -94,6 +94,18 @@ public:
 
     }
 
+    defaulttype::Vector3 getFirstDirection(){
+        if(m_dirs.size() == 0){
+            std::cerr<<"error, no direction in constraint normal"<<std::endl;
+            return defaulttype::Vector3(0,0,0);
+        }
+        return m_dirs[0];
+    }
+
+    void setFirstDirection(defaulttype::Vector3 dir){
+        m_dirs[0] = dir;
+    }
+
 protected:
     //pai of directions (vec3) and function to compute the violation of a par proximity
     helper::vector<defaulttype::Vector3> m_dirs;

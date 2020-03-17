@@ -129,6 +129,27 @@ public:
 
     void updateForceMask() {}
 
+
+    void modifyConstraintNormals(){
+        std::cout<<"m_container.size() = "<<m_container.size()<<std::endl;
+        const collisionAlgorithm::DetectionOutput & input = d_input.getValue();
+        for (unsigned i=0;i<input.size();i++) {
+            ConstraintNormal CN = createConstraintNormal(input[i]);
+
+            if (CN.size() == 0) continue;
+
+            m_container[i].updateConstraintNormalFirstDirection(CN.getFirstDirection());
+//            m_container[i].printNormalDirections();
+        }
+    }
+
+    void getConstraintMatrix_from(sofa::defaulttype::BaseMatrix * J_from){
+        J_from->clear();
+        for (unsigned i=0;i<m_container.size();i++){
+            m_container[i].getConstraintMatrix_from(i, J_from);
+        }
+    }
+
 protected:
     std::vector<InternalConstraint>  m_container;
 };
