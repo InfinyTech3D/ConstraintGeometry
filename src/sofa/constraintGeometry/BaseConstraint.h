@@ -143,10 +143,19 @@ public:
         }
     }
 
-    void getConstraintMatrix_from(sofa::defaulttype::BaseMatrix * J_from){
-        J_from->clear();
+    void buildConstraintMatrixJ0(const int colDim_from, sofa::defaulttype::BaseMatrix * J0_from, const int colDim_dest, sofa::defaulttype::BaseMatrix * J0_dest){
+        const int rowDim = m_container.size();
+        J0_from->resize(rowDim, colDim_from);
+//        J0_dest->resize(rowDim, colDim_dest);
         for (unsigned i=0;i<m_container.size();i++){
-            m_container[i].getConstraintMatrix_from(i, J_from);
+            m_container[i].buildConstraintMatrixJ0(i, J0_from, J0_dest);
+        }
+    }
+
+    void pushNormalIntoVector(helper::vector<defaulttype::Vector3> *vecN){
+        vecN->clear();
+        for (unsigned i=0;i<m_container.size();i++) {
+            m_container[i].pushNormalIntoVector(vecN);
         }
     }
 

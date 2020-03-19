@@ -125,11 +125,18 @@ public :
         for(int i=0; i<m_normals.size(); i++){
             std::cout<<m_normals.m_dirs[i]<<std::endl;
         }
-
     }
 
-    void getConstraintMatrix_from(int cId, sofa::defaulttype::BaseMatrix * J_from){
-        m_detection.first->getConstraintMatrix(cId, J_from,  1.0);
+    void buildConstraintMatrixJ0(int cId, sofa::defaulttype::BaseMatrix * J0_from, sofa::defaulttype::BaseMatrix * /*J0_dest*/){
+        m_detection.first->buildConstraintMatrixJ0(cId, J0_from,  1.0);
+//        m_detection.first->buildConstraintMatrixJ0(cId, J0_dest,  -1.0);
+        std::cout<<"proximity position "<<cId<<" = "<<m_detection.first->getPosition()<<std::endl;
+    }
+
+    void pushNormalIntoVector(helper::vector<defaulttype::Vec3> * vecN){
+        for(int i=0; i<m_normals.size(); i++){
+            vecN->push_back(m_normals.m_dirs[i]);
+        }
     }
 
  protected:
