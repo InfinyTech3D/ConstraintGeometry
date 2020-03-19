@@ -152,10 +152,20 @@ public:
         }
     }
 
-    void pushNormalIntoVector(helper::vector<defaulttype::Vector3> *vecN){
+    void pushNormalIntoVector(helper::vector<defaulttype::Vector3> *vecN, unsigned int & nb_normal){
         vecN->clear();
         for (unsigned i=0;i<m_container.size();i++) {
-            m_container[i].pushNormalIntoVector(vecN);
+            m_container[i].pushNormalIntoVector(vecN, nb_normal);
+        }
+    }
+
+    void pushNormalIntoMatrix(sofa::defaulttype::BaseMatrix * matN, unsigned int nb_normal){
+        int nb_constraint = m_container.size();
+        matN->clear();
+        matN->resize(nb_normal, nb_constraint*3);
+        unsigned int nId =0;
+        for (int i=0;i<m_container.size();i++) {
+            m_container[i].pushNormalIntoMatrix(matN, i, nId);
         }
     }
 
