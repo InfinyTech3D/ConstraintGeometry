@@ -31,6 +31,11 @@ public:
         return l_directions->createConstraintsNormal(detection);
     }
 
+    ConstraintNormal UpdateConstraintsNormalWithProximityPosition(const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 pf, bool getF, defaulttype::Vec3 pd, bool getD) const override {
+        ConstraintNormal CN = l_directions->UpdateConstraintsNormalWithProximityPosition(detection, pf, getF, pd, getD);
+        return CN;
+    }
+
     core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint & cst) const {
         if (cst.size() == 1) {
             double maxf = std::numeric_limits<double>::max();

@@ -46,6 +46,17 @@ public:
         return CN;
     }
 
+    ConstraintNormal UpdateConstraintsNormalWithProximityPosition(const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 pf, bool getF, defaulttype::Vec3 pd, bool getD) const override {
+        ConstraintNormal CN = l_directions->UpdateConstraintsNormalWithProximityPosition(detection, pf, getF, pd, getD);
+
+        if (d_friction.getValue() != 0.0) {
+            CN.addOrthogonalDirection();
+            CN.addOrthogonalDirection();
+        }
+
+        return CN;
+    }
+
     /*!
      * \brief createConstraintResolution : factory method for constraint solvers
      * \param cst : InternalConstraint

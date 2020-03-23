@@ -140,14 +140,14 @@ public :
         nb_nornmal+=m_normals.size();
     }
 
-    void pushNormalIntoMatrix(sofa::defaulttype::BaseMatrix * matN, unsigned int cId, unsigned int & nId){
+    void pushNormalIntoMatrix(sofa::defaulttype::BaseMatrix * matN, unsigned int cId, unsigned int & dirId){
         for(int i=0; i<m_normals.size(); i++){
             defaulttype::Vector3 n = m_normals.m_dirs[i];
-            matN->add(nId, cId*3, n[0]);
-            matN->add(nId, cId*3+1, n[1]);
-            matN->add(nId, cId*3+2, n[2]);
-        }
-        nId += m_normals.size();
+            matN->add(dirId, cId*3, n[0]);
+            matN->add(dirId, cId*3+1, n[1]);
+            matN->add(dirId, cId*3+2, n[2]);
+            dirId++;
+        }        
     }
 
  protected:
