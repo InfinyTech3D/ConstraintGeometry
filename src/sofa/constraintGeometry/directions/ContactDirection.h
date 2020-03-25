@@ -29,26 +29,16 @@ public:
         return ConstraintNormal(mainDir);
     }
 
-    ConstraintNormal UpdateConstraintsNormalWithProximityPosition(const collisionAlgorithm::PairDetection & d, defaulttype::Vec3 pf, bool getF, defaulttype::Vec3 pd, bool getD) const override {
-        if(getF&&getD){
-            defaulttype::Vector3 mainDir = (pf - pd).normalized();
-            defaulttype::Vector3 secondDir = d.second->getNormal().normalized();
-            if (dot(mainDir,secondDir)<=std::numeric_limits<double>::epsilon()) mainDir=secondDir;
-            return ConstraintNormal(mainDir);
-        }
-        else if(getF){
-            defaulttype::Vector3 mainDir = (pf- d.second->getPosition()).normalized();
-            defaulttype::Vector3 secondDir = d.second->getNormal().normalized();
-            if (dot(mainDir,secondDir)<=std::numeric_limits<double>::epsilon()) mainDir=secondDir;
-            return ConstraintNormal(mainDir);
-        }
-        else if(getD){
-            defaulttype::Vector3 mainDir = (d.first->getPosition() - pd).normalized();
-            defaulttype::Vector3 secondDir = d.second->getNormal().normalized();
-            if (dot(mainDir,secondDir)<=std::numeric_limits<double>::epsilon()) mainDir=secondDir;
-            return ConstraintNormal(mainDir);
-        }
-        else return ConstraintNormal(defaulttype::Vector3(0, 0, 0));
+    ConstraintNormal UpdateConstraintNormalWithProximityPosition(const collisionAlgorithm::PairDetection & d, defaulttype::Vec3 pf, bool getF, defaulttype::Vec3 pd, bool getD) const override {
+        defaulttype::Vector3 pfrom = d.first->getPosition();
+        defaulttype::Vector3 pdest = d.second->getPosition();
+        if(getF) pfrom = pf;
+        if(getD) pdest = pd;
+        defaulttype::Vector3 dir = pfrom- pdest;
+        defaulttype::Vector3 mainDir = dir.normalized();
+        defaulttype::Vector3 secondDir = d.second->getNormal().normalized();
+        if (dot(mainDir,secondDir)<=std::numeric_limits<double>::epsilon()) mainDir=secondDir;
+        return ConstraintNormal(mainDir);
 
     }
 

@@ -21,17 +21,12 @@ public:
         return ConstraintNormal(d.first->getPosition() - d.second->getPosition());
     }
 
-    ConstraintNormal UpdateConstraintsNormalWithProximityPosition(const collisionAlgorithm::PairDetection & d, defaulttype::Vec3 pf, bool getF, defaulttype::Vec3 pd, bool getD) const override {
-        if(getF&&getD){
-            return ConstraintNormal(pf - pd);
-        }
-        else if(getF){
-            return ConstraintNormal(pf - d.second->getPosition());
-        }
-        else if(getD){
-            return ConstraintNormal(d.first->getPosition() - pd);
-        }
-        else return ConstraintNormal(defaulttype::Vector3(0, 0, 0));
+    ConstraintNormal UpdateConstraintNormalWithProximityPosition(const collisionAlgorithm::PairDetection & d, defaulttype::Vec3 pf, bool getF, defaulttype::Vec3 pd, bool getD) const override {
+        defaulttype::Vector3 pfrom = d.first->getPosition();
+        defaulttype::Vector3 pdest = d.second->getPosition();
+        if(getF) pfrom = pf;
+        if(getD) pdest = pd;
+        return ConstraintNormal(pfrom - pdest);
 
     }
 

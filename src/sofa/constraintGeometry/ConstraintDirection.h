@@ -18,7 +18,7 @@ public:
     SOFA_CLASS(ConstraintDirection, sofa::core::objectmodel::BaseObject);
 
     virtual ConstraintNormal createConstraintsNormal(const collisionAlgorithm::PairDetection & detection) const = 0;
-    virtual ConstraintNormal UpdateConstraintsNormalWithProximityPosition(const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 prox_from, bool getF, defaulttype::Vec3 prox_dest, bool getD) const = 0;
+    virtual ConstraintNormal UpdateConstraintNormalWithProximityPosition(const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 prox_from, bool getF, defaulttype::Vec3 prox_dest, bool getD) const = 0;
 };
 
 }

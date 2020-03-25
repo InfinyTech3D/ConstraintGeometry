@@ -31,7 +31,7 @@ public:
                  .addOrthogonalDirection();
     }
 
-    ConstraintNormal UpdateConstraintsNormalWithProximityPosition(const collisionAlgorithm::PairDetection & d, defaulttype::Vec3 /*pf*/, bool /*getF*/, defaulttype::Vec3 /*pd*/, bool /*getD*/) const override {
+    ConstraintNormal UpdateConstraintNormalWithProximityPosition(const collisionAlgorithm::PairDetection & d, defaulttype::Vec3 /*pf*/, bool /*getF*/, defaulttype::Vec3 /*pd*/, bool /*getD*/) const override {
         return createConstraintsNormal(d);
     }
 

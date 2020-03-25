@@ -145,11 +145,18 @@ public:
 
     void buildConstraintMatrixJ0(const int colDim_from, sofa::defaulttype::BaseMatrix * J0_from, const int colDim_dest, sofa::defaulttype::BaseMatrix * J0_dest){
         const int rowDim = m_container.size();
+        J0_from->clear();
         J0_from->resize(rowDim, colDim_from);
+//        J0_dest->clear();
 //        J0_dest->resize(rowDim, colDim_dest);
         for (unsigned i=0;i<m_container.size();i++){
             m_container[i].buildConstraintMatrixJ0(i, J0_from, J0_dest);
         }
+
+//        const collisionAlgorithm::DetectionOutput & input = d_input.getValue();
+//        for (unsigned i=0;i<m_container.size();i++){
+//            std::cout<<"prox pos ref = "<<input[i].first->getPosition()<<std::endl;
+//        }
     }
 
     void pushNormalIntoVector(helper::vector<defaulttype::Vector3> *vecN, unsigned int & nb_normal){
@@ -175,55 +182,27 @@ public:
         }
     }
 
-    virtual ConstraintNormal UpdateConstraintsNormalWithProximityPosition(const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 prox_from, bool getF, defaulttype::Vec3 prox_dest, bool getD) const = 0;
+    virtual ConstraintNormal UpdateConstraintNormalAndViolationWithProximityPosition(unsigned cid, const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 pf, bool getF, defaulttype::Vec3 pd, bool getD, defaulttype::BaseVector *delta) const = 0;
 
-    void updateConstraintNormalsWithProximityPositions(const unsigned int dimConstraintSet, double *prox_from, bool getF, double *prox_dest, bool getD){
+    void UpdateConstraintNormalAndViolationWithProximityPosition(const unsigned int dimConstraintSet, double *prox_from, bool getF, double *prox_dest, bool getD, defaulttype::BaseVector *delta){
         if(dimConstraintSet != m_container.size()){
             std::cerr<<"error in dimension constraint set"<<std::endl;
         }
 
         m_container.clear();
         const collisionAlgorithm::DetectionOutput & input = d_input.getValue();
-        if(getF && getD){
-            for (unsigned i=0;i<input.size();i++) {
-                defaulttype::Vec3 pf(prox_from[i*3], prox_from[i*3+1], prox_from[i*3+2]);
-                defaulttype::Vec3 pd(prox_dest[i*3], prox_dest[i*3+1], prox_dest[i*3+2]);
-                ConstraintNormal CN = UpdateConstraintsNormalWithProximityPosition(input[i], pf, getF, pd, getD);
+        for (unsigned i=0;i<input.size();i++) {
+            defaulttype::Vec3 pfrom(0, 0, 0);
+            defaulttype::Vec3 pdest(0, 0, 0);
+            if(getF) pfrom = defaulttype::Vec3(prox_from[i*3], prox_from[i*3+1], prox_from[i*3+2]);
+            if(getD) pdest = defaulttype::Vec3(prox_dest[i*3], prox_dest[i*3+1], prox_dest[i*3+2]);
+            ConstraintNormal CN = UpdateConstraintNormalAndViolationWithProximityPosition(i, input[i], pfrom, getF, pdest, getD, delta);
 
-                if (CN.size() == 0) continue;
+            if (CN.size() == 0) continue;
 
-                m_container.push_back(InternalConstraint(input[i],CN,
-                                                         std::bind(&BaseConstraint::createConstraintResolution, this, std::placeholders::_1)));
-            }
-            return;
+            m_container.push_back(InternalConstraint(input[i],CN,
+                                                     std::bind(&BaseConstraint::createConstraintResolution, this, std::placeholders::_1)));
         }
-        else if(getF){
-            for (unsigned i=0;i<input.size();i++) {
-                defaulttype::Vec3 pf(prox_from[i*3], prox_from[i*3+1], prox_from[i*3+2]);
-                defaulttype::Vec3 pd(0, 0, 0);
-                ConstraintNormal CN = UpdateConstraintsNormalWithProximityPosition(input[i], pf, getF, pd, getD);
-
-                if (CN.size() == 0) continue;
-
-                m_container.push_back(InternalConstraint(input[i],CN,
-                                                         std::bind(&BaseConstraint::createConstraintResolution, this, std::placeholders::_1)));
-            }
-            return;
-        }
-        else if(getD){
-            for (unsigned i=0;i<input.size();i++) {
-                defaulttype::Vec3 pf(0, 0, 0);
-                defaulttype::Vec3 pd(prox_dest[i*3], prox_dest[i*3+1], prox_dest[i*3+2]);
-                ConstraintNormal CN = UpdateConstraintsNormalWithProximityPosition(input[i], pf, getF, pd, getD);
-
-                if (CN.size() == 0) continue;
-
-                m_container.push_back(InternalConstraint(input[i],CN,
-                                                         std::bind(&BaseConstraint::createConstraintResolution, this, std::placeholders::_1)));
-            }
-            return;
-        }
-        else return;
 
 
     }

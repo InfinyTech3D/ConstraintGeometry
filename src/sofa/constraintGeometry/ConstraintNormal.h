@@ -106,6 +106,17 @@ public:
         m_dirs[0] = dir;
     }
 
+    void UpdateConstraintViolationWithProximityPosition(unsigned  cid, const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 prox_from, bool getF, defaulttype::Vec3 prox_dest, bool getD, defaulttype::BaseVector * delta){
+        defaulttype::Vector3 PFree = detection.first->getPosition(core::VecCoordId::freePosition());
+        defaulttype::Vector3 QFree = detection.second->getPosition(core::VecCoordId::freePosition());
+//        if(getF) PFree = prox_from;
+//        if(getD) QFree = prox_dest;
+        for (unsigned i=0;i<m_dirs.size();i++) {
+            double v = dot(PFree - QFree, m_dirs[i]);
+            delta->set(cid + i, v);
+        }
+    }
+
 protected:
     //pai of directions (vec3) and function to compute the violation of a par proximity
     helper::vector<defaulttype::Vector3> m_dirs;

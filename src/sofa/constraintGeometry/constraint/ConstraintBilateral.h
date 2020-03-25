@@ -31,8 +31,9 @@ public:
         return l_directions->createConstraintsNormal(detection);
     }
 
-    ConstraintNormal UpdateConstraintsNormalWithProximityPosition(const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 pf, bool getF, defaulttype::Vec3 pd, bool getD) const override {
-        ConstraintNormal CN = l_directions->UpdateConstraintsNormalWithProximityPosition(detection, pf, getF, pd, getD);
+    ConstraintNormal UpdateConstraintNormalAndViolationWithProximityPosition(unsigned cid, const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 pf, bool getF, defaulttype::Vec3 pd, bool getD, defaulttype::BaseVector *delta) const override {
+        ConstraintNormal CN = l_directions->UpdateConstraintNormalWithProximityPosition(detection, pf, getF, pd, getD);
+        CN.UpdateConstraintViolationWithProximityPosition(cid, detection, pf, getF, pd, getD, delta);
         return CN;
     }
 
