@@ -38,6 +38,7 @@ public:
         defaulttype::Vector3 mainDir = dir.normalized();
         defaulttype::Vector3 secondDir = d.second->getNormal().normalized();
         if (dot(mainDir,secondDir)<=std::numeric_limits<double>::epsilon()) mainDir=secondDir;
+
         return ConstraintNormal(mainDir);
 
     }

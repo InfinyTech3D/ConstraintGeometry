@@ -117,27 +117,16 @@ public :
         return m_cid;
     }
 
-    void updateConstraintNormalFirstDirection(defaulttype::Vector3 dir){
-        m_normals.setFirstDirection(dir);
-    }
-
-    void printNormalDirections(){
-        for(int i=0; i<m_normals.size(); i++){
-            std::cout<<m_normals.m_dirs[i]<<std::endl;
-        }
-    }
-
-    void buildConstraintMatrixJ0(int cId, sofa::defaulttype::BaseMatrix * J0_from, sofa::defaulttype::BaseMatrix * /*J0_dest*/){
-        m_detection.first->buildConstraintMatrixJ0(cId, J0_from,  1.0);
-//        m_detection.first->buildConstraintMatrixJ0(cId, J0_dest,  -1.0);
+    void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_from, sofa::defaulttype::BaseMatrix * /*J_dest*/){
+        m_detection.first->buildConstraintProximityMatrix(cId, J_from,  1.0);
+//        m_detection.first->buildConstraintMatrixJ0(cId, J_dest,  -1.0);
 //        std::cout<<"proximity position "<<cId<<" = "<<m_detection.first->getPosition()<<std::endl;
     }
 
-    void pushNormalIntoVector(helper::vector<defaulttype::Vec3> * vecN, unsigned int & nb_nornmal){
+    void pushNormalIntoVector(helper::vector<defaulttype::Vec3> * vecN){
         for(int i=0; i<m_normals.size(); i++){
             vecN->push_back(m_normals.m_dirs[i]);
         }
-        nb_nornmal+=m_normals.size();
     }
 
     void pushNormalIntoMatrix(sofa::defaulttype::BaseMatrix * matN, unsigned int cId, unsigned int & dirId){

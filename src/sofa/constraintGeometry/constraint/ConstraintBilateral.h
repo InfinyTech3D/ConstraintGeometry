@@ -31,12 +31,6 @@ public:
         return l_directions->createConstraintsNormal(detection);
     }
 
-    ConstraintNormal UpdateConstraintNormalAndViolationWithProximityPosition(unsigned cid, const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 pf, bool getF, defaulttype::Vec3 pd, bool getD, defaulttype::BaseVector *delta) const override {
-        ConstraintNormal CN = l_directions->UpdateConstraintNormalWithProximityPosition(detection, pf, getF, pd, getD);
-        CN.UpdateConstraintViolationWithProximityPosition(cid, detection, pf, getF, pd, getD, delta);
-        return CN;
-    }
-
     core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint & cst) const {
         if (cst.size() == 1) {
             double maxf = std::numeric_limits<double>::max();

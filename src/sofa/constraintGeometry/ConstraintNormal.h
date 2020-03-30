@@ -94,17 +94,6 @@ public:
 
     }
 
-    defaulttype::Vector3 getFirstDirection(){
-        if(m_dirs.size() == 0){
-            std::cerr<<"error, no direction in constraint normal"<<std::endl;
-            return defaulttype::Vector3(0,0,0);
-        }
-        return m_dirs[0];
-    }
-
-    void setFirstDirection(defaulttype::Vector3 dir){
-        m_dirs[0] = dir;
-    }
 
     void UpdateConstraintViolationWithProximityPosition(unsigned  cid, const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 prox_from, bool getF, defaulttype::Vec3 prox_dest, bool getD, defaulttype::BaseVector * delta){
         defaulttype::Vector3 PFree = detection.first->getPosition(core::VecCoordId::freePosition());
