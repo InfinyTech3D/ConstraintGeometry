@@ -95,11 +95,12 @@ public:
     }
 
 
-    void UpdateConstraintViolationWithProximityPosition(unsigned  cid, const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 prox_from, bool getF, defaulttype::Vec3 prox_dest, bool getD, defaulttype::BaseVector * delta){
+    void UpdateConstraintViolationWithProximityPosition(unsigned  cid, const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 prox_from, bool getF, defaulttype::Vec3 prox_dest, bool getD, defaulttype::BaseVector * delta) const {
         defaulttype::Vector3 PFree = detection.first->getPosition(core::VecCoordId::freePosition());
         defaulttype::Vector3 QFree = detection.second->getPosition(core::VecCoordId::freePosition());
-//        if(getF) PFree = prox_from;
-//        if(getD) QFree = prox_dest;
+        defaulttype::Vec3 freeMotion = detection.first->getPosition(core::VecCoordId::freePosition()) - detection.first->getPosition(core::VecCoordId::position());
+        if(getF) PFree = prox_from;
+        if(getD) QFree = prox_dest;
         for (unsigned i=0;i<m_dirs.size();i++) {
             double v = dot(PFree - QFree, m_dirs[i]);
             delta->set(cid + i, v);

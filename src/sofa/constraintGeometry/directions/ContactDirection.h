@@ -32,6 +32,8 @@ public:
     ConstraintNormal UpdateConstraintNormalWithProximityPosition(const collisionAlgorithm::PairDetection & d, defaulttype::Vec3 pf, bool getF, defaulttype::Vec3 pd, bool getD) const override {
         defaulttype::Vector3 pfrom = d.first->getPosition();
         defaulttype::Vector3 pdest = d.second->getPosition();
+//        defaulttype::Vec3 freeMotion = d.first->getPosition(core::VecCoordId::freePosition()) - d.first->getPosition(core::VecCoordId::position());
+//        std::cout<<"free Motion = "<<freeMotion<<std::endl;
         if(getF) pfrom = pf;
         if(getD) pdest = pd;
         defaulttype::Vector3 dir = pfrom- pdest;

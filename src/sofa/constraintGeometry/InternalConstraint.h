@@ -117,10 +117,20 @@ public :
         return m_cid;
     }
 
-    void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_from, sofa::defaulttype::BaseMatrix * /*J_dest*/){
-        m_detection.first->buildConstraintProximityMatrix(cId, J_from,  1.0);
+    void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_from, sofa::defaulttype::BaseMatrix * /*J_dest*/, const bool expand){
+        m_detection.first->buildConstraintProximityMatrix(cId, J_from,  1.0, expand);
 //        m_detection.first->buildConstraintMatrixJ0(cId, J_dest,  -1.0);
 //        std::cout<<"proximity position "<<cId<<" = "<<m_detection.first->getPosition()<<std::endl;
+    }
+
+    void buildConstraintProximityMatrixDeriv(core::MultiMatrixDerivId cId, unsigned int constraintId) const {
+        helper::vector<defaulttype::Vector3> normals;
+        normals.clear();
+        normals.push_back(defaulttype::Vector3(1, 1, 1));
+
+        m_detection.first->buildJacobianConstraint(cId, normals,  1.0, constraintId);
+        m_detection.second->buildJacobianConstraint(cId, normals, -1.0, constraintId);
+
     }
 
     void pushNormalIntoVector(helper::vector<defaulttype::Vec3> * vecN){
@@ -137,6 +147,10 @@ public :
             matN->add(dirId, cId*3+2, n[2]);
             dirId++;
         }        
+    }
+
+    void UpdateConstraintViolationWithProximityPosition(unsigned  cid, const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 prox_from, bool getF, defaulttype::Vec3 prox_dest, bool getD, defaulttype::BaseVector * delta) const {
+            m_normals.UpdateConstraintViolationWithProximityPosition(cid, detection, prox_from, getF, prox_dest, getD, delta);
     }
 
  protected:
