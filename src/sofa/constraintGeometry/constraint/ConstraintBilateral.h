@@ -22,11 +22,13 @@ public:
     , l_directions(initLink("directions", "link to the default direction")) {}
 
     void init() { // make sure we have a direction
-        l_directions->setName("defaultDirection");
-        this->addSlave(l_directions.get());
+        if (l_directions == NULL) {
+            serr << "Error you must provide the directions to solve the constraints " << sendl;
+        } else this->addSlave(l_directions.get());
     }
 
     virtual ConstraintNormal createConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & detection) const override {
+        if (l_directions == NULL) return ConstraintNormal();
         return l_directions->createConstraintsNormal(detection);
     }
 
