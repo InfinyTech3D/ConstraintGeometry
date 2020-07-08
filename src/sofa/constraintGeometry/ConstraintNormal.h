@@ -103,7 +103,13 @@ public:
         if(getD) QFree = prox_dest;
         for (unsigned i=0;i<m_dirs.size();i++) {
             double v = dot(PFree - QFree, m_dirs[i]);
-            delta->set(cid + i, v);
+            delta->set(cid*m_dirs.size() + i, v);
+        }
+    }
+
+    void printDirections(){
+        for(int i=0; i<m_dirs.size(); i++){
+            std::cout<<"direction = "<<m_dirs[i]<<std::endl;
         }
     }
 
