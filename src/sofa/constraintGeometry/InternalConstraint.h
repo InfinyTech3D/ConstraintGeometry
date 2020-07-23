@@ -123,6 +123,25 @@ public :
 //        std::cout<<"proximity position "<<cId<<" = "<<m_detection.first->getPosition()<<std::endl;
     }
 
+    sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> * getStateFrom() const{
+        return m_detection.first->getState();
+    }
+
+    sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> * getStateDest() const{
+        return m_detection.second->getState();
+    }
+
+    void buildConstraintProximityMatrix(sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> *MecState, int cID, sofa::defaulttype::BaseMatrix * J_prox, const bool expand){
+        if(MecState == getStateFrom()) {
+            m_detection.first->buildConstraintProximityMatrix(cID, J_prox,  1.0, expand);
+        }
+
+        if(MecState == getStateDest()) {
+            m_detection.second->buildConstraintProximityMatrix(cID, J_prox,  -1.0, expand);
+        }
+    }
+
+
     void buildConstraintProximityMatrixDeriv(core::MultiMatrixDerivId cId, unsigned int constraintId) const {
         helper::vector<defaulttype::Vector3> normals;
         normals.clear();
@@ -152,6 +171,7 @@ public :
     void UpdateConstraintViolationWithProximityPosition(unsigned  cid, const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 prox_from, bool getF, defaulttype::Vec3 prox_dest, bool getD, defaulttype::BaseVector * delta) const {
             m_normals.UpdateConstraintViolationWithProximityPosition(cid, detection, prox_from, getF, prox_dest, getD, delta);
     }
+
 
  protected:
     collisionAlgorithm::PairDetection m_detection;
