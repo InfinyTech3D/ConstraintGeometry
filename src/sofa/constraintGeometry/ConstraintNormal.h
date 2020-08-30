@@ -83,12 +83,12 @@ public:
         return m_dirs[i];
     }
 
-    ConstraintNormal& operator=(const ConstraintNormal& _CN)
+    ConstraintNormal& operator=(const ConstraintNormal& CN)
     {
-        if(&_CN == this)
+        if(&CN == this)
             return *this;
-        this->m_dirs = _CN.m_dirs;
-        this->m_functions = _CN.m_functions;
+        this->m_dirs = CN.m_dirs;
+        this->m_functions = CN.m_functions;
 
         return *this;
 
