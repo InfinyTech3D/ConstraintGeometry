@@ -13,12 +13,6 @@
 #define PLUGIN_DATA_DIR_ QUOTE(PLUGIN_DATA_DIR)
 #endif
 
-#ifndef PLUGIN_GIT_INFO
-#define PLUGIN_GIT_INFO_ ""
-#else
-#define PLUGIN_GIT_INFO_ QUOTE(PLUGIN_GIT_INFO)
-#endif
-
 namespace sofa {
 
 namespace constraintGeometry {
@@ -52,7 +46,7 @@ namespace constraintGeometry {
 
 	const char* getModuleVersion()
 	{
-        return "0.0";
+        return PLUGIN_GIT_INFO;
 	}
 
 	const char* getModuleLicense()
@@ -62,14 +56,7 @@ namespace constraintGeometry {
 
     const char* getModuleDescription()
     {
-        std::ostringstream oss;
-        oss << "<MODULE_DESCRIPTION>" << std::endl
-            << "<GIT>" << PLUGIN_GIT_INFO_  << std::endl;
-
-        char* desc = new char[oss.str().size()];
-        strcpy(desc, oss.str().c_str());
-
-        return desc;
+        return "Plugin to hendle constraints";
     }
 
 	const char* getModuleComponentList()
