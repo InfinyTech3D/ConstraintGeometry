@@ -7,12 +7,6 @@
 #define Q(x) #x
 #define QUOTE(x) Q(x)
 
-#ifndef PLUGIN_DATA_DIR
-#define PLUGIN_DATA_DIR_ ""
-#else
-#define PLUGIN_DATA_DIR_ QUOTE(PLUGIN_DATA_DIR)
-#endif
-
 namespace sofa {
 
 namespace constraintGeometry {
@@ -34,7 +28,9 @@ namespace constraintGeometry {
 		if (first)
 		{
             first = false;
-            sofa::helper::system::DataRepository.addLastPath(std::string(PLUGIN_DATA_DIR_));
+#ifdef PLUGIN_DATA_DIR
+            sofa::helper::system::DataRepository.addLastPath(std::string(QUOTE(PLUGIN_DATA_DIR)));
+#endif
             sofa::helper::system::DataRepository.addLastPath(sofa::helper::system::SetDirectory::GetCurrentDir());
 		}
 	}
@@ -46,7 +42,11 @@ namespace constraintGeometry {
 
 	const char* getModuleVersion()
 	{
-        return PLUGIN_GIT_INFO;
+#ifdef PLUGIN_GIT_INFO
+        return QUOTE(PLUGIN_GIT_INFO);
+#else
+        return "??? to get the last git hash you must active the setupGit macro in CMakeLists"
+#endif
 	}
 
 	const char* getModuleLicense()
