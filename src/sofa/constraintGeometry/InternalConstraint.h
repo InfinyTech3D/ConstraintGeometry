@@ -172,6 +172,22 @@ public :
             m_normals.UpdateConstraintViolationWithProximityPosition(cid, detection, prox_from, getF, prox_dest, getD, delta);
     }
 
+    void buildConstraintMatrix_alt(core::MultiMatrixDerivId cId, unsigned int & constraintId) const {
+        m_cid = constraintId;
+        std::cout<<"buildConstraintMatrix_alt"<<std::endl;
+
+        helper::vector<defaulttype::Vector3> dirs;
+        dirs.clear();
+        for(int i=0; i<m_normals.size(); i++){
+            dirs.push_back(defaulttype::Vector3(1,1,1));
+        }
+
+        m_detection.first->buildJacobianConstraint(cId, dirs,  1.0, constraintId);
+        m_detection.second->buildJacobianConstraint(cId, dirs, -1.0, constraintId);
+
+        constraintId += m_normals.size();
+    }
+
 
  protected:
     collisionAlgorithm::PairDetection m_detection;
