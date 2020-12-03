@@ -45,7 +45,7 @@ namespace constraintGeometry {
 #ifdef PLUGIN_GIT_INFO
         return QUOTE(PLUGIN_GIT_INFO);
 #else
-        return "??? to get the last git hash you must active the setupGit macro in CMakeLists"
+        return "??? to get the last git hash you must active the setupGit macro in CMakeLists";
 #endif
 	}
 
