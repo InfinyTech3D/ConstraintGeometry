@@ -2,6 +2,7 @@
 
 #include <sofa/constraintGeometry/BaseConstraint.h>
 #include <sofa/constraintGeometry/directions/BindDirection.h>
+#include <sofa/core/behavior/ConstraintResolution.h>
 
 namespace sofa {
 
