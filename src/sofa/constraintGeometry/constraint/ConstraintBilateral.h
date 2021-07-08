@@ -12,8 +12,8 @@ class ConstraintBilateral : public BaseConstraint {
 public:
     SOFA_CLASS(ConstraintBilateral , BaseConstraint);
 
-    Data<helper::vector<double> > d_maxForce;
-    Data<helper::vector<double> > d_compliance;
+    Data<sofa::type::vector<double> > d_maxForce;
+    Data<sofa::type::vector<double> > d_compliance;
     core::objectmodel::SingleLink<ConstraintBilateral,ConstraintDirection, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_directions;
 
     ConstraintBilateral()

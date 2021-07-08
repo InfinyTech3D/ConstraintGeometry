@@ -59,7 +59,7 @@ public:
 
 
     virtual void init(int line, double** w, double * /*force*/) {
-        sofa::defaulttype::Mat<3,3,double> temp;
+        sofa::type::Mat<3,3,double> temp;
         for (unsigned j=0;j<3;j++) {
             for (unsigned i=0;i<3;i++) {
                 temp[j][i] = w[line+j][line+i];
@@ -110,7 +110,7 @@ public:
 
     double m_maxForce0,m_maxForce1,m_maxForce2;
     double m_friction;
-    sofa::defaulttype::Mat<3,3,double> invW;
+    sofa::type::Mat<3,3,double> invW;
 };
 
 }

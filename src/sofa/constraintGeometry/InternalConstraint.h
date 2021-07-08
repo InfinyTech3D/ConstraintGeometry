@@ -3,7 +3,7 @@
 #include <sofa/constraintGeometry/ConstraintNormal.h>
 #include <sofa/core/behavior/BaseConstraint.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
-#include <sofa/helper/vector.h>
+#include <sofa/type/vector.h>
 
 namespace sofa {
 
@@ -82,18 +82,18 @@ public :
 
     void draw(const core::visual::VisualParams* vparams,double scale) const {
         if (m_normals.size()>0) {
-            vparams->drawTool()->drawArrow(getFirstProximity()->getPosition(), getFirstProximity()->getPosition() + m_normals.m_dirs[0] * scale, scale * 0.1, helper::types::RGBAColor(1,0,0,1));
-//            vparams->drawTool()->drawArrow(m_p2->getPosition(), m_p2->getPosition() - m_normals.m_dirs[0] * scale, scale * 0.1, helper::types::RGBAColor(1,0,0,1));
+            vparams->drawTool()->drawArrow(getFirstProximity()->getPosition(), getFirstProximity()->getPosition() + m_normals.m_dirs[0] * scale, scale * 0.1, type::RGBAColor(1,0,0,1));
+//            vparams->drawTool()->drawArrow(m_p2->getPosition(), m_p2->getPosition() - m_normals.m_dirs[0] * scale, scale * 0.1, type::RGBAColor(1,0,0,1));
         }
 
         if (m_normals.size()>1) {
-            vparams->drawTool()->drawArrow(getFirstProximity()->getPosition(), getFirstProximity()->getPosition() + m_normals.m_dirs[1] * scale, scale * 0.1, helper::types::RGBAColor(0,1,0,1));
-//            vparams->drawTool()->drawArrow(m_p2->getPosition(), m_p2->getPosition() - m_normals.m_dirs[1] * scale, scale * 0.1, helper::types::RGBAColor(0,1,0,1));
+            vparams->drawTool()->drawArrow(getFirstProximity()->getPosition(), getFirstProximity()->getPosition() + m_normals.m_dirs[1] * scale, scale * 0.1, type::RGBAColor(0,1,0,1));
+//            vparams->drawTool()->drawArrow(m_p2->getPosition(), m_p2->getPosition() - m_normals.m_dirs[1] * scale, scale * 0.1, type::RGBAColor(0,1,0,1));
         }
 
         if (m_normals.size()>2) {
-            vparams->drawTool()->drawArrow(getFirstProximity()->getPosition(), getFirstProximity()->getPosition() + m_normals.m_dirs[2] * scale, scale * 0.1, helper::types::RGBAColor(0,0,1,1));
-//            vparams->drawTool()->drawArrow(m_p2->getPosition(), m_p2->getPosition() - m_normals.m_dirs[2] * scale, scale * 0.1, helper::types::RGBAColor(0,0,1,1));
+            vparams->drawTool()->drawArrow(getFirstProximity()->getPosition(), getFirstProximity()->getPosition() + m_normals.m_dirs[2] * scale, scale * 0.1, type::RGBAColor(0,0,1,1));
+//            vparams->drawTool()->drawArrow(m_p2->getPosition(), m_p2->getPosition() - m_normals.m_dirs[2] * scale, scale * 0.1, type::RGBAColor(0,0,1,1));
         }
     }
 
@@ -143,16 +143,16 @@ public :
 
 
     void buildConstraintProximityMatrixDeriv(core::MultiMatrixDerivId cId, unsigned int constraintId) const {
-        helper::vector<defaulttype::Vector3> normals;
+        sofa::type::vector<type::Vector3> normals;
         normals.clear();
-        normals.push_back(defaulttype::Vector3(1, 1, 1));
+        normals.push_back(type::Vector3(1, 1, 1));
 
         m_detection.first->buildJacobianConstraint(cId, normals,  1.0, constraintId);
         m_detection.second->buildJacobianConstraint(cId, normals, -1.0, constraintId);
 
     }
 
-    void pushNormalIntoVector(helper::vector<defaulttype::Vec3> * vecN){
+    void pushNormalIntoVector(sofa::type::vector<type::Vec3> * vecN){
         for(int i=0; i<m_normals.size(); i++){
             vecN->push_back(m_normals.m_dirs[i]);
         }
@@ -160,7 +160,7 @@ public :
 
     void pushNormalIntoMatrix(sofa::defaulttype::BaseMatrix * matN, unsigned int cId, unsigned int & dirId){
         for(int i=0; i<m_normals.size(); i++){
-            defaulttype::Vector3 n = m_normals.m_dirs[i];
+            type::Vector3 n = m_normals.m_dirs[i];
             matN->add(dirId, cId*3, n[0]);
             matN->add(dirId, cId*3+1, n[1]);
             matN->add(dirId, cId*3+2, n[2]);
@@ -168,7 +168,7 @@ public :
         }        
     }
 
-    void UpdateConstraintViolationWithProximityPosition(unsigned  cid, const collisionAlgorithm::PairDetection & detection, defaulttype::Vec3 prox_from, bool getF, defaulttype::Vec3 prox_dest, bool getD, defaulttype::BaseVector * delta) const {
+    void UpdateConstraintViolationWithProximityPosition(unsigned  cid, const collisionAlgorithm::PairDetection & detection, type::Vec3 prox_from, bool getF, type::Vec3 prox_dest, bool getD, defaulttype::BaseVector * delta) const {
             m_normals.UpdateConstraintViolationWithProximityPosition(cid, detection, prox_from, getF, prox_dest, getD, delta);
     }
 
@@ -176,10 +176,10 @@ public :
         m_cid = constraintId;
         std::cout<<"buildConstraintMatrix_alt"<<std::endl;
 
-        helper::vector<defaulttype::Vector3> dirs;
+        sofa::type::vector<type::Vector3> dirs;
         dirs.clear();
         for(int i=0; i<m_normals.size(); i++){
-            dirs.push_back(defaulttype::Vector3(1,1,1));
+            dirs.push_back(type::Vector3(1,1,1));
         }
 
         m_detection.first->buildJacobianConstraint(cId, dirs,  1.0, constraintId);

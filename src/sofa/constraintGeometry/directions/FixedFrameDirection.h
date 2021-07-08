@@ -15,7 +15,7 @@ class FixedFrameDirection : public ConstraintDirection {
 public:
     SOFA_CLASS(FixedFrameDirection , ConstraintDirection);
 
-//    Data<std::vector<defaulttype::Vec3> > d_frame ;
+//    Data<std::vector<type::Vec3> > d_frame ;
 
     FixedFrameDirection ()
 //        : d_frame (initData(&d_frame, "frame", "frame vectors"))
@@ -31,7 +31,7 @@ public:
                  .addOrthogonalDirection();
     }
 
-    ConstraintNormal UpdateConstraintNormalWithProximityPosition(const collisionAlgorithm::PairDetection & d, defaulttype::Vec3 /*pf*/, bool /*getF*/, defaulttype::Vec3 /*pd*/, bool /*getD*/) const override {
+    ConstraintNormal UpdateConstraintNormalWithProximityPosition(const collisionAlgorithm::PairDetection & d, type::Vec3 /*pf*/, bool /*getF*/, type::Vec3 /*pd*/, bool /*getD*/) const override {
         return createConstraintsNormal(d);
     }
 

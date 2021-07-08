@@ -39,7 +39,7 @@ public:
 
     virtual void init(int line, double** w, double * /*force*/)
     {
-        sofa::defaulttype::Mat<2,2,double> temp;
+        sofa::type::Mat<2,2,double> temp;
         for (unsigned j=0;j<2;j++) {
             for (unsigned i=0;i<2;i++) {
                 temp[j][i] = w[line+j][line+i];
@@ -48,7 +48,7 @@ public:
             }
         }
 
-        sofa::defaulttype::invertMatrix(invW,temp);
+        sofa::type::invertMatrix(invW,temp);
     }
 
     virtual void resolution(int line, double** /*w*/, double* d, double* force, double * /*dFree*/)
@@ -66,7 +66,7 @@ public:
 
     double m_maxForce[2];
     double m_compliance[2];
-    sofa::defaulttype::Mat<2,2,double> invW;
+    sofa::type::Mat<2,2,double> invW;
 };
 
 
@@ -85,7 +85,7 @@ public:
 
     virtual void init(int line, double** w, double * /*force*/)
     {
-        sofa::defaulttype::Mat<3,3,double> temp;
+        sofa::type::Mat<3,3,double> temp;
         for (unsigned j=0;j<3;j++) {
             for (unsigned i=0;i<3;i++) {
                 temp[j][i] = w[line+j][line+i];
@@ -94,7 +94,7 @@ public:
             }
         }
 
-        sofa::defaulttype::invertMatrix(invW,temp);
+        sofa::type::invertMatrix(invW,temp);
     }
 
     virtual void resolution(int line, double** /*w*/, double* d, double* force, double * /*dFree*/)
@@ -112,7 +112,7 @@ public:
 
     double m_maxForce[3];
     double m_compliance[3];
-    sofa::defaulttype::Mat<3,3,double> invW;
+    sofa::type::Mat<3,3,double> invW;
 };
 
 }
