@@ -20,10 +20,12 @@ public:
     SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseConstraint);
 
     Data<double> d_drawScale;
+    Data<bool> d_draw;
     Data<collisionAlgorithm::DetectionOutput> d_input;
 
     BaseConstraint()
         : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
+        , d_draw(initData(&d_draw, true, "draw", "draw "))
         , d_input(initData(&d_input, "input", "Link to detection output"))
     {}
 
@@ -81,6 +83,7 @@ public:
     }
 
     void draw(const core::visual::VisualParams* vparams) {
+        if(!d_draw.getValue()) return;
         if(d_drawScale.getValue()>std::numeric_limits<double>::min())
         {
             if (vparams->displayFlags().getShowInteractionForceFields()) {
