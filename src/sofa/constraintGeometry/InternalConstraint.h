@@ -159,7 +159,7 @@ public :
     }
 
     void pushNormalIntoMatrix(sofa::defaulttype::BaseMatrix * matN, unsigned int cId, unsigned int & dirId){
-        for(int i=0; i<m_normals.size(); i++){
+        for(unsigned i=0; i<m_normals.size(); i++){
             type::Vector3 n = m_normals.m_dirs[i];
             matN->add(dirId, cId*3, n[0]);
             matN->add(dirId, cId*3+1, n[1]);
@@ -178,7 +178,7 @@ public :
 
         sofa::type::vector<type::Vector3> dirs;
         dirs.clear();
-        for(int i=0; i<m_normals.size(); i++){
+        for(unsigned i=0; i<m_normals.size(); i++){
             dirs.push_back(type::Vector3(1,1,1));
         }
 

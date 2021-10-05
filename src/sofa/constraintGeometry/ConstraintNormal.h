@@ -98,7 +98,7 @@ public:
     void UpdateConstraintViolationWithProximityPosition(unsigned  cid, const collisionAlgorithm::PairDetection & detection, type::Vec3 prox_from, bool getF, type::Vec3 prox_dest, bool getD, defaulttype::BaseVector * delta) const {
         type::Vector3 PFree = detection.first->getPosition(core::VecCoordId::freePosition());
         type::Vector3 QFree = detection.second->getPosition(core::VecCoordId::freePosition());
-        type::Vec3 freeMotion = detection.first->getPosition(core::VecCoordId::freePosition()) - detection.first->getPosition(core::VecCoordId::position());
+//        type::Vec3 freeMotion = detection.first->getPosition(core::VecCoordId::freePosition()) - detection.first->getPosition(core::VecCoordId::position());
         if(getF) PFree = prox_from;
         if(getD) QFree = prox_dest;
         for (unsigned i=0;i<m_dirs.size();i++) {
@@ -108,7 +108,7 @@ public:
     }
 
     void printDirections(){
-        for(int i=0; i<m_dirs.size(); i++){
+        for(unsigned i=0; i<m_dirs.size(); i++){
             std::cout<<"direction = "<<m_dirs[i]<<std::endl;
         }
     }
