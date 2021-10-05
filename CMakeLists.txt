@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 3.1)
 project(ConstraintGeometry)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-if(COMMAND setupGitInfo)
-    setupGitInfo(PLUGIN_GIT_INFO)
-endif()
-
 
 file(GLOB_RECURSE HEADER_FILES
     "src/*.h"
@@ -35,6 +31,8 @@ file(GLOB_RECURSE DEPRECATED_FILES
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/ignored")
 #include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deprecated")
+
+find_package(CollisionAlgorithm REQUIRED)
 
 set_source_files_properties(${IGNORED_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 
