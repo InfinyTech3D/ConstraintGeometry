@@ -57,8 +57,14 @@ public:
      * \param constraintId
      */
     virtual void buildConstraintMatrix(const core::ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned int &constraintId) {
+        setConstraintId(constraintId);
+        m_nbConstraints = 0;
         for (unsigned i=0;i<m_container.size();i++)
+        {
             m_container[i].buildConstraintMatrix(cId,constraintId);
+            m_nbConstraints += m_container[i].size();
+
+        }
     }
 
     /*!
@@ -132,9 +138,20 @@ public:
 
     void updateForceMask() {}
 
+    unsigned getCId ()
+    {
+        return this->m_cId;
+    }
+
+    unsigned getSize ()
+    {
+        return m_nbConstraints;
+    }
+
 
 protected:
     std::vector<InternalConstraint>  m_container;
+    unsigned m_nbConstraints;
 };
 
 }
