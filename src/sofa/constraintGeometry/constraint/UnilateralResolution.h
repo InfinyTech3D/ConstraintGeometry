@@ -5,6 +5,7 @@
 #include <sofa/core/behavior/ConstraintResolution.h>
 
 
+
 namespace sofa {
 
 namespace constraintGeometry {

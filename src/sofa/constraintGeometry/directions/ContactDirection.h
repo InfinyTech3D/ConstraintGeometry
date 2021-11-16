@@ -29,21 +29,6 @@ public:
         return ConstraintNormal(mainDir);
     }
 
-    ConstraintNormal UpdateConstraintNormalWithProximityPosition(const collisionAlgorithm::PairDetection & d, type::Vec3 pf, bool getF, type::Vec3 pd, bool getD) const override {
-        type::Vector3 pfrom = d.first->getPosition();
-        type::Vector3 pdest = d.second->getPosition();
-//        type::Vec3 freeMotion = d.first->getPosition(core::VecCoordId::freePosition()) - d.first->getPosition(core::VecCoordId::position());
-//        std::cout<<"free Motion = "<<freeMotion<<std::endl;
-        if(getF) pfrom = pf;
-        if(getD) pdest = pd;
-        type::Vector3 dir = pfrom- pdest;
-        type::Vector3 mainDir = dir.normalized();
-        type::Vector3 secondDir = d.second->getNormal().normalized();
-        if (dot(mainDir,secondDir)<=std::numeric_limits<double>::epsilon()) mainDir=secondDir;
-
-        return ConstraintNormal(mainDir);
-
-    }
 
 };
 

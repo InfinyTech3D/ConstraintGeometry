@@ -117,73 +117,30 @@ public :
         return m_cid;
     }
 
-    void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_from, sofa::defaulttype::BaseMatrix * /*J_dest*/, const bool expand){
-        m_detection.first->buildConstraintProximityMatrix(cId, J_from,  1.0, expand);
-//        m_detection.first->buildConstraintMatrixJ0(cId, J_dest,  -1.0);
-//        std::cout<<"proximity position "<<cId<<" = "<<m_detection.first->getPosition()<<std::endl;
-    }
+    void buildProximityMappingMatrix(core::MultiMatrixDerivId cId, unsigned int & constraintId) const {
+        std::cout<<"buildProximityMappingMatrix"<<std::endl;
 
-    sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> * getStateFrom() const{
-        return m_detection.first->getState();
-    }
-
-    sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> * getStateDest() const{
-        return m_detection.second->getState();
-    }
-
-    void buildConstraintProximityMatrix(sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> *MecState, int cID, sofa::defaulttype::BaseMatrix * J_prox, const bool expand){
-        if(MecState == getStateFrom()) {
-            m_detection.first->buildConstraintProximityMatrix(cID, J_prox,  1.0, expand);
-        }
-
-        if(MecState == getStateDest()) {
-            m_detection.second->buildConstraintProximityMatrix(cID, J_prox,  -1.0, expand);
-        }
-    }
-
-
-    void buildConstraintProximityMatrixDeriv(core::MultiMatrixDerivId cId, unsigned int constraintId) const {
-        sofa::type::vector<type::Vector3> normals;
-        normals.clear();
-        normals.push_back(type::Vector3(1, 1, 1));
-
-        m_detection.first->buildJacobianConstraint(cId, normals,  1.0, constraintId);
-        m_detection.second->buildJacobianConstraint(cId, normals, -1.0, constraintId);
-
-    }
-
-    void pushNormalIntoVector(sofa::type::vector<type::Vec3> * vecN){
-        for(int i=0; i<m_normals.size(); i++){
-            vecN->push_back(m_normals.m_dirs[i]);
-        }
-    }
-
-    void pushNormalIntoMatrix(sofa::defaulttype::BaseMatrix * matN, unsigned int cId, unsigned int & dirId){
-        for(unsigned i=0; i<m_normals.size(); i++){
-            type::Vector3 n = m_normals.m_dirs[i];
-            matN->add(dirId, cId*3, n[0]);
-            matN->add(dirId, cId*3+1, n[1]);
-            matN->add(dirId, cId*3+2, n[2]);
-            dirId++;
-        }        
-    }
-
-    void UpdateConstraintViolationWithProximityPosition(unsigned  cid, const collisionAlgorithm::PairDetection & detection, type::Vec3 prox_from, bool getF, type::Vec3 prox_dest, bool getD, defaulttype::BaseVector * delta) const {
-            m_normals.UpdateConstraintViolationWithProximityPosition(cid, detection, prox_from, getF, prox_dest, getD, delta);
-    }
-
-    void buildConstraintMatrix_alt(core::MultiMatrixDerivId cId, unsigned int & constraintId) const {
-        m_cid = constraintId;
-        std::cout<<"buildConstraintMatrix_alt"<<std::endl;
+        m_cSetId = constraintId;
 
         sofa::type::vector<type::Vector3> dirs;
         dirs.clear();
-        for(unsigned i=0; i<m_normals.size(); i++){
-            dirs.push_back(type::Vector3(1,1,1));
-        }
+        dirs.push_back(type::Vector3(1,0,0));
+        dirs.push_back(type::Vector3(0,1,0));
+        dirs.push_back(type::Vector3(0,0,1));
 
         m_detection.first->buildJacobianConstraint(cId, dirs,  1.0, constraintId);
         m_detection.second->buildJacobianConstraint(cId, dirs, -1.0, constraintId);
+
+        constraintId += 3;
+    }
+
+    void buildConstraintNormalMatrix(sofa::type::vector<sofa::type::Vector3> & normal, unsigned int & constraintId) const {
+        m_cDirId = constraintId;
+
+        normal.clear();
+        for (unsigned i=0;i<m_normals.size();i++) {
+            normal.push_back(m_normals.m_dirs[i]);
+        }
 
         constraintId += m_normals.size();
     }
@@ -194,6 +151,9 @@ public :
     ConstraintNormal m_normals;
     ResolutionCreator m_creator;
     mutable unsigned m_cid;
+
+    mutable unsigned m_cDirId;
+    mutable unsigned m_cSetId;
 };
 
 }
