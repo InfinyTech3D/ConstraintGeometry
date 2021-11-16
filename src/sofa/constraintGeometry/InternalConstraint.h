@@ -26,7 +26,10 @@ public :
     : m_detection(detection)
     , m_normals(normals)
     , m_creator(creator)
-    , m_cid(0) {}
+    , m_cid(0)
+    , m_cSetId(0)
+    , m_cDirId(0)
+    {}
 
     /*!
      * \brief buildConstraintMatrix
@@ -117,10 +120,8 @@ public :
         return m_cid;
     }
 
-    void buildProximityMappingMatrix(core::MultiMatrixDerivId cId, unsigned int & constraintId) const {
-        std::cout<<"buildProximityMappingMatrix"<<std::endl;
-
-        m_cSetId = constraintId;
+    void buildProximityMappingMatrix(core::MultiMatrixDerivId cId, unsigned int & csetId) const {
+        m_cSetId = csetId;
 
         sofa::type::vector<type::Vector3> dirs;
         dirs.clear();
@@ -128,21 +129,21 @@ public :
         dirs.push_back(type::Vector3(0,1,0));
         dirs.push_back(type::Vector3(0,0,1));
 
-        m_detection.first->buildJacobianConstraint(cId, dirs,  1.0, constraintId);
-        m_detection.second->buildJacobianConstraint(cId, dirs, -1.0, constraintId);
+        m_detection.first->buildJacobianConstraint(cId, dirs,  1.0, csetId*3);
+        m_detection.second->buildJacobianConstraint(cId, dirs, -1.0, csetId*3);
 
-        constraintId += 3;
+        csetId ++;
     }
 
-    void buildConstraintNormalMatrix(sofa::type::vector<sofa::type::Vector3> & normal, unsigned int & constraintId) const {
-        m_cDirId = constraintId;
+    void buildConstraintNormalMatrix(sofa::type::vector<sofa::type::Vector3> & normal, sofa::type::vector<int> & cstInd, unsigned int & cdirId) const {
+        m_cDirId = cdirId;
 
-        normal.clear();
         for (unsigned i=0;i<m_normals.size();i++) {
             normal.push_back(m_normals.m_dirs[i]);
         }
 
-        constraintId += m_normals.size();
+        cdirId += m_normals.size();
+        cstInd.push_back(cdirId);
     }
 
 
