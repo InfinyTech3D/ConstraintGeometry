@@ -146,6 +146,15 @@ public :
         cstInd.push_back(cdirId);
     }
 
+    unsigned constraintSetId() const {
+        return m_cSetId;
+    }
+
+    unsigned constraintDirId() const {
+        return m_cDirId;
+    }
+
+
 
  protected:
     collisionAlgorithm::PairDetection m_detection;

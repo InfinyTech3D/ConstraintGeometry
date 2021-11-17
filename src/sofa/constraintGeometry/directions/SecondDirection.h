@@ -21,9 +21,6 @@ public:
         return ConstraintNormal(d.second->getNormal());
     }
 
-    ConstraintNormal UpdateConstraintNormalWithProximityPosition(const collisionAlgorithm::PairDetection & d, type::Vec3 /*pf*/, bool /*getF*/, type::Vec3 /*pd*/, bool /*getD*/) const override {
-        return createConstraintsNormal(d);
-    }
 };
 
 }
