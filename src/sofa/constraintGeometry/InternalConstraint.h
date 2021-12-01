@@ -146,6 +146,13 @@ public :
         cstInd.push_back(cdirId);
     }
 
+    void SetProximityFreePosition(sofa::core::MultiVecDerivId pfreeId) const {
+        const type::Vector3 & PFree = m_detection.first->getPosition(core::VecCoordId::freePosition());
+        const type::Vector3 & QFree = m_detection.second->getPosition(core::VecCoordId::freePosition());
+
+
+    }
+
     unsigned constraintSetId() const {
         return m_cSetId;
     }
