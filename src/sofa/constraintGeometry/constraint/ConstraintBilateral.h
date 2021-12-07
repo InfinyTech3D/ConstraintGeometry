@@ -23,7 +23,7 @@ public:
 
     void init() { // make sure we have a direction
         if (l_directions == NULL) {
-            serr << "Error you must provide the directions to solve the constraints " << sendl;
+            msg_error(this) << "Error you must provide the directions to solve the constraints ";
         } else this->addSlave(l_directions.get());
     }
 

@@ -146,9 +146,9 @@ public :
         cstInd.push_back(cdirId);
     }
 
-    void SetProximityFreePosition(sofa::core::MultiVecDerivId pfreeId) const {
-        const type::Vector3 & PFree = m_detection.first->getPosition(core::VecCoordId::freePosition());
-        const type::Vector3 & QFree = m_detection.second->getPosition(core::VecCoordId::freePosition());
+    void SetProximityFreePosition(sofa::core::MultiVecDerivId /*pfreeId*/) const {
+//        const type::Vector3 & PFree = m_detection.first->getPosition(core::VecCoordId::freePosition());
+//        const type::Vector3 & QFree = m_detection.second->getPosition(core::VecCoordId::freePosition());
 
 
     }
@@ -169,8 +169,8 @@ public :
     ResolutionCreator m_creator;
     mutable unsigned m_cid;
 
-    mutable unsigned m_cDirId;
     mutable unsigned m_cSetId;
+    mutable unsigned m_cDirId;
 };
 
 }

@@ -28,6 +28,11 @@ public:
 
     ConstraintNormal() {}
 
+    ConstraintNormal(const ConstraintNormal & cn) {
+        m_dirs = cn.m_dirs;
+        m_functions = cn.m_functions;
+    }
+
     ConstraintNormal(const type::Vector3 & N, ViolationFunction f = std::bind(&ConstraintNormal::defaultViolationFunction, std::placeholders::_1, std::placeholders::_2)) {
         m_dirs.push_back(N.normalized());
         m_functions.push_back(f);
