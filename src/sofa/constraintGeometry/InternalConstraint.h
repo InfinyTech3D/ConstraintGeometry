@@ -46,7 +46,7 @@ public :
         constraintId += m_normals.size();
     }
 
-    void getConstraintViolation(defaulttype::BaseVector *v) const {
+    void getConstraintViolation(linearalgebra::BaseVector *v) const {
         //for (unsigned i=0;i<m_normals.size();i++) {
             m_normals.computeViolations(m_cid, m_detection, v);
         //}
@@ -66,7 +66,7 @@ public :
      * \param res
      * \param lambda
      */
-    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) const {
+    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::linearalgebra::BaseVector* lambda) const {
         for (unsigned i=0;i<m_normals.size();i++) {
             m_detection.first->storeLambda(cParams,res,m_cid,i,lambda);
             m_detection.second->storeLambda(cParams,res,m_cid,i,lambda);
@@ -79,7 +79,7 @@ public :
      * \param id : unsigned
      * \return lambda element @ cid+id
      */
-    double getLambda(const sofa::defaulttype::BaseVector* lambda, unsigned id) {
+    double getLambda(const sofa::linearalgebra::BaseVector* lambda, unsigned id) {
         return lambda->element(m_cid+id);
     }
 

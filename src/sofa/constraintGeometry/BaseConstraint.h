@@ -71,7 +71,7 @@ public:
      * \brief getConstraintViolation gets constraint violation for each constraint in constraint container
      * \param v
      */
-    virtual void getConstraintViolation(const core::ConstraintParams* /*cParams*/, defaulttype::BaseVector *v,unsigned /*cid*/) {
+    virtual void getConstraintViolation(const core::ConstraintParams* /*cParams*/, linearalgebra::BaseVector *v,unsigned /*cid*/) {
         for (unsigned i=0;i<m_container.size();i++)
             m_container[i].getConstraintViolation(v);
     }
@@ -118,7 +118,7 @@ public:
      * \param res
      * \param lambda
      */
-    virtual void storeLambda(const InternalConstraint & cst, const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
+    virtual void storeLambda(const InternalConstraint & cst, const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::linearalgebra::BaseVector* lambda) {
         cst.storeLambda(cParams,res,lambda);
     }
 
@@ -128,7 +128,7 @@ public:
      * \param res
      * \param lambda
      */
-     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) {
+     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::linearalgebra::BaseVector* lambda) {
         if (! cParams)
             return;
 

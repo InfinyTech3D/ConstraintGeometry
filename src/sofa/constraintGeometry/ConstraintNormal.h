@@ -77,7 +77,7 @@ public:
         return *this;
     }
 
-    void computeViolations(unsigned  cid, collisionAlgorithm::PairDetection d, defaulttype::BaseVector * delta) const {
+    void computeViolations(unsigned  cid, collisionAlgorithm::PairDetection d, linearalgebra::BaseVector * delta) const {
         for (unsigned i=0;i<m_dirs.size();i++) {
             double v = m_functions[i](d, m_dirs[i]);
             delta->set(cid + i, v);
