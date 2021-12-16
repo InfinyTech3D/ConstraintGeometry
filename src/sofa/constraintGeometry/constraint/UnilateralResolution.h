@@ -58,23 +58,13 @@ public:
         m_maxForce2(m2),
         m_friction(f) {}
 
-
-    virtual void init(int line, double** w, double * /*force*/) {
-        sofa::type::Mat<3,3,double> temp;
-        for (unsigned j=0;j<3;j++) {
-            for (unsigned i=0;i<3;i++) {
-                temp[j][i] = w[line+j][line+i];
-            }
-        }
-
-        invertMatrix(invW, temp);
-    }
-
-    virtual void resolution(int line, double** /*w*/, double* d, double* force, double * /*dFree*/) {
+    virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/) {
         //we solve the first constraint as if there was no friction
-        force[line+0] -= invW[0][0] * d[line+0] +
-                         invW[0][1] * d[line+1] +
-                         invW[0][2] * d[line+2] ;
+        double inv;
+        inv=1.0/(w[line][line]);
+        double corr0 = -inv * d[line+0];
+        force[line+0] += corr0;
+
 
         //we check unilateral conditions
         if (force[line]<0) {
@@ -88,13 +78,16 @@ public:
         if (force[line]>m_maxForce0) force[line] = m_maxForce0;
 
         //now we compute tangential forces
-        force[line+1] -= invW[1][0] * d[line+0] +
-                         invW[1][1] * d[line+1] +
-                         invW[1][2] * d[line+2] ;
 
-        force[line+2] -= invW[2][0] * d[line+0] +
-                         invW[2][1] * d[line+1] +
-                         invW[2][2] * d[line+2] ;
+        d[line+1] += w[line+1][line+0] * corr0;
+        inv=1.0/(w[line+1][line+1]);
+        double corr1= -inv * d[line+1];
+        force[line+1] += corr1;
+
+        d[line+2] += w[line+2][line+0] * corr0 + w[line+2][line+0] * corr1;
+        inv=1.0/(w[line+2][line+2]);
+        double corr2= -inv * d[line+2];
+        force[line+2] += corr2;
 
 
         double slip_force = force[line+0] * m_friction;
@@ -111,7 +104,6 @@ public:
 
     double m_maxForce0,m_maxForce1,m_maxForce2;
     double m_friction;
-    sofa::type::Mat<3,3,double> invW;
 };
 
 }
