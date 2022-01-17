@@ -2,33 +2,21 @@
 <Node name="Root" gravity="0 -15 0" dt="0.05">
         <RequiredPlugin pluginName="CollisionAlgorithm"/>
         <RequiredPlugin pluginName="ConstraintGeometry"/>
-        <RequiredPlugin pluginName="SofaCUDASolvers"/>
-        <RequiredPlugin pluginName="SofaAsyncSolvers"/>
-        <RequiredPlugin pluginName='SofaExporter'/>
-        <RequiredPlugin pluginName='SofaPreconditioner'/>
-        <RequiredPlugin pluginName='SofaSparseSolver'/>
-<!--        <RequiredPlugin pluginName='SofaDefaultPlugin'/>-->
-<!--        <RequiredPlugin pluginName='RegressionTestPlugin'/>-->
-<!--        <TestManager filename="/home/hadrien/travail/ConstraintGeometry/ConstraintGeometryTest.xml" scene="scenes/liver.scn" drawScale="0.1" printLog="1" />-->
 
         <VisualStyle displayFlags="showVisualModels hideBehaviorModels showCollisionModels hideMappings hideForceFields showWireframe showInteractionForceFields" />
-<!--         <DefaultAnimationLoop /> -->
         <FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
         <GenericConstraintSolver maxIterations="200" tolerance="0.0001" />
 
-<!--        <ContactDistance name="dist" /> -->
+        <CollisionLoop />
         <FindClosestProximityAlgorithm name="algo" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
-        <NormalFilter name="normal" algo="@algo" angle="-1 0.5" />
-        <DistanceFilter name="distance" algo="@algo" distance="0.1" />
-        <AABBSearchMethod algo="@algo" />
+<!--         <NormalFilter name="normal" algo="@algo" angle="-1 0.5" /> -->
+<!--         <DistanceFilter name="distance" algo="@algo" distance="0.1" /> -->
+<!--         <AABBSearchMethod algo="@algo" /> -->
 <!--        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" distance="@dist.distance" dest="@Liver/Collision/TriangleGeometry" from="@Plane/TriangleGeometry" />-->
 
         <Node name="Liver">
                 <EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
-<!--                <SparseLDLSolver />-->
-<!--                <CGLinearSolver name="CGLinearSolver" tolerance="1e-09" threshold="1e-09" />-->
-<!--                <ShewchukPCGLinearSolver name="solver" tolerance="1e-5" iterations="20" preconditioners="precond" update_step="1" />-->
-                <CudaSparseLDLSolver name="precond" template="CompressedRowSparseMatrix3f" />
+                <SparseLDLSolver />
 
                 <MeshGmshLoader name="loader" filename="mesh/liver.msh"/>
                 <MeshTopology name="Topology" tetrahedra="@loader.tetrahedra" />
@@ -50,7 +38,7 @@
 <!--                        <PointGeometry name="Geometry" color="0 0 1 1" drawRadius="0.1" />-->
 <!--                        <BezierTriangleGeometry name="Geometry" color="0 0 1 1" />-->
 
-                        <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" />
+<!--                         <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" /> -->
 
                         <BarycentricMapping name="BarycentricMapping"/>
                 </Node>
@@ -62,7 +50,7 @@
                         <BarycentricMapping name="BarycentricMapping"/>
                 </Node>
 
-                <LinearSolverConstraintCorrection solverName="precond" />
+                <LinearSolverConstraintCorrection />
         </Node>
 
         <Node name="Plane">
@@ -71,11 +59,11 @@
                 <MechanicalObject name="State3D1" dy="1" position="@loader.position" />
                 <OglModel name="OglModel" color="1 1 1 0.8"/>
                 <TriangleGeometry name="Geometry" color="1 1 1 0.6" />
-                <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" />
+<!--                 <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" /> -->
         </Node>
 
 <!--        <SecondNormalDirection name="dir" />-->
-        <ConstraintUnilateral input="@algo.output" mu="0.6" />
+<!--         <ConstraintUnilateral input="@algo.output" mu="0.6" /> -->
 <!--        <TestConstraintBilateral name="test" />-->
 <!--		<ConstraintBilateral input="@algo.output" />-->
 <!--	<Constraintless algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />-->
