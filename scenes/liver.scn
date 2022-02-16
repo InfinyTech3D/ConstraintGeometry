@@ -62,11 +62,13 @@
                 <MechanicalObject name="State3D1" dy="1" position="@loader.position" />
                 <OglModel name="OglModel" color="1 1 1 0.8"/>
                 <TriangleGeometry name="Geometry" color="1 1 1 0.6" />
+                <PhongTriangleNormalHandler geometry="@Geometry" />
+                
 <!--                 <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" /> -->
         </Node>
 
-<!--        <SecondNormalDirection name="dir" />-->
-<!--         <ConstraintUnilateral input="@algo.output" mu="0.6" /> -->
+<!--         <SecondNormalDirection name="dir" /> -->
+        <ConstraintUnilateral name="constraint" input="@algo.output" mu="0.6" />
 <!--        <TestConstraintBilateral name="test" />-->
 <!--		<ConstraintBilateral input="@algo.output" />-->
 <!--	<Constraintless algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />-->
