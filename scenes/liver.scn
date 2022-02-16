@@ -9,6 +9,9 @@
 
         <CollisionLoop />
         <FindClosestProximityAlgorithm name="algo" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
+
+        
+        
 <!--         <NormalFilter name="normal" algo="@algo" angle="-1 0.5" /> -->
 <!--         <DistanceFilter name="distance" algo="@algo" distance="0.1" /> -->
 <!--         <AABBSearchMethod algo="@algo" /> -->
@@ -38,7 +41,7 @@
 <!--                        <PointGeometry name="Geometry" color="0 0 1 1" drawRadius="0.1" />-->
 <!--                        <BezierTriangleGeometry name="Geometry" color="0 0 1 1" />-->
 
-<!--                         <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" /> -->
+                        <AABBGeometry geometry="@Geometry" nbox="8 8 8" />
 
                         <BarycentricMapping name="BarycentricMapping"/>
                 </Node>
