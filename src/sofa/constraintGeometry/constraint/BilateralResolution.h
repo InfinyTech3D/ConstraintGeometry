@@ -48,7 +48,7 @@ public:
             }
         }
 
-        sofa::type::invertMatrix(invW,temp);
+        SOFA_UNUSED(sofa::type::invertMatrix(invW,temp));
     }
 
     virtual void resolution(int line, double** /*w*/, double* d, double* force, double * /*dFree*/)
@@ -94,7 +94,7 @@ public:
             }
         }
 
-        sofa::type::invertMatrix(invW,temp);
+        SOFA_UNUSED(sofa::type::invertMatrix(invW,temp));
     }
 
     virtual void resolution(int line, double** /*w*/, double* d, double* force, double * /*dFree*/)

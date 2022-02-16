@@ -8,7 +8,7 @@
         <GenericConstraintSolver maxIterations="200" tolerance="0.0001" />
 
         <CollisionLoop />
-        <FindClosestProximityAlgorithm name="algo" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
+        <FindClosestProximityAlgorithm name="algo" from="@Liver/Collision/AABB" dest="@Plane/AABB" />
 
         
         
@@ -41,7 +41,7 @@
 <!--                        <PointGeometry name="Geometry" color="0 0 1 1" drawRadius="0.1" />-->
 <!--                        <BezierTriangleGeometry name="Geometry" color="0 0 1 1" />-->
 
-                        <AABBGeometry geometry="@Geometry" nbox="8 8 8" />
+                        <AABBGeometry name="AABB" geometry="@Geometry" nbox="8 8 8" />
 
                         <BarycentricMapping name="BarycentricMapping"/>
                 </Node>
@@ -64,7 +64,7 @@
                 <TriangleGeometry name="Geometry" color="1 1 1 0.6" />
                 <PhongTriangleNormalHandler geometry="@Geometry" />
                 
-<!--                 <AABBBroadPhase geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" /> -->
+                <AABBGeometry name="AABB" geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" />
         </Node>
 
 <!--         <SecondNormalDirection name="dir" /> -->
