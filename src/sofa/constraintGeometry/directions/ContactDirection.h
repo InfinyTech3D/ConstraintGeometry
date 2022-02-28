@@ -20,11 +20,13 @@ public:
     ConstraintNormal createConstraintsNormal(const collisionAlgorithm::PairDetection & d) const override {
         type::Vector3 mainDir = (d.first->getPosition() - d.second->getPosition()).normalized();
 
+
     //            type::Vector3 firstDir = -d.getFirstProximity()->getNormal().normalized();
         type::Vector3 secondDir = d.second->getNormal().normalized();
 
 //        if (mainDir.norm() < std::numeric_limits<double>::epsilon()) mainDir = secondDir;
         if (dot(mainDir,secondDir)<=std::numeric_limits<double>::epsilon()) mainDir=secondDir;
+
 
         return ConstraintNormal(mainDir);
     }

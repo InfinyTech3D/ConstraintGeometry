@@ -30,10 +30,10 @@ public:
     , d_maxforce2(initData(&d_maxforce2, std::numeric_limits<double>::max(), "maxForce2", "Max force applied on the third axis"))
     , l_directions(initLink("directions", "link to the default direction")) {}
 
-    void init() { // make sure we have a direction
-        if (this->l_directions == NULL) l_directions = sofa::core::objectmodel::New<ContactDirection>();
-        this->addSlave(l_directions.get());
-    }
+//    void init() { // make sure we have a direction
+//        if (this->l_directions == NULL) l_directions = sofa::core::objectmodel::New<ContactDirection>();
+//        this->addSlave(l_directions.get());
+//    }
 
     ConstraintNormal createConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & detection) const override {
         ConstraintNormal CN = l_directions->createConstraintsNormal(detection);
@@ -42,6 +42,7 @@ public:
             CN.addOrthogonalDirection();
             CN.addOrthogonalDirection();
         }
+
 
         return CN;
     }
@@ -57,7 +58,7 @@ public:
      * \return (UnilateralConstraint|UnilateralFriction)Resolution => abstract ConstraintResolution ptr
      */
     core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint & cst) const {
-        if (cst.size() == 1) return new UnilateralConstraintResolution();
+        if (cst.size() == 1) return new UnilateralConstraintResolution(d_maxforce0.getValue());
         else if (cst.size() == 3) return new UnilateralFrictionResolution(d_friction.getValue(),d_maxforce0.getValue(),d_maxforce1.getValue(),d_maxforce2.getValue());
         std::cerr << "Error the size of the constraint is not correct in ConstraintUnilateral size=" << cst.size() << std::endl;
         return NULL;
