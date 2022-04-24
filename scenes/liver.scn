@@ -2,7 +2,13 @@
 <Node name="Root" gravity="0 -15 0" dt="0.05">
         <RequiredPlugin pluginName="CollisionAlgorithm"/>
         <RequiredPlugin pluginName="ConstraintGeometry"/>
-
+		<RequiredPlugin name='SofaConstraint'/>  
+		<RequiredPlugin name='SofaSparseSolver'/>
+		<RequiredPlugin name='SofaGeneralLoader'/>
+		<RequiredPlugin name='SofaSimpleFem'/>
+		<RequiredPlugin name='SofaTopologyMapping'/>
+		<RequiredPlugin name='SofaOpenglVisual'/>
+		
         <VisualStyle displayFlags="showVisualModels hideBehaviorModels showCollisionModels hideMappings hideForceFields showWireframe showInteractionForceFields" />
         <FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
         <GenericConstraintSolver maxIterations="200" tolerance="0.0001" />
