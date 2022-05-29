@@ -1,16 +1,15 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/CollisionPipeline.h>
+#include <sofa/constraintGeometry/BaseNormalHandler.h>
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
 
-namespace sofa::collisionAlgorithm {
-
+namespace sofa::constraintGeometry {
 
 template<class DataTypes>
-class VectorPointGeometry : public CollisionComponent {
+class VectorPointNormalHandler : public BaseNormalHandler {
 public:
 
-    SOFA_CLASS(SOFA_TEMPLATE(VectorPointGeometry,DataTypes), CollisionComponent);
+    SOFA_CLASS(SOFA_TEMPLATE(VectorPointNormalHandler,DataTypes), BaseNormalHandler);
 
     Data<type::vector<type::Vector3>> d_normals;
 	core::objectmodel::DataCallback c_callback;

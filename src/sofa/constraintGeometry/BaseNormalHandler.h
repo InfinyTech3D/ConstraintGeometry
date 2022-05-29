@@ -5,17 +5,19 @@
 #include <sofa/core/behavior/BaseConstraint.h>
 #include <sofa/constraintGeometry/ConstraintNormal.h>
 #include <sofa/constraintGeometry/InternalConstraint.h>
+#include <sofa/constraintGeometry/ConstraintResponse.h>
+#include <sofa/constraintGeometry/ConstraintDirection.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa ::constraintGeometry {
 
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseConstraint
  */
-class ConstraintDirection : public sofa::core::objectmodel::BaseObject {
+class BaseNormalHandler : public sofa::core::objectmodel::BaseObject {
 public:
-    SOFA_CLASS(ConstraintDirection, sofa::core::objectmodel::BaseObject);
+    SOFA_ABSTRACT_CLASS(BaseNormalHandler, sofa::core::objectmodel::BaseObject);
 
-    virtual ConstraintNormal createConstraintsNormal(const collisionAlgorithm::PairDetection & detection) const = 0;
+    virtual type::Vector3 getNormal(collisionAlgorithm::BaseProximity::SPtr prox) = 0;
 
 };
 

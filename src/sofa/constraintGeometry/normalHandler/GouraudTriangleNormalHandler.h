@@ -1,15 +1,15 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/CollisionPipeline.h>
-#include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
+#include <sofa/constraintGeometry/BaseNormalHandler.h>
+#include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 
-namespace sofa::collisionAlgorithm {
+namespace sofa::constraintGeometry {
 
 template<class DataTypes>
-class GouraudTriangleGeometry : public CollisionComponent {
+class GouraudTriangleNormalHandler : public BaseNormalHandler {
 public:
 
-    SOFA_CLASS(SOFA_TEMPLATE(GouraudTriangleGeometry,DataTypes), CollisionComponent);
+    SOFA_CLASS(SOFA_TEMPLATE(GouraudTriangleNormalHandler,DataTypes), BaseNormalHandler);
 
     typedef TriangleGeometry<DataTypes> GEOMETRY;
     typedef typename GEOMETRY::ELEMENT ELEMENT;

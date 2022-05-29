@@ -1,15 +1,15 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/CollisionPipeline.h>
+#include <sofa/constraintGeometry/BaseNormalHandler.h>
 #include <sofa/collisionAlgorithm/geometry/EdgeGeometry.h>
 
-namespace sofa::collisionAlgorithm {
+namespace sofa::constraintGeometry {
 
 template<class DataTypes>
-class TrajectoryGeometry : public CollisionComponent {
+class TrajectoryNormalHandler : public BaseNormalHandler {
 public:
 
-    SOFA_CLASS(SOFA_TEMPLATE(TrajectoryGeometry,DataTypes), CollisionComponent);
+    SOFA_CLASS(SOFA_TEMPLATE(TrajectoryNormalHandler,DataTypes), BaseNormalHandler);
 
     typedef EdgeGeometry<DataTypes> GEOMETRY;
     typedef typename GEOMETRY::ELEMENT ELEMENT;

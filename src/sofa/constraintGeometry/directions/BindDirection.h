@@ -2,9 +2,7 @@
 
 #include <sofa/constraintGeometry/ConstraintDirection.h>
 
-namespace sofa {
-
-namespace constraintGeometry {
+namespace sofa::constraintGeometry {
 
 /*!
  * \brief The BindDirection class
@@ -22,7 +20,5 @@ public:
     }
 
 };
-
-}
 
 }

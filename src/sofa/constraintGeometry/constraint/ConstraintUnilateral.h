@@ -36,6 +36,8 @@ public:
 //    }
 
     ConstraintNormal createConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & detection) const override {
+        if (l_directions==NULL) return ConstraintNormal();
+
         ConstraintNormal CN = l_directions->createConstraintsNormal(detection);
 
         if (d_friction.getValue() != 0.0) {

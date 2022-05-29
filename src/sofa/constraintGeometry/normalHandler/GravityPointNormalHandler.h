@@ -1,22 +1,20 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/CollisionPipeline.h>
+#include <sofa/constraintGeometry/BaseNormalHandler.h>
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
 
-namespace sofa::collisionAlgorithm {
-
+namespace sofa::constraintGeometry {
 
 template<class DataTypes>
-class GravityPointGeometry : public CollisionComponent {
+class GravityPointNormalHandler : public BaseNormalHandler {
 public:
 
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef PointGeometry<DataTypes> GEOMETRY;
     typedef typename GEOMETRY::ELEMENT ELEMENT;
 
-    SOFA_CLASS(SOFA_TEMPLATE(GravityPointGeometry,DataTypes), CollisionComponent);
+    SOFA_CLASS(SOFA_TEMPLATE(GravityPointNormalHandler,DataTypes), BaseNormalHandler);
 
     core::objectmodel::SingleLink<GravityPointGeometry<DataTypes>,GEOMETRY,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
