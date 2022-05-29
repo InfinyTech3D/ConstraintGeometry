@@ -6,6 +6,6 @@ namespace sofa::constraintGeometry {
 SOFA_DECL_CLASS(GouraudTriangleNormalHandler)
 
 int GouraudTriangleNormalHandlerClass = core::RegisterObject("GouraudTriangleNormalHandler")
-.add< GouraudTriangleNormalHandler<sofa::defaulttype::Vec3dTypes> >();
+.add< GouraudTriangleNormalHandler>();
 
 }

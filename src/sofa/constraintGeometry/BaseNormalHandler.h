@@ -13,9 +13,9 @@ namespace sofa ::constraintGeometry {
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseConstraint
  */
-class BaseNormalHandler : public sofa::core::objectmodel::BaseObject {
+class BaseNormalHandler : public collisionAlgorithm::CollisionComponent {
 public:
-    SOFA_ABSTRACT_CLASS(BaseNormalHandler, sofa::core::objectmodel::BaseObject);
+    SOFA_ABSTRACT_CLASS(BaseNormalHandler, collisionAlgorithm::CollisionComponent);
 
     virtual type::Vector3 getNormal(collisionAlgorithm::BaseProximity::SPtr prox) = 0;
 

@@ -5,39 +5,30 @@
 
 namespace sofa::constraintGeometry {
 
-template<class DataTypes>
 class GravityPointNormalHandler : public BaseNormalHandler {
 public:
 
-    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef typename GEOMETRY::ELEMENT ELEMENT;
+    SOFA_CLASS(GravityPointNormalHandler, BaseNormalHandler);
 
-    SOFA_CLASS(SOFA_TEMPLATE(GravityPointNormalHandler,DataTypes), BaseNormalHandler);
+    core::objectmodel::SingleLink<GravityPointNormalHandler,collisionAlgorithm::BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
-    core::objectmodel::SingleLink<GravityPointGeometry<DataTypes>,GEOMETRY,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+    GravityPointNormalHandler()
+    : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
 
-    void init() {
-
-        for (unsigned i=0; i<l_geometry->getTopoProx().size(); i++)
-        {
-            l_geometry->getTopoProxIdx(i)->setNormal((l_geometry->getTopoProxIdx(i)->getPosition() - m_gcenter).normalized());
-        }
+    type::Vector3 getNormal(collisionAlgorithm::BaseProximity::SPtr prox) override {
+        return (prox->getPosition() - m_gcenter).normalized();
     }
 
     void prepareDetection() override {
         m_gcenter = type::Vector3();
 
-        const helper::ReadAccessor<DataVecCoord> & pos = this->l_geometry->getState()->read(core::VecCoordId::position());
-
-        for (unsigned i=0;i<pos.size();i++) {
-            m_gcenter += pos[i];
+        unsigned nbPoints = 0;
+        for (auto it=l_geometry->pointBegin();it!=l_geometry->end();it++) {
+            m_gcenter += it->element()->pointElements()[0]->getP0()->getPosition();
+            nbPoints++;
         }
 
-        if (pos.size()) m_gcenter*=1.0/pos.size();
-
-		init();
+        if (nbPoints) m_gcenter*=1.0/nbPoints;
     }
 
 private :
