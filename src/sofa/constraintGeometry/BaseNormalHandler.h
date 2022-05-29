@@ -17,7 +17,7 @@ class BaseNormalHandler : public collisionAlgorithm::CollisionComponent {
 public:
     SOFA_ABSTRACT_CLASS(BaseNormalHandler, collisionAlgorithm::CollisionComponent);
 
-    virtual type::Vector3 getNormal(collisionAlgorithm::BaseProximity::SPtr prox) = 0;
+    virtual bool getNormal(collisionAlgorithm::BaseProximity::SPtr prox,type::Vector3 & N) = 0;
 
 };
 

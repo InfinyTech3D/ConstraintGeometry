@@ -15,8 +15,9 @@ public:
     GravityPointNormalHandler()
     : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
 
-    type::Vector3 getNormal(collisionAlgorithm::BaseProximity::SPtr prox) override {
-        return (prox->getPosition() - m_gcenter).normalized();
+    bool getNormal(collisionAlgorithm::BaseProximity::SPtr prox,type::Vector3 & N) override {
+        N = (prox->getPosition() - m_gcenter).normalized();
+        return true;
     }
 
     void prepareDetection() override {

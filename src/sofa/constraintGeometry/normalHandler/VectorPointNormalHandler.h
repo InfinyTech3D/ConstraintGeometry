@@ -2,6 +2,7 @@
 
 #include <sofa/constraintGeometry/BaseNormalHandler.h>
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
+#include <sofa/collisionAlgorithm/proximity/MechanicalProximity.h>
 
 namespace sofa::constraintGeometry {
 
@@ -12,42 +13,28 @@ public:
     SOFA_CLASS(SOFA_TEMPLATE(VectorPointNormalHandler,DataTypes), BaseNormalHandler);
 
     Data<type::vector<type::Vector3>> d_normals;
-	core::objectmodel::DataCallback c_callback;
 
-    typedef PointGeometry<DataTypes> GEOMETRY;
-    typedef typename GEOMETRY::ELEMENT ELEMENT;
+    VectorPointNormalHandler()
+    : d_normals(initData(&d_normals, "normals", "Vector of normals")) {}
 
-    core::objectmodel::SingleLink<VectorPointGeometry<DataTypes>,PointGeometry<DataTypes>,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+    bool getNormal(collisionAlgorithm::BaseProximity::SPtr prox,type::Vector3 & N) override {
+        if (typename collisionAlgorithm::MechanicalProximity<DataTypes>::SPtr tprox =
+                std::dynamic_pointer_cast<collisionAlgorithm::MechanicalProximity<DataTypes> >(prox)) {
 
-    VectorPointGeometry()
-    : d_normals(initData(&d_normals, "normals", "Vector of normals"))
-    , l_geometry(initLink("geometry","Link to Geometry")){}
+            if (tprox->getPId()>=d_normals.getValue().size()) {
+                std::cerr << "Wrong id in VectorPointNormalHandler" << std::endl;
+                return false;
+            }
 
-
-    void init()
-	{
-        for (unsigned i=0; i<d_normals.getValue().size(); i++)
-        {
-            l_geometry->getTopoProxIdx(i)->setNormal(d_normals.getValue()[i]);
+            N = d_normals.getValue()[tprox->getPId()];
+            return true;
         }
 
-		c_callback.addInputs({&d_normals});
-        c_callback.addCallback(std::bind(&VectorPointGeometry::makeDirty,this));
-	}
+        std::cerr << "Error the proximity is not a MechanicalProximity in VectorPointNormalHandler" << std::endl;
+        return false;
+    }
 
-	void makeDirty()
-	{
-		m_dirty = true;
-	}
-
-    void prepareDetection() override
-	{
-		if(m_dirty)
-			init();
-		m_dirty = false;
-	}
-
-	bool m_dirty;
+    void prepareDetection() override {}
 
 };
 

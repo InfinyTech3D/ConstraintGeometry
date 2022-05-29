@@ -1,18 +1,18 @@
 #pragma once
 
 #include <sofa/constraintGeometry/BaseNormalHandler.h>
-#include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
+#include <sofa/collisionAlgorithm/geometry/EdgeGeometry.h>
 
 namespace sofa::constraintGeometry {
 
-class GouraudTriangleNormalHandler : public BaseNormalHandler {
+class EdgeNormalHandler : public BaseNormalHandler {
 public:
 
-    SOFA_CLASS(GouraudTriangleNormalHandler, BaseNormalHandler);
+    SOFA_CLASS(EdgeNormalHandler, BaseNormalHandler);
 
     bool getNormal(collisionAlgorithm::BaseProximity::SPtr prox,type::Vector3 & N) override {
-        if (collisionAlgorithm::TriangleProximity::SPtr tprox = std::dynamic_pointer_cast<collisionAlgorithm::TriangleProximity>(prox)) {
-            N = tprox->element()->getTriangleInfo().N;
+        if (collisionAlgorithm::EdgeProximity::SPtr tprox = std::dynamic_pointer_cast<collisionAlgorithm::EdgeProximity>(prox)) {
+            N = (tprox->element()->getP1()->getPosition() - tprox->element()->getP0()->getPosition()).normalized();
             return true;
         }
 

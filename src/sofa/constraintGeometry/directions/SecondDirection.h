@@ -27,7 +27,9 @@ public:
             return ConstraintNormal();
         }
 
-        type::Vector3 N = l_normalHandler->getNormal(d.second);
+        type::Vector3 N;
+
+        if (!l_normalHandler->getNormal(d.second,N)) return ConstraintNormal();
 
         return ConstraintNormal(N);
     }

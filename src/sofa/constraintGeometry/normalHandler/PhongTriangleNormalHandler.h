@@ -5,59 +5,48 @@
 
 namespace sofa::constraintGeometry {
 
-template<class DataTypes>
 class PhongTriangleNormalHandler : public BaseNormalHandler {
 public:
 
-    SOFA_CLASS(SOFA_TEMPLATE(PhongTriangleNormalHandler,DataTypes), BaseNormalHandler);
+    SOFA_CLASS(PhongTriangleNormalHandler, BaseNormalHandler);
 
-    typedef TriangleGeometry<DataTypes> GEOMETRY;
-    typedef typename GEOMETRY::ELEMENT ELEMENT;
+    bool getNormal(collisionAlgorithm::BaseProximity::SPtr prox,type::Vector3 & N) override {
+        collisionAlgorithm::TriangleProximity::SPtr tprox = std::dynamic_pointer_cast<collisionAlgorithm::TriangleProximity>(prox);
 
-    core::objectmodel::SingleLink<PhongTriangleGeometry<DataTypes>,GEOMETRY,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
-
-    PhongTriangleGeometry()
-    : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
-
-    type::Vector3 getNormal(collisionAlgorithm::BaseProximity::SPtr prox) override {
-        if (collisionAlgorithm::TriangleProximity::SPtr tprox = std::dynamic_pointer_cast<collisionAlgorithm::TriangleProximity>(prox)) {
-            auto element = tprox->element();
-
-
-            for (auto it = element->pointElements().cbegin();it != element->pointElements().cend(); it++) {
-                collisionAlgorithm::PointElement::SPtr pe = *it;
-
-                type::Vector3 N;
-
-                for (auto it2 = pe->triangleAround().cbegin();it2!=pe->triangleAround().cend();it2++) {
-                    collisionAlgorithm::TriangleElement::SPtr te = *it2;
-
-                    N+=te->getTriangleInfo().N;
-                }
-
-
-            }
+        if (tprox==NULL) {
+            std::cerr << "Error the proximity is no a TriangleProximity in GouraudTriangleNormalHandler " << std::endl;
+            return false;
         }
 
-        std::cerr << "Error the proximity is no a TriangleProximity in GouraudTriangleNormalHandler " << std::endl;
-        return type::Vector3();
-    }
+        auto element = tprox->element();
 
-    void prepareDetection() override {
+        collisionAlgorithm::PointElement::SPtr p0 = element->pointElements()[0];
+        collisionAlgorithm::PointElement::SPtr p1 = element->pointElements()[1];
+        collisionAlgorithm::PointElement::SPtr p2 = element->pointElements()[2];
 
-        for (unsigned i=0;i<l_geometry->getTopoProx().size();i++) {
-            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = this->l_geometry->l_topology->getTrianglesAroundVertex(i);
-            type::Vector3 N(0,0,0);
-            for (size_t t=0;t<tav.size();t++) {
-                unsigned eid = tav[t];
-                auto element = l_geometry->getElements()[eid];
-                N += element->getTriangleInfo().N;
-            }
-            N.normalize();
-
-            l_geometry->getTopoProx()[i]->setNormal(N);
+        type::Vector3 N0_point;
+        for (auto it = p0->triangleAround().cbegin();it!=p0->triangleAround().cend();it++) {
+            N0_point+=(*it)->getTriangleInfo().N;
         }
+
+        type::Vector3 N1_point;
+        for (auto it = p1->triangleAround().cbegin();it!=p1->triangleAround().cend();it++) {
+            N1_point+=(*it)->getTriangleInfo().N;
+        }
+
+        type::Vector3 N2_point;
+        for (auto it = p2->triangleAround().cbegin();it!=p2->triangleAround().cend();it++) {
+            N2_point+=(*it)->getTriangleInfo().N;
+        }
+
+        N = N0_point.normalized() * tprox->f0() +
+            N1_point.normalized() * tprox->f1() +
+            N2_point.normalized() * tprox->f2();
+
+        return true;
     }
+
+    void prepareDetection() override {}
 
 };
 

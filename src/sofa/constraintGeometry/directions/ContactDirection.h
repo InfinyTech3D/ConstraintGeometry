@@ -29,7 +29,12 @@ public:
 
         type::Vector3 mainDir = (d.first->getPosition() - d.second->getPosition()).normalized();
 
-        type::Vector3 secondDir = l_normalHandler->getNormal(d.second);
+
+        type::Vector3 secondDir;
+
+        if (! l_normalHandler->getNormal(d.second,secondDir)) {
+            return ConstraintNormal();
+        }
 
         if (dot(mainDir,secondDir)<=std::numeric_limits<double>::epsilon()) mainDir=secondDir;
 
