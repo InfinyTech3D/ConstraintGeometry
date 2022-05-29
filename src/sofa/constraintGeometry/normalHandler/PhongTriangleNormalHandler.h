@@ -19,6 +19,30 @@ public:
     PhongTriangleGeometry()
     : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
 
+    type::Vector3 getNormal(collisionAlgorithm::BaseProximity::SPtr prox) override {
+        if (collisionAlgorithm::TriangleProximity::SPtr tprox = std::dynamic_pointer_cast<collisionAlgorithm::TriangleProximity>(prox)) {
+            auto element = tprox->element();
+
+
+            for (auto it = element->pointElements().cbegin();it != element->pointElements().cend(); it++) {
+                collisionAlgorithm::PointElement::SPtr pe = *it;
+
+                type::Vector3 N;
+
+                for (auto it2 = pe->triangleAround().cbegin();it2!=pe->triangleAround().cend();it2++) {
+                    collisionAlgorithm::TriangleElement::SPtr te = *it2;
+
+                    N+=te->getTriangleInfo().N;
+                }
+
+
+            }
+        }
+
+        std::cerr << "Error the proximity is no a TriangleProximity in GouraudTriangleNormalHandler " << std::endl;
+        return type::Vector3();
+    }
+
     void prepareDetection() override {
 
         for (unsigned i=0;i<l_geometry->getTopoProx().size();i++) {
