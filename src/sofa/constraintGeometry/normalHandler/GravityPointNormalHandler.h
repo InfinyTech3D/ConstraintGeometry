@@ -32,6 +32,8 @@ public:
         if (nbPoints) m_gcenter*=1.0/nbPoints;
     }
 
+    const std::type_info & getTypeInfo() override { return typeid(GravityPointNormalHandler); }
+
 private :
     type::Vector3 m_gcenter;
 };

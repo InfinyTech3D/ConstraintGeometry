@@ -36,6 +36,8 @@ public:
 
     void prepareDetection() override {}
 
+    const std::type_info & getTypeInfo() override { return typeid(VectorPointNormalHandler); }
+
 };
 
 
