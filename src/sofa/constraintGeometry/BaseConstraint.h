@@ -21,7 +21,7 @@ public:
 
     Data<double> d_drawScale;
     Data<bool> d_draw;
-    Data<collisionAlgorithm::DetectionOutput> d_input;
+    Data<collisionAlgorithm::DetectionOutput> d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
 
     BaseConstraint()
         : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))

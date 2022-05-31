@@ -2,6 +2,7 @@
 
 #include <sofa/constraintGeometry/BaseNormalHandler.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
+#include <sofa/constraintGeometry/ConstraintProximity.h>
 
 namespace sofa::constraintGeometry {
 
@@ -21,6 +22,14 @@ public:
     }
 
     void prepareDetection() override {}
+
+    static ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::BaseProximity::SPtr prox) {
+        if (collisionAlgorithm::TriangleProximity::SPtr tprox = std::dynamic_pointer_cast<collisionAlgorithm::TriangleProximity>(prox)) {
+            //TODO : return NEW GROURAD CSTPROX
+        }
+
+        return NULL;
+    }
 
     const std::type_info & getTypeInfo() override { return typeid(GouraudTriangleNormalHandler); }
 };

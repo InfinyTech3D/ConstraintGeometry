@@ -2,6 +2,7 @@
 
 #include <sofa/constraintGeometry/BaseNormalHandler.h>
 #include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
+#include <sofa/constraintGeometry/ConstraintProximity.h>
 
 namespace sofa::constraintGeometry {
 
@@ -10,6 +11,9 @@ public:
 
     SOFA_CLASS(PhongTriangleNormalHandler, BaseNormalHandler);
 
+
+    //THIS FUNCTION SHOULD BE MOVE IN THE CST PHONG PROXIMIT
+    //IT SHOULD ALSO BE REMOVE FROM BASENORMALHANDLER (virtual pure)
     bool getNormal(collisionAlgorithm::BaseProximity::SPtr prox,type::Vector3 & N) override {
         collisionAlgorithm::TriangleProximity::SPtr tprox = std::dynamic_pointer_cast<collisionAlgorithm::TriangleProximity>(prox);
 
@@ -46,10 +50,18 @@ public:
         return true;
     }
 
+    //THIS FUNCTION SHOULD BE REMOVE FROM BASENORMALHANDLER (virtual pure)
     void prepareDetection() override {}
 
     const std::type_info & getTypeInfo() override { return typeid(PhongTriangleNormalHandler); }
 
+    static ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::BaseProximity::SPtr prox) {
+        if (collisionAlgorithm::TriangleProximity::SPtr tprox = std::dynamic_pointer_cast<collisionAlgorithm::TriangleProximity>(prox)) {
+            //TODO : return NEW PHONG CSTPROX
+        }
+
+        return NULL;
+    }
 };
 
 
