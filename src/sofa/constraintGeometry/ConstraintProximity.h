@@ -45,6 +45,10 @@ public:
         return NULL;
     }
 
+    void notFound(const std::type_info & id) const override {
+        std::cerr << "ConstraintProximityOperation has no registered function for type " << sofa::helper::NameDecoder::decodeFullName(id) << std::endl;
+    }
+
 };
 
 }
