@@ -15,13 +15,8 @@ public:
 
     void prepareDetection() override {}
 
-    ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::BaseProximity::SPtr prox) {
-        if (collisionAlgorithm::EdgeProximity::SPtr eprox = std::dynamic_pointer_cast<collisionAlgorithm::EdgeProximity>(prox)) {
-            //TODO : return NEW EDGE CSTPROX
-            return ConstraintProximity::SPtr(new EdgeConstraintProximity(eprox));
-        }
-
-        return NULL;
+    static ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::EdgeProximity::SPtr prox) {
+        return ConstraintProximity::SPtr(new EdgeConstraintProximity(prox));
     }
 
     const std::type_info & getTypeInfo() override { return typeid(EdgeNormalHandler); }

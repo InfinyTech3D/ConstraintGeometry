@@ -8,11 +8,11 @@
 
 namespace sofa::constraintGeometry {
 
-//int gouraud_reg = ConstraintProximityOperation::register_func<GouraudTriangleNormalHandler>(&GouraudTriangleNormalHandler::buildConstraintProximity);
+int gouraud_reg = ConstraintProximityOperation::register_func<GouraudTriangleNormalHandler>(&GouraudTriangleNormalHandler::buildConstraintProximity);
 
-//int phong_reg = ConstraintProximityOperation::register_func<PhongTriangleNormalHandler>(&PhongTriangleNormalHandler::buildConstraintProximity);
+int phong_reg = ConstraintProximityOperation::register_func<PhongTriangleNormalHandler>(&PhongTriangleNormalHandler::buildConstraintProximity);
 
-//int edge_reg = ConstraintProximityOperation::register_func<EdgeNormalHandler>(&EdgeNormalHandler::buildConstraintProximity);
+int edge_reg = ConstraintProximityOperation::register_func<EdgeNormalHandler>(&EdgeNormalHandler::buildConstraintProximity);
 
 //int gravityPoint_reg = ConstraintProximityOperation::register_func<GravityPointNormalHandler>(&GravityPointNormalHandler::buildConstraintProximity);
 
