@@ -2,6 +2,8 @@
 
 #include <sofa/constraintGeometry/BaseNormalHandler.h>
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
+#include <sofa/constraintGeometry/ConstraintProximity.h>
+#include <sofa/constraintGeometry/constraintProximities/GravityPointConstraintProximity.h>
 
 namespace sofa::constraintGeometry {
 
@@ -15,10 +17,6 @@ public:
     GravityPointNormalHandler()
     : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
 
-    bool getNormal(collisionAlgorithm::BaseProximity::SPtr prox,type::Vector3 & N) override {
-        N = (prox->getPosition() - m_gcenter).normalized();
-        return true;
-    }
 
     void prepareDetection() override {
         m_gcenter = type::Vector3();
@@ -30,6 +28,15 @@ public:
         }
 
         if (nbPoints) m_gcenter*=1.0/nbPoints;
+    }
+
+    ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::BaseProximity::SPtr prox) override {
+        if (collisionAlgorithm::PointProximity::SPtr gpprox = std::dynamic_pointer_cast<collisionAlgorithm::PointProximity>(prox)) {
+            //TODO : return NEW GRAVITY_POINT CSTPROX
+            return ConstraintProximity::SPtr(new GravityPointConstraintProximity(gpprox,m_gcenter));
+        }
+
+        return NULL;
     }
 
     const std::type_info & getTypeInfo() override { return typeid(GravityPointNormalHandler); }

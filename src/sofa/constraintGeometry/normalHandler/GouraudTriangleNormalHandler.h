@@ -3,6 +3,7 @@
 #include <sofa/constraintGeometry/BaseNormalHandler.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 #include <sofa/constraintGeometry/ConstraintProximity.h>
+#include <sofa/constraintGeometry/constraintProximities/GouraudConstraintProximity.h>
 
 namespace sofa::constraintGeometry {
 
@@ -11,21 +12,13 @@ public:
 
     SOFA_CLASS(GouraudTriangleNormalHandler, BaseNormalHandler);
 
-    bool getNormal(collisionAlgorithm::BaseProximity::SPtr prox,type::Vector3 & N) override {
-        if (collisionAlgorithm::TriangleProximity::SPtr tprox = std::dynamic_pointer_cast<collisionAlgorithm::TriangleProximity>(prox)) {
-            N = tprox->element()->getTriangleInfo().N;
-            return true;
-        }
-
-        std::cerr << "Error the proximity is no a TriangleProximity in GouraudTriangleNormalHandler " << std::endl;
-        return false;
-    }
 
     void prepareDetection() override {}
 
-    static ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::BaseProximity::SPtr prox) {
+    ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::BaseProximity::SPtr prox) override {
         if (collisionAlgorithm::TriangleProximity::SPtr tprox = std::dynamic_pointer_cast<collisionAlgorithm::TriangleProximity>(prox)) {
             //TODO : return NEW GROURAD CSTPROX
+            return ConstraintProximity::SPtr(new GouraudConstraintProximity(tprox));
         }
 
         return NULL;
