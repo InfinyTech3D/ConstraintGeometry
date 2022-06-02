@@ -1,12 +1,5 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseAlgorithm.h>
-#include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/core/behavior/BaseConstraint.h>
-#include <sofa/constraintGeometry/ConstraintNormal.h>
-#include <sofa/constraintGeometry/InternalConstraint.h>
-#include <sofa/constraintGeometry/ConstraintResponse.h>
-#include <sofa/constraintGeometry/ConstraintDirection.h>
 #include <sofa/collisionAlgorithm/BaseOperation.h>
 
 namespace sofa::constraintGeometry {
@@ -16,7 +9,7 @@ public:
 
     typedef std::shared_ptr<ConstraintProximity> SPtr;
 
-    sofa::type::Vector3 getPosition(core::VecCoordId v) {
+    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
         return getProximity()->getPosition(v);
     }
 

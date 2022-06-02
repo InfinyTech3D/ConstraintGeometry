@@ -27,7 +27,7 @@ public:
         } else this->addSlave(l_directions.get());
     }
 
-    virtual ConstraintNormal createConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & detection) const override {
+    virtual ConstraintNormal createConstraintNormal(const ConstraintPairsOutput::ConstraintPairs & detection) const override {
         if (l_directions == NULL) return ConstraintNormal();
         return l_directions->createConstraintsNormal(detection);
     }

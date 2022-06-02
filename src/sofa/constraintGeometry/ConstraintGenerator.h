@@ -1,33 +1,30 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseAlgorithm.h>
-#include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/core/behavior/BaseConstraint.h>
-#include <sofa/constraintGeometry/ConstraintNormal.h>
-#include <sofa/constraintGeometry/InternalConstraint.h>
-#include <sofa/constraintGeometry/ConstraintResponse.h>
-#include <sofa/constraintGeometry/ConstraintDirection.h>
 #include <sofa/constraintGeometry/ConstraintProximity.h>
-#include <sofa/core/objectmodel/DataCallback.h>
 #include <sofa/constraintGeometry/BaseNormalHandler.h>
+#include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 
-namespace sofa {
+namespace sofa::constraintGeometry {
 
-namespace constraintGeometry {
-
-class ConstraintPairs {
+class ConstraintPairsOutput {
 public:
 
-    friend std::ostream& operator<<(std::ostream& os, const ConstraintPairs& )  { return os; }
+    typedef std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr> ConstraintPairs;
 
-    friend std::istream& operator>>(std::istream& i, ConstraintPairs& ) { return i; }
+    friend std::ostream& operator<<(std::ostream& os, const ConstraintPairsOutput& )  { return os; }
 
-    void clear() { m_constraints.clear(); }
+    friend std::istream& operator>>(std::istream& i, ConstraintPairsOutput& ) { return i; }
 
-    void push_back(const std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr> & p) { m_constraints.push_back(p); }
+    inline unsigned size() const { return m_constraints.size(); }
+
+    inline void clear() { m_constraints.clear(); }
+
+    inline const ConstraintPairs & operator[] (unsigned i) const { return m_constraints[i]; }
+
+    inline void push_back(const std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr> & p) { m_constraints.push_back(p); }
 
 private:
-    std::vector<std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr> > m_constraints;
+    std::vector<ConstraintPairs> m_constraints;
 };
 
 class ConstraintGenerator : public sofa::core::objectmodel::BaseObject {
@@ -35,7 +32,7 @@ public:
     SOFA_CLASS(ConstraintGenerator, sofa::core::objectmodel::BaseObject);
 
     Data<collisionAlgorithm::DetectionOutput> d_input;
-    Data<ConstraintPairs> d_output;
+    Data<ConstraintPairsOutput> d_output;
 
     core::objectmodel::DataCallback c_callback;
 
@@ -54,7 +51,7 @@ public:
             ConstraintProximityOperation::FUNC firstOp = ConstraintProximityOperation::get(l_firstHandler->getTypeInfo());
             ConstraintProximityOperation::FUNC secondOp = ConstraintProximityOperation::get(l_secondHandler->getTypeInfo());
 
-            ConstraintPairs & pairs = *d_output.beginEdit();
+            ConstraintPairsOutput & pairs = *d_output.beginEdit();
             pairs.clear();
             for (unsigned i=0;i<d_input.getValue().size();i++) {
                 auto & pair = d_input.getValue()[i];
@@ -67,7 +64,5 @@ public:
     }
 
 };
-
-}
 
 }

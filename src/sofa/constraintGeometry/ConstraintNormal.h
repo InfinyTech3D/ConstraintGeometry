@@ -3,10 +3,9 @@
 #include <sofa/type/vector.h>
 #include <sofa/defaulttype/VecTypes.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
+#include <sofa/constraintGeometry/ConstraintGenerator.h>
 
-namespace sofa {
-
-namespace constraintGeometry {
+namespace sofa::constraintGeometry {
 
 class InternalConstraint;
 
@@ -18,9 +17,9 @@ class ConstraintNormal {
 
 public:
 
-    typedef std::function<double(const collisionAlgorithm::PairDetection & , const type::Vector3 &)> ViolationFunction;
+    typedef std::function<double(const ConstraintPairsOutput::ConstraintPairs & , const type::Vector3 &)> ViolationFunction;
 
-    static double defaultViolationFunction(const collisionAlgorithm::PairDetection & detection, const type::Vector3 & normal) {
+    static double defaultViolationFunction(const ConstraintPairsOutput::ConstraintPairs & detection, const type::Vector3 & normal) {
         const type::Vector3 & PFree = detection.first->getPosition(core::VecCoordId::freePosition());
         const type::Vector3 & QFree = detection.second->getPosition(core::VecCoordId::freePosition());
         return dot(PFree - QFree, normal);
@@ -77,7 +76,7 @@ public:
         return *this;
     }
 
-    void computeViolations(unsigned  cid, collisionAlgorithm::PairDetection d, linearalgebra::BaseVector * delta) const {
+    void computeViolations(unsigned  cid, const ConstraintPairsOutput::ConstraintPairs & d, linearalgebra::BaseVector * delta) const {
         for (unsigned i=0;i<m_dirs.size();i++) {
             double v = m_functions[i](d, m_dirs[i]);
             delta->set(cid + i, v);
@@ -105,7 +104,5 @@ protected:
     sofa::type::vector<ViolationFunction> m_functions;
 
 };
-
-}
 
 }

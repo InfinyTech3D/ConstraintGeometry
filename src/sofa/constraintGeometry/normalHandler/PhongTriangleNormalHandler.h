@@ -22,7 +22,7 @@ public:
 
     const std::type_info & getTypeInfo() override { return typeid(PhongTriangleNormalHandler); }
 
-    ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::BaseProximity::SPtr prox) override {
+    ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::BaseProximity::SPtr prox) {
         if (collisionAlgorithm::TriangleProximity::SPtr tprox = std::dynamic_pointer_cast<collisionAlgorithm::TriangleProximity>(prox)) {
             //TODO : return NEW PHONG CSTPROX
             return ConstraintProximity::SPtr(new PhongConstraintProximity(tprox));

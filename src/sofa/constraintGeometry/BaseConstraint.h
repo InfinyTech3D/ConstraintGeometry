@@ -7,10 +7,9 @@
 #include <sofa/constraintGeometry/InternalConstraint.h>
 #include <sofa/constraintGeometry/ConstraintResponse.h>
 #include <sofa/constraintGeometry/ConstraintDirection.h>
+#include <sofa/constraintGeometry/ConstraintGenerator.h>
 
-namespace sofa {
-
-namespace constraintGeometry {
+namespace sofa::constraintGeometry {
 
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseConstraint
@@ -21,7 +20,7 @@ public:
 
     Data<double> d_drawScale;
     Data<bool> d_draw;
-    Data<collisionAlgorithm::DetectionOutput> d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
+    Data<ConstraintPairsOutput> d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
 
     BaseConstraint()
         : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
@@ -29,7 +28,7 @@ public:
         , d_input(initData(&d_input, "input", "Link to detection output"))
     {}
 
-    virtual ConstraintNormal createConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & detection) const = 0;
+    virtual ConstraintNormal createConstraintNormal(const ConstraintPairsOutput::ConstraintPairs & detection) const = 0;
 
     virtual core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint & cst) const = 0;
 
@@ -40,7 +39,7 @@ public:
     virtual void processGeometricalData() {
         m_container.clear();//clear previsou constraints
 
-        const collisionAlgorithm::DetectionOutput & input = d_input.getValue();
+        const ConstraintPairsOutput & input = d_input.getValue();
         for (unsigned i=0;i<input.size();i++) {
             ConstraintNormal CN = createConstraintNormal(input[i]);
 
@@ -153,7 +152,5 @@ protected:
     std::vector<InternalConstraint>  m_container;
     unsigned m_nbConstraints;
 };
-
-}
 
 }

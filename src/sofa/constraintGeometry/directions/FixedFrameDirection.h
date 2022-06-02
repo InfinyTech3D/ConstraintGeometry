@@ -22,7 +22,7 @@ public:
     /*!
      * \brief The ContactNormal class is the container class for direction constraints
      */
-    ConstraintNormal createConstraintsNormal(const collisionAlgorithm::PairDetection & /*d*/) const override {
+    ConstraintNormal createConstraintsNormal(const ConstraintPairsOutput::ConstraintPairs & /*d*/) const override {
         ConstraintNormal CN ;
         return CN.addOrthogonalDirection()
                  .addOrthogonalDirection()

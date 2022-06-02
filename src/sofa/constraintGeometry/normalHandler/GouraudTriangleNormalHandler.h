@@ -15,7 +15,7 @@ public:
 
     void prepareDetection() override {}
 
-    ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::BaseProximity::SPtr prox) override {
+    ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::BaseProximity::SPtr prox) {
         if (collisionAlgorithm::TriangleProximity::SPtr tprox = std::dynamic_pointer_cast<collisionAlgorithm::TriangleProximity>(prox)) {
             //TODO : return NEW GROURAD CSTPROX
             return ConstraintProximity::SPtr(new GouraudConstraintProximity(tprox));

@@ -4,10 +4,9 @@
 #include <sofa/core/behavior/BaseConstraint.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/type/vector.h>
+#include <sofa/constraintGeometry/ConstraintGenerator.h>
 
-namespace sofa {
-
-namespace constraintGeometry {
+namespace sofa::constraintGeometry {
 
 class InternalConstraint {
 public :
@@ -22,7 +21,7 @@ public :
      * \param normals : ConstraintNormals
      * \param creator : resolutionCreator (factory)
      */
-    InternalConstraint(collisionAlgorithm::PairDetection detection,const ConstraintNormal normals, ResolutionCreator creator)
+    InternalConstraint(const ConstraintPairsOutput::ConstraintPairs & detection,const ConstraintNormal normals, ResolutionCreator creator)
     : m_detection(detection)
     , m_normals(normals)
     , m_creator(creator)
@@ -100,11 +99,11 @@ public :
         }
     }
 
-    inline collisionAlgorithm::BaseProximity::SPtr getFirstProximity() const {
+    inline ConstraintProximity::SPtr getFirstProximity() const {
         return m_detection.first;
     }
 
-    inline collisionAlgorithm::BaseProximity::SPtr getSecondProximity() const {
+    inline ConstraintProximity::SPtr getSecondProximity() const {
         return m_detection.second;
     }
 
@@ -164,7 +163,7 @@ public :
 
 
  protected:
-    collisionAlgorithm::PairDetection m_detection;
+    ConstraintPairsOutput::ConstraintPairs m_detection;
     ConstraintNormal m_normals;
     ResolutionCreator m_creator;
     mutable unsigned m_cid;
@@ -172,7 +171,5 @@ public :
     mutable unsigned m_cSetId;
     mutable unsigned m_cDirId;
 };
-
-}
 
 }

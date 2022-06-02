@@ -30,7 +30,7 @@ public:
         if (nbPoints) m_gcenter*=1.0/nbPoints;
     }
 
-    ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::BaseProximity::SPtr prox) override {
+    ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::BaseProximity::SPtr prox) {
         if (collisionAlgorithm::PointProximity::SPtr gpprox = std::dynamic_pointer_cast<collisionAlgorithm::PointProximity>(prox)) {
             //TODO : return NEW GRAVITY_POINT CSTPROX
             return ConstraintProximity::SPtr(new GravityPointConstraintProximity(gpprox,m_gcenter));
