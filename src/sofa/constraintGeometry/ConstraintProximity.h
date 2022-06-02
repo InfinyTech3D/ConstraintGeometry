@@ -1,6 +1,7 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseOperation.h>
+#include <sofa/collisionAlgorithm/BaseProximity.h>
+#include <memory>
 
 namespace sofa::constraintGeometry {
 
@@ -24,23 +25,6 @@ public:
     virtual type::Vector3 getNormal() = 0;
 
     virtual collisionAlgorithm::BaseProximity::SPtr getProximity() const = 0;
-
-};
-
-//Specific operation to find the closest point on a geometry (the code is in the c++ class)
-class ConstraintProximityOperation : public collisionAlgorithm::Operations::GenericOperation<ConstraintProximityOperation,//operation type
-                                                                                             ConstraintProximity::SPtr, // default return
-                                                                                             collisionAlgorithm::BaseProximity::SPtr // parameters
-                                                                                            > {
-public:
-
-    ConstraintProximity::SPtr defaultFunc(collisionAlgorithm::BaseProximity::SPtr ) const override {
-        return NULL;
-    }
-
-    void notFound(const std::type_info & id) const override {
-        std::cerr << "ConstraintProximityOperation has no registered function for type " << sofa::helper::NameDecoder::decodeFullName(id) << std::endl;
-    }
 
 };
 

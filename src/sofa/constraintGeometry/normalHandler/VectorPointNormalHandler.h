@@ -22,13 +22,8 @@ public:
 
     void prepareDetection() override {}
 
-    static ConstraintProximity::SPtr buildConstraintProximity(typename collisionAlgorithm::MechanicalProximity<DataTypes>::SPtr prox) {
-//        if (typename collisionAlgorithm::MechanicalProximity<DataTypes>::SPtr vpprox = std::dynamic_pointer_cast<collisionAlgorithm::MechanicalProximity<DataTypes>>(prox)) {
-//            //TODO : return NEW VECTOR_POINT CSTPROX
-//            return ConstraintProximity::SPtr(new VectorPointConstraintProximity<DataTypes>(vpprox,d_normals.getValue()));
-//        }
-
-        return NULL;
+    static ConstraintProximity::SPtr buildConstraintProximity(VectorPointNormalHandler * handler, typename collisionAlgorithm::MechanicalProximity<DataTypes>::SPtr prox) {
+        return ConstraintProximity::SPtr(new VectorPointConstraintProximity<DataTypes>(prox,handler->d_normals.getValue()));
     }
 
     const std::type_info & getTypeInfo() override { return typeid(VectorPointNormalHandler); }

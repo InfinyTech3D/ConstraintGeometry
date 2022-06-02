@@ -30,8 +30,8 @@ public:
         if (nbPoints) m_gcenter*=1.0/nbPoints;
     }
 
-    static ConstraintProximity::SPtr buildConstraintProximity(GravityPointConstraintProximity::SPtr prox) {
-//        return ConstraintProximity::SPtr(new GravityPointConstraintProximity(gpprox,m_gcenter));
+    static ConstraintProximity::SPtr buildConstraintProximity(GravityPointNormalHandler * handler, collisionAlgorithm::PointProximity::SPtr prox) {
+        return ConstraintProximity::SPtr(new GravityPointConstraintProximity(prox,handler->m_gcenter));
     }
 
     const std::type_info & getTypeInfo() override { return typeid(GravityPointNormalHandler); }

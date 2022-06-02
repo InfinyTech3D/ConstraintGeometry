@@ -15,7 +15,7 @@ public:
 
     void prepareDetection() override {}
 
-    static ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::EdgeProximity::SPtr prox) {
+    static ConstraintProximity::SPtr buildConstraintProximity(EdgeNormalHandler *, collisionAlgorithm::EdgeProximity::SPtr prox) {
         return ConstraintProximity::SPtr(new EdgeConstraintProximity(prox));
     }
 

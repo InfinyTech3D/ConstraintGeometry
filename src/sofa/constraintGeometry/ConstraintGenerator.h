@@ -3,6 +3,7 @@
 #include <sofa/constraintGeometry/ConstraintProximity.h>
 #include <sofa/constraintGeometry/BaseNormalHandler.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
+#include <sofa/constraintGeometry/ConstraintProximityOperation.h>
 
 namespace sofa::constraintGeometry {
 
@@ -56,8 +57,8 @@ public:
             for (unsigned i=0;i<d_input.getValue().size();i++) {
                 auto & pair = d_input.getValue()[i];
 
-                pairs.push_back(std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr>(firstOp(pair.first),
-                                                                                               secondOp(pair.second)));
+                pairs.push_back(std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr>(firstOp(l_firstHandler.get(), pair.first),
+                                                                                               secondOp(l_secondHandler.get(), pair.second)));
             }
             d_output.endEdit();
         });

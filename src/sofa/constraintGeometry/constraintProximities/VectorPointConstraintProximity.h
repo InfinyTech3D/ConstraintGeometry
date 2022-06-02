@@ -20,7 +20,7 @@ public:
 
     typedef std::shared_ptr<VectorPointConstraintProximity> SPtr;
 
-    VectorPointConstraintProximity(typename collisionAlgorithm::MechanicalProximity<DataTypes>::SPtr prox, type::vector<type::Vector3> normals)
+    VectorPointConstraintProximity(typename collisionAlgorithm::MechanicalProximity<DataTypes>::SPtr prox, const type::vector<type::Vector3> & normals)
     : m_prox(prox), m_normals(normals) {}
 
 
@@ -42,7 +42,7 @@ public:
 
 private:
     typename collisionAlgorithm::MechanicalProximity<DataTypes>::SPtr m_prox;
-    type::vector<type::Vector3> m_normals;
+    const type::vector<type::Vector3> & m_normals;
 };
 
 }

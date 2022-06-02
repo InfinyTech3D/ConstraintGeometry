@@ -16,7 +16,7 @@ public:
 
     const std::type_info & getTypeInfo() override { return typeid(PhongTriangleNormalHandler); }
 
-    static ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::TriangleProximity::SPtr tprox) {
+    static ConstraintProximity::SPtr buildConstraintProximity(PhongTriangleNormalHandler *, collisionAlgorithm::TriangleProximity::SPtr tprox) {
         return ConstraintProximity::SPtr(new PhongConstraintProximity(tprox));
     }
 };

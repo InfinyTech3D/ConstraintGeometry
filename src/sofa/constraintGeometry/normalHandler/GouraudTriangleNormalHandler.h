@@ -15,7 +15,7 @@ public:
 
     void prepareDetection() override {}
 
-    static ConstraintProximity::SPtr buildConstraintProximity(collisionAlgorithm::TriangleProximity::SPtr tprox) {
+    static ConstraintProximity::SPtr buildConstraintProximity(GouraudTriangleNormalHandler * , collisionAlgorithm::TriangleProximity::SPtr tprox) {
         return ConstraintProximity::SPtr(new GouraudConstraintProximity(tprox));
     }
 

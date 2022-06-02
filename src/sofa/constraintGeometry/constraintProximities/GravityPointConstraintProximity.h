@@ -18,7 +18,7 @@ public:
 
     typedef std::shared_ptr<GravityPointConstraintProximity> SPtr;
 
-    GravityPointConstraintProximity(collisionAlgorithm::PointProximity::SPtr prox, type::Vector3 gcenter)
+    GravityPointConstraintProximity(collisionAlgorithm::PointProximity::SPtr prox, const type::Vector3 & gcenter)
     : m_prox(prox), m_gcenter(gcenter) {}
 
 
@@ -32,7 +32,7 @@ public:
 
 private:
     collisionAlgorithm::PointProximity::SPtr m_prox;
-    type::Vector3 m_gcenter;
+    const type::Vector3 & m_gcenter;
 };
 
 }
