@@ -14,7 +14,8 @@
         <GenericConstraintSolver maxIterations="200" tolerance="0.0001" />
 
         <CollisionLoop />
-        <FindClosestProximityAlgorithm name="algo" dest="@Liver/Collision/Geometry" from="@Plane/Geometry" />
+<!--        <FindClosestProximityAlgorithm name="algo" dest="@Liver/Collision/Geometry" from="@Plane/Geometry" />-->
+        <FindClosestProximityAlgorithm name="algo" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
 
         
         
@@ -68,6 +69,9 @@
 
         <PhongTriangleNormalHandler name="handler" />
         <ContactDirection name="second" handler="@handler"/>
-        <ConstraintUnilateral name="constraint" input="@algo.output" mu="0.6" directions="@second" />
+<!--        <ConstraintUnilateral name="constraint" input="@algo.output" mu="0.6" directions="@second" />-->
+
+        <ConstraintGenerator name="cstGenerator" input="@algo.output" firstHandler="@handler" secondHandler="@handler" />
+        <ConstraintUnilateral name="constraint" input="@cstGenerator.output" mu="0.6" directions="@second" />
 
 </Node>
