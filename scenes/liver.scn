@@ -16,11 +16,11 @@
         <CollisionLoop />
 <!--        <FindClosestProximityAlgorithm name="algo" dest="@Liver/Collision/Geometry" from="@Plane/Geometry" />-->
         <FindClosestProximityAlgorithm name="algo" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
-
+<!--         <DistanceFilter name="distance" algo="@algo" distance="0.1" /> -->
+    
         
         
 <!--         <NormalFilter name="normal" algo="@algo" angle="-1 0.5" /> -->
-<!--         <DistanceFilter name="distance" algo="@algo" distance="0.1" /> -->
 <!--         <AABBSearchMethod algo="@algo" /> -->
 <!--        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" distance="@dist.distance" dest="@Liver/Collision/TriangleGeometry" from="@Plane/TriangleGeometry" />-->
 

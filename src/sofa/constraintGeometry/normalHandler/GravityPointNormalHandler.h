@@ -1,9 +1,9 @@
 #pragma once
 
 #include <sofa/constraintGeometry/BaseNormalHandler.h>
-#include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
+#include <sofa/collisionAlgorithm/proximity/PointProximity.h>
+#include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/constraintGeometry/ConstraintProximity.h>
-#include <sofa/constraintGeometry/constraintProximities/GravityPointConstraintProximity.h>
 
 namespace sofa::constraintGeometry {
 
@@ -17,7 +17,6 @@ public:
     GravityPointNormalHandler()
     : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
 
-
     void prepareDetection() override {
         m_gcenter = type::Vector3();
 
@@ -30,15 +29,24 @@ public:
         if (nbPoints) m_gcenter*=1.0/nbPoints;
     }
 
-    static ConstraintProximity::SPtr buildConstraintProximity(GravityPointNormalHandler * handler, collisionAlgorithm::PointProximity::SPtr prox) {
-        return ConstraintProximity::SPtr(new GravityPointConstraintProximity(prox,handler->m_gcenter));
-    }
+    template<class PROXIMITY>
+    type::Vector3 getNormal(const typename PROXIMITY::SPtr & prox);
 
     const std::type_info & getTypeInfo() override { return typeid(GravityPointNormalHandler); }
+
+    template<class PROXIMITY>
+    static inline ConstraintProximity::SPtr buildCstProximity(GravityPointNormalHandler * handler, typename PROXIMITY::SPtr prox) {
+        return TConstraintProximity<PROXIMITY>::create(prox,std::bind(&GravityPointNormalHandler::getNormal<PROXIMITY>,handler,std::placeholders::_1));
+    }
 
 private :
     type::Vector3 m_gcenter;
 };
 
+template<>
+inline type::Vector3 GravityPointNormalHandler::getNormal<collisionAlgorithm::PointProximity>(const collisionAlgorithm::PointProximity::SPtr & prox) {
+    type::Vector3 N = (prox->getPosition() - m_gcenter).normalized();
+    return N;
+}
 
 }

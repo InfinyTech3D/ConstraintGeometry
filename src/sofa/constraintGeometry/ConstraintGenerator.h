@@ -49,16 +49,20 @@ public:
         c_callback.addInput(&d_input);
         c_callback.addCallback([=](){
 
-            ConstraintProximityOperation::FUNC firstOp = ConstraintProximityOperation::get(l_firstHandler->getTypeInfo());
-            ConstraintProximityOperation::FUNC secondOp = ConstraintProximityOperation::get(l_secondHandler->getTypeInfo());
-
             ConstraintPairsOutput & pairs = *d_output.beginEdit();
             pairs.clear();
             for (unsigned i=0;i<d_input.getValue().size();i++) {
                 auto & pair = d_input.getValue()[i];
 
-                pairs.push_back(std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr>(firstOp(l_firstHandler.get(), pair.first),
-                                                                                               secondOp(l_secondHandler.get(), pair.second)));
+                ConstraintProximityOperation::FUNC firstOp = ConstraintProximityOperation::get(l_firstHandler->getTypeInfo(),pair.first->getTypeInfo());
+                ConstraintProximity::SPtr first_cstProx = firstOp(l_firstHandler.get(), pair.first);
+                if (first_cstProx==NULL) continue;
+
+                ConstraintProximityOperation::FUNC secondOp = ConstraintProximityOperation::get(l_secondHandler->getTypeInfo(),pair.second->getTypeInfo());
+                ConstraintProximity::SPtr second_cstProx = secondOp(l_secondHandler.get(), pair.second);
+                if (second_cstProx==NULL) continue;
+
+                pairs.push_back(std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr>(first_cstProx,second_cstProx));
             }
             d_output.endEdit();
         });

@@ -2,6 +2,7 @@
 
 #include <sofa/collisionAlgorithm/CollisionPipeline.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
+#include <sofa/constraintGeometry/ConstraintProximity.h>
 
 namespace sofa ::constraintGeometry {
 
@@ -11,8 +12,6 @@ namespace sofa ::constraintGeometry {
 class BaseNormalHandler : public collisionAlgorithm::CollisionComponent {
 public:
     SOFA_ABSTRACT_CLASS(BaseNormalHandler, collisionAlgorithm::CollisionComponent);
-
-//    virtual bool getNormal(collisionAlgorithm::BaseProximity::SPtr prox,type::Vector3 & N) = 0;
 
     virtual const std::type_info & getTypeInfo() = 0;
 
