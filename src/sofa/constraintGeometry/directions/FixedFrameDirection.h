@@ -3,9 +3,7 @@
 #include <sofa/constraintGeometry/ConstraintDirection.h>
 #include <sofa/type/Vec.h>
 
-namespace sofa {
-
-namespace constraintGeometry {
+namespace sofa::constraintGeometry {
 
 /*!
  * \brief The BindDirection class
@@ -24,7 +22,7 @@ public:
     /*!
      * \brief The ContactNormal class is the container class for direction constraints
      */
-    ConstraintNormal createConstraintsNormal(const collisionAlgorithm::PairDetection & /*d*/) const override {
+    ConstraintNormal createConstraintsNormal(const ConstraintProximity::SPtr & , const ConstraintProximity::SPtr & ) const override {
         ConstraintNormal CN ;
         return CN.addOrthogonalDirection()
                  .addOrthogonalDirection()
@@ -32,7 +30,5 @@ public:
     }
 
 };
-
-}
 
 }

@@ -35,8 +35,10 @@ public:
 //        this->addSlave(l_directions.get());
 //    }
 
-    ConstraintNormal createConstraintNormal(const collisionAlgorithm::DetectionOutput::PairDetection & detection) const override {
-        ConstraintNormal CN = l_directions->createConstraintsNormal(detection);
+    ConstraintNormal createConstraintNormal(const ConstraintProximity::SPtr & first, const ConstraintProximity::SPtr & second) const override {
+        if (l_directions==NULL) return ConstraintNormal();
+
+        ConstraintNormal CN = l_directions->createConstraintsNormal(first,second);
 
         if (d_friction.getValue() != 0.0) {
             CN.addOrthogonalDirection();

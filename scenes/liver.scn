@@ -14,12 +14,13 @@
         <GenericConstraintSolver maxIterations="200" tolerance="0.0001" />
 
         <CollisionLoop />
-        <FindClosestProximityAlgorithm name="algo" from="@Liver/Collision/AABB" dest="@Plane/AABB" />
-
+<!--        <FindClosestProximityAlgorithm name="algo" dest="@Liver/Collision/Geometry" from="@Plane/Geometry" />-->
+        <FindClosestProximityAlgorithm name="algo" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
+<!--         <DistanceFilter name="distance" algo="@algo" distance="0.1" /> -->
+    
         
         
 <!--         <NormalFilter name="normal" algo="@algo" angle="-1 0.5" /> -->
-<!--         <DistanceFilter name="distance" algo="@algo" distance="0.1" /> -->
 <!--         <AABBSearchMethod algo="@algo" /> -->
 <!--        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" distance="@dist.distance" dest="@Liver/Collision/TriangleGeometry" from="@Plane/TriangleGeometry" />-->
 
@@ -42,11 +43,6 @@
                         <MechanicalObject name="state" />
 
                         <TriangleGeometry name="Geometry" color="0 1 0 1" />
-                        <PhongTriangleNormalHandler geometry="@Geometry" />
-                        
-<!--                        <PointGeometry name="Geometry" color="0 0 1 1" drawRadius="0.1" />-->
-<!--                        <BezierTriangleGeometry name="Geometry" color="0 0 1 1" />-->
-
                         <AABBGeometry name="AABB" geometry="@Geometry" nbox="8 8 8" />
 
                         <BarycentricMapping name="BarycentricMapping"/>
@@ -68,15 +64,14 @@
                 <MechanicalObject name="State3D1" dy="1" position="@loader.position" />
                 <OglModel name="OglModel" color="1 1 1 0.8"/>
                 <TriangleGeometry name="Geometry" color="1 1 1 0.6" />
-                <PhongTriangleNormalHandler geometry="@Geometry" />
-                
                 <AABBGeometry name="AABB" geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" />
         </Node>
 
-<!--         <SecondNormalDirection name="dir" /> -->
-        <ConstraintUnilateral name="constraint" input="@algo.output" mu="0.6" />
-<!--        <TestConstraintBilateral name="test" />-->
-<!--		<ConstraintBilateral input="@algo.output" />-->
-<!--	<Constraintless algo="@algo" from="@Liver/Collision/TriangleGeometry" dest="@Plane/TriangleGeometry" />-->
+        <PhongTriangleNormalHandler name="handler" />
+        <ContactDirection name="second" handler="@handler"/>
+<!--        <ConstraintUnilateral name="constraint" input="@algo.output" mu="0.6" directions="@second" />-->
+
+        <ConstraintGenerator name="cstGenerator" input="@algo.output" firstHandler="@handler" secondHandler="@handler" />
+        <ConstraintUnilateral name="constraint" input="@cstGenerator.output" mu="0.6" directions="@second" />
 
 </Node>

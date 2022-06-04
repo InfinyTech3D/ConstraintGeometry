@@ -1,10 +1,9 @@
 #pragma once
 
+#include <sofa/constraintGeometry/BaseNormalHandler.h>
 #include <sofa/constraintGeometry/ConstraintDirection.h>
 
-namespace sofa {
-
-namespace constraintGeometry {
+namespace sofa::constraintGeometry {
 
 /*!
  * \brief The SecondDirection class
@@ -17,12 +16,10 @@ public:
     /*!
      * \brief The ContactNormal class is the container class for direction constraints
      */
-    ConstraintNormal createConstraintsNormal(const collisionAlgorithm::PairDetection & d) const override {
-        return ConstraintNormal(d.second->getNormal());
+    ConstraintNormal createConstraintsNormal(const ConstraintProximity::SPtr & , const ConstraintProximity::SPtr & second) const override {
+        return ConstraintNormal(second->getNormal());
     }
 
 };
-
-}
 
 }
