@@ -16,10 +16,10 @@ public:
     /*!
      * \brief The ContactNormal class is the container class for direction constraints
      */
-    ConstraintNormal createConstraintsNormal(const ConstraintPairsOutput::ConstraintPairs & d) const override {
-        type::Vector3 mainDir = (d.first->getPosition() - d.second->getPosition()).normalized();
+    ConstraintNormal createConstraintsNormal(const ConstraintProximity::SPtr & first, const ConstraintProximity::SPtr & second) const override {
+        type::Vector3 mainDir = (first->getPosition() - second->getPosition()).normalized();
 
-        type::Vector3 secondDir = d.second->getNormal();
+        type::Vector3 secondDir = second->getNormal();
 
         if (dot(mainDir,secondDir)<=std::numeric_limits<double>::epsilon()) mainDir=secondDir;
 

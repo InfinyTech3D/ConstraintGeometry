@@ -20,7 +20,7 @@ public:
 
     Data<double> d_drawScale;
     Data<bool> d_draw;
-    Data<ConstraintPairsOutput> d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
+    Data<collisionAlgorithm::DetectionOutput<ConstraintProximity, ConstraintProximity> > d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
 
     BaseConstraint()
         : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
@@ -28,7 +28,7 @@ public:
         , d_input(initData(&d_input, "input", "Link to detection output"))
     {}
 
-    virtual ConstraintNormal createConstraintNormal(const ConstraintPairsOutput::ConstraintPairs & detection) const = 0;
+    virtual ConstraintNormal createConstraintNormal(const ConstraintProximity::SPtr & first, const ConstraintProximity::SPtr & second) const = 0;
 
     virtual core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint & cst) const = 0;
 
@@ -39,13 +39,14 @@ public:
     virtual void processGeometricalData() {
         m_container.clear();//clear previsou constraints
 
-        const ConstraintPairsOutput & input = d_input.getValue();
+        auto & input = d_input.getValue();
         for (unsigned i=0;i<input.size();i++) {
-            ConstraintNormal CN = createConstraintNormal(input[i]);
+            ConstraintNormal CN = createConstraintNormal(input[i].first,input[i].second);
 
             if (CN.size() == 0) continue;
 
-            m_container.push_back(InternalConstraint(input[i],CN,
+            m_container.push_back(InternalConstraint(input[i].first,input[i].second,
+                                                     CN,
                                                      std::bind(&BaseConstraint::createConstraintResolution, this, std::placeholders::_1)));
         }
     }

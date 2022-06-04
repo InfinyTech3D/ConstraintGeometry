@@ -21,8 +21,9 @@ public :
      * \param normals : ConstraintNormals
      * \param creator : resolutionCreator (factory)
      */
-    InternalConstraint(const ConstraintPairsOutput::ConstraintPairs & detection,const ConstraintNormal normals, ResolutionCreator creator)
-    : m_detection(detection)
+    InternalConstraint(const ConstraintProximity::SPtr & first, const ConstraintProximity::SPtr & second, const ConstraintNormal normals, ResolutionCreator creator)
+    : m_first(first)
+    , m_second(second)
     , m_normals(normals)
     , m_creator(creator)
     , m_cid(0)
@@ -39,15 +40,15 @@ public :
     void buildConstraintMatrix(core::MultiMatrixDerivId cId, unsigned int & constraintId) const {
         m_cid = constraintId;
 
-        m_detection.first->buildJacobianConstraint(cId, m_normals.m_dirs,  1.0, constraintId);
-        m_detection.second->buildJacobianConstraint(cId, m_normals.m_dirs, -1.0, constraintId);
+        m_first->buildJacobianConstraint(cId, m_normals.m_dirs,  1.0, constraintId);
+        m_second->buildJacobianConstraint(cId, m_normals.m_dirs, -1.0, constraintId);
 
         constraintId += m_normals.size();
     }
 
     void getConstraintViolation(linearalgebra::BaseVector *v) const {
         //for (unsigned i=0;i<m_normals.size();i++) {
-            m_normals.computeViolations(m_cid, m_detection, v);
+            m_normals.computeViolations(m_cid, m_first, m_second, v);
         //}
     }
 
@@ -67,8 +68,8 @@ public :
      */
     void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::linearalgebra::BaseVector* lambda) const {
         for (unsigned i=0;i<m_normals.size();i++) {
-            m_detection.first->storeLambda(cParams,res,m_cid,i,lambda);
-            m_detection.second->storeLambda(cParams,res,m_cid,i,lambda);
+            m_first->storeLambda(cParams,res,m_cid,i,lambda);
+            m_second->storeLambda(cParams,res,m_cid,i,lambda);
         }
     }
 
@@ -100,11 +101,11 @@ public :
     }
 
     inline ConstraintProximity::SPtr getFirstProximity() const {
-        return m_detection.first;
+        return m_first;
     }
 
     inline ConstraintProximity::SPtr getSecondProximity() const {
-        return m_detection.second;
+        return m_second;
     }
 
     const ConstraintNormal getConstraintNormal() const {
@@ -128,8 +129,8 @@ public :
         dirs.push_back(type::Vector3(0,1,0));
         dirs.push_back(type::Vector3(0,0,1));
 
-        m_detection.first->buildJacobianConstraint(cId, dirs,  1.0, csetId*3);
-        m_detection.second->buildJacobianConstraint(cId, dirs, -1.0, csetId*3);
+        m_first->buildJacobianConstraint(cId, dirs,  1.0, csetId*3);
+        m_second->buildJacobianConstraint(cId, dirs, -1.0, csetId*3);
 
         csetId ++;
     }
@@ -163,7 +164,9 @@ public :
 
 
  protected:
-    ConstraintPairsOutput::ConstraintPairs m_detection;
+    ConstraintProximity::SPtr m_first;
+    ConstraintProximity::SPtr m_second;
+
     ConstraintNormal m_normals;
     ResolutionCreator m_creator;
     mutable unsigned m_cid;

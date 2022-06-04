@@ -17,11 +17,11 @@ class ConstraintNormal {
 
 public:
 
-    typedef std::function<double(const ConstraintPairsOutput::ConstraintPairs & , const type::Vector3 &)> ViolationFunction;
+    typedef std::function<double(const ConstraintProximity::SPtr & , const ConstraintProximity::SPtr , const type::Vector3 &)> ViolationFunction;
 
-    static double defaultViolationFunction(const ConstraintPairsOutput::ConstraintPairs & detection, const type::Vector3 & normal) {
-        const type::Vector3 & PFree = detection.first->getPosition(core::VecCoordId::freePosition());
-        const type::Vector3 & QFree = detection.second->getPosition(core::VecCoordId::freePosition());
+    static double defaultViolationFunction(const ConstraintProximity::SPtr & first, const ConstraintProximity::SPtr second, const type::Vector3 & normal) {
+        const type::Vector3 & PFree = first->getPosition(core::VecCoordId::freePosition());
+        const type::Vector3 & QFree = second->getPosition(core::VecCoordId::freePosition());
         return dot(PFree - QFree, normal);
     }
 
@@ -32,12 +32,12 @@ public:
         m_functions = cn.m_functions;
     }
 
-    ConstraintNormal(const type::Vector3 & N, ViolationFunction f = std::bind(&ConstraintNormal::defaultViolationFunction, std::placeholders::_1, std::placeholders::_2)) {
+    ConstraintNormal(const type::Vector3 & N, ViolationFunction f = std::bind(&ConstraintNormal::defaultViolationFunction, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)) {
         m_dirs.push_back(N.normalized());
         m_functions.push_back(f);
     }
 
-    ConstraintNormal & add(const type::Vector3 & N, ViolationFunction f = std::bind(&ConstraintNormal::defaultViolationFunction, std::placeholders::_1, std::placeholders::_2)) {
+    ConstraintNormal & add(const type::Vector3 & N, ViolationFunction f = std::bind(&ConstraintNormal::defaultViolationFunction, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)) {
         m_dirs.push_back(N.normalized());
         m_functions.push_back(f);
         return *this;
@@ -48,7 +48,7 @@ public:
         return m_dirs.size();
     }
 
-    ConstraintNormal & addOrthogonalDirection(ViolationFunction f = std::bind(&ConstraintNormal::defaultViolationFunction, std::placeholders::_1, std::placeholders::_2)) {
+    ConstraintNormal & addOrthogonalDirection(ViolationFunction f = std::bind(&ConstraintNormal::defaultViolationFunction, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)) {
         if (m_dirs.size() == 0) {
             m_dirs.push_back(type::Vector3(1,0,0));
             m_functions.push_back(f);
@@ -76,9 +76,9 @@ public:
         return *this;
     }
 
-    void computeViolations(unsigned  cid, const ConstraintPairsOutput::ConstraintPairs & d, linearalgebra::BaseVector * delta) const {
+    void computeViolations(unsigned  cid, const ConstraintProximity::SPtr & first, const ConstraintProximity::SPtr & second, linearalgebra::BaseVector * delta) const {
         for (unsigned i=0;i<m_dirs.size();i++) {
-            double v = m_functions[i](d, m_dirs[i]);
+            double v = m_functions[i](first,second, m_dirs[i]);
             delta->set(cid + i, v);
         }
     }

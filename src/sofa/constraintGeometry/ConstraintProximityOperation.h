@@ -2,9 +2,10 @@
 
 #include <sofa/collisionAlgorithm/BaseOperation.h>
 #include <sofa/constraintGeometry/ConstraintProximity.h>
-#include <sofa/constraintGeometry/BaseNormalHandler.h>
 
 namespace sofa::constraintGeometry {
+
+class BaseNormalHandler;
 
 //Specific operation to find the closest point on a geometry (the code is in the c++ class)
 class ConstraintProximityOperation : public collisionAlgorithm::Operations::GenericOperation2<ConstraintProximityOperation,//operation type

@@ -16,7 +16,7 @@ public:
 
     virtual void storeLambda(const core::ConstraintParams* , core::MultiVecDerivId , Index , Index , const sofa::linearalgebra::BaseVector* ) const = 0;
 
-    virtual type::Vector3 getNormal() = 0;
+    virtual type::Vector3 getNormal() const = 0;
 
 };
 
@@ -25,7 +25,7 @@ class TConstraintProximity : public ConstraintProximity {
 public:
     typedef std::function<type::Vector3(const typename PROXIMITY::SPtr & p)> FUNC_GET_NORMAL;
 
-    TConstraintProximity(typename PROXIMITY::SPtr & p,FUNC_GET_NORMAL n)
+    TConstraintProximity(const typename PROXIMITY::SPtr & p,FUNC_GET_NORMAL n)
     : m_prox(p)
     , m_normalFunc(n) {}
 
@@ -41,17 +41,41 @@ public:
         m_prox->storeLambda(cParams,resId,cid_global,cid_local,lambda);
     }
 
-    type::Vector3 getNormal() {
+    type::Vector3 getNormal() const {
         return m_normalFunc(m_prox);
     }
 
-    static ConstraintProximity::SPtr create(typename PROXIMITY::SPtr & p,FUNC_GET_NORMAL n) {
+    static ConstraintProximity::SPtr create(const typename PROXIMITY::SPtr & p,FUNC_GET_NORMAL n) {
         return ConstraintProximity::SPtr(new TConstraintProximity(p,n));
     }
 
 protected:
     typename PROXIMITY::SPtr m_prox;
     FUNC_GET_NORMAL m_normalFunc;
+};
+
+template<class PROXIMITY>
+class BaseProximityNormal : public PROXIMITY, public constraintGeometry::ConstraintProximity {
+public:
+    typedef std::shared_ptr<BaseProximityNormal> SPtr;
+
+    template<class... ARGS>
+    BaseProximityNormal(ARGS... args)
+    : PROXIMITY(args...) {}
+
+    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
+        return PROXIMITY::getPosition(v);
+    }
+
+    void buildJacobianConstraint(core::MultiMatrixDerivId id, const sofa::type::vector<sofa::type::Vector3> & N, double f, Index i) const override {
+        PROXIMITY::buildJacobianConstraint(id,N,f,i);
+    }
+
+    void storeLambda(const core::ConstraintParams* cp, core::MultiVecDerivId id, Index i, Index j, const sofa::linearalgebra::BaseVector* l) const override {
+        PROXIMITY::storeLambda(cp,id,i,j,l);
+    }
+
+    virtual sofa::type::Vector3 getNormal() const = 0;
 };
 
 }

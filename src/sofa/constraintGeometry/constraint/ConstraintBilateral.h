@@ -27,9 +27,9 @@ public:
         } else this->addSlave(l_directions.get());
     }
 
-    virtual ConstraintNormal createConstraintNormal(const ConstraintPairsOutput::ConstraintPairs & detection) const override {
+    virtual ConstraintNormal createConstraintNormal(const ConstraintProximity::SPtr & first, const ConstraintProximity::SPtr & second) const override {
         if (l_directions == NULL) return ConstraintNormal();
-        return l_directions->createConstraintsNormal(detection);
+        return l_directions->createConstraintsNormal(first,second);
     }
 
     core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint & cst) const {
