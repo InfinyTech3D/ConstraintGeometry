@@ -13,11 +13,30 @@ class FirstDirection : public ConstraintDirection {
 public:
     SOFA_CLASS(FirstDirection , ConstraintDirection);
 
+    core::objectmodel::SingleLink<FirstDirection, BaseNormalHandler, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_handler;
+
+    FirstDirection()
+    : l_handler(initLink("handler", "link to the second normal handler")) {}
+
+    void init() override {
+        if (l_handler==NULL) {
+            std::cerr << "Cannot find normal handler in FirstDirection " << std::endl;
+        }
+    }
+
     /*!
      * \brief The ContactNormal class is the container class for direction constraints
      */
-    ConstraintNormal createConstraintsNormal(const ConstraintProximity::SPtr & first, const ConstraintProximity::SPtr & ) const override {
-        return ConstraintNormal(-first->getNormal());
+    ConstraintNormal createConstraintsNormal(const BaseProximity::SPtr & first, const BaseProximity::SPtr & ) const override {
+        if (l_handler==NULL) return ConstraintNormal();
+
+        const ConstraintProximity::SPtr & cp = l_handler->createConstraintProximity(first);
+        if (cp==NULL) {
+            std::cerr << "Error cannot create normal in ContactDirection " << std::endl;
+            return ConstraintNormal();
+        }
+
+        return -cp->getNormal();
     }
 
 };

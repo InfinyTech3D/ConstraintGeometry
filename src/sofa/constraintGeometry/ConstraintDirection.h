@@ -15,7 +15,9 @@ class ConstraintDirection : public sofa::core::objectmodel::BaseObject {
 public:
     SOFA_CLASS(ConstraintDirection, sofa::core::objectmodel::BaseObject);
 
-    virtual ConstraintNormal createConstraintsNormal(const ConstraintProximity::SPtr & first, const ConstraintProximity::SPtr & second) const = 0;
+    typedef collisionAlgorithm::BaseProximity BaseProximity;
+
+    virtual ConstraintNormal createConstraintsNormal(const BaseProximity::SPtr & first, const BaseProximity::SPtr & second) const = 0;
 
 };
 

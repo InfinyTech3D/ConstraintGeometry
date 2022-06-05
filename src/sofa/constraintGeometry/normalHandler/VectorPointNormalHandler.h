@@ -13,10 +13,15 @@ public:
     SOFA_CLASS(VectorPointNormalHandler, BaseNormalHandler);
 
     Data<type::vector<type::Vector3> > d_normals;
+    core::objectmodel::SingleLink<VectorPointNormalHandler,collisionAlgorithm::BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
     VectorPointNormalHandler()
-    : d_normals(initData(&d_normals, "normals", "Vector of normals")) {}
+    : d_normals(initData(&d_normals, "normals", "Vector of normals"))
+    , l_geometry(initLink("handler", "link to the second normal handler")) {
+        l_geometry.setPath("@.");
+    }
 
+    BaseGeometry * getGeometry() override { return l_geometry.get(); }
 
     void prepareDetection() override {}
 

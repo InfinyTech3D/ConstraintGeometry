@@ -15,7 +15,11 @@ public:
     core::objectmodel::SingleLink<GravityPointNormalHandler,collisionAlgorithm::BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
     GravityPointNormalHandler()
-    : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
+    : l_geometry(initLink("geometry","Link to TriangleGeometry")){
+        l_geometry.setPath("@.");
+    }
+
+    BaseGeometry * getGeometry() override { return l_geometry.get(); }
 
     void prepareDetection() override {
         m_gcenter = type::Vector3();

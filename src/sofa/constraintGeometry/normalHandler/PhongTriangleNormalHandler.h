@@ -12,6 +12,15 @@ public:
 
     SOFA_CLASS(PhongTriangleNormalHandler, BaseNormalHandler);
 
+    core::objectmodel::SingleLink<PhongTriangleNormalHandler, BaseGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+
+    PhongTriangleNormalHandler()
+    : l_geometry(initLink("handler", "link to the second normal handler")) {
+        l_geometry.setPath("@.");
+    }
+
+    BaseGeometry * getGeometry() override { return l_geometry.get(); }
+
     void prepareDetection() override {}
 
     const std::type_info & getTypeInfo() override { return typeid(PhongTriangleNormalHandler); }

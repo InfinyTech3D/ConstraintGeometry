@@ -4,7 +4,7 @@
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/constraintGeometry/ConstraintProximity.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/constraintGeometry/ConstraintProximityOperation.h>
+#include <sofa/constraintGeometry/operations/ConstraintProximityOperation.h>
 
 namespace sofa ::constraintGeometry {
 
@@ -15,27 +15,23 @@ class BaseNormalHandler : public collisionAlgorithm::CollisionComponent {
 public:
     SOFA_ABSTRACT_CLASS(BaseNormalHandler, collisionAlgorithm::CollisionComponent);
 
-    core::objectmodel::SingleLink<BaseNormalHandler, collisionAlgorithm::BaseGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
-
-    BaseNormalHandler()
-    : l_geometry(initLink("geometry","link to needle data")) {}
+    typedef collisionAlgorithm::BaseGeometry BaseGeometry;
+    typedef collisionAlgorithm::BaseProximity BaseProximity;
 
     void init() {
-        if (l_geometry==NULL) {
+        if (getGeometry()==NULL) {
             std::cerr << "Error cannot find the geometry" << std::endl;
             return;
         }
 
-        l_geometry->addSlave(this);
+        getGeometry()->addSlave(this);
     }
 
-    collisionAlgorithm::BaseGeometry * getGeometry() {
-        return l_geometry.get();
-    }
+    virtual BaseGeometry * getGeometry() = 0;
 
     virtual const std::type_info & getTypeInfo() = 0;
 
-    virtual ConstraintProximity::SPtr createConstraintProximity(const collisionAlgorithm::BaseProximity::SPtr & prox) {
+    virtual ConstraintProximity::SPtr createConstraintProximity(const BaseProximity::SPtr & prox) {
         ConstraintProximityOperation::FUNC operation = ConstraintProximityOperation::get(getTypeInfo(),prox->getTypeInfo());
         return operation(this, prox);
     }

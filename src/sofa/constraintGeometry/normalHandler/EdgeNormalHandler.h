@@ -12,6 +12,15 @@ public:
 
     SOFA_CLASS(EdgeNormalHandler, BaseNormalHandler);
 
+    core::objectmodel::SingleLink<EdgeNormalHandler, BaseGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+
+    EdgeNormalHandler()
+    : l_geometry(initLink("handler", "link to the second normal handler")) {
+        l_geometry.setPath("@.");
+    }
+
+    BaseGeometry * getGeometry() override { return l_geometry.get(); }
+
     void prepareDetection() override {}
 
     template<class PROXIMITY>

@@ -7,20 +7,22 @@
 #include <sofa/constraintGeometry/InternalConstraint.h>
 #include <sofa/constraintGeometry/ConstraintResponse.h>
 #include <sofa/constraintGeometry/ConstraintDirection.h>
-#include <sofa/constraintGeometry/ConstraintGenerator.h>
 
 namespace sofa::constraintGeometry {
 
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseConstraint
  */
+template<class FIRST = collisionAlgorithm::BaseProximity, class SECOND = collisionAlgorithm::BaseProximity>
 class BaseConstraint : public sofa::core::behavior::BaseConstraint {
 public:
     SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseConstraint);
 
+    typedef collisionAlgorithm::BaseProximity BaseProximity;
+
     Data<double> d_drawScale;
     Data<bool> d_draw;
-    Data<collisionAlgorithm::DetectionOutput<ConstraintProximity, ConstraintProximity> > d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
+    Data<collisionAlgorithm::DetectionOutput<FIRST,SECOND> > d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
 
     BaseConstraint()
         : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
@@ -28,9 +30,9 @@ public:
         , d_input(initData(&d_input, "input", "Link to detection output"))
     {}
 
-    virtual ConstraintNormal createConstraintNormal(const ConstraintProximity::SPtr & first, const ConstraintProximity::SPtr & second) const = 0;
+    virtual ConstraintNormal createConstraintNormal(const typename FIRST::SPtr & first, const typename SECOND::SPtr & second) const = 0;
 
-    virtual core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint & cst) const = 0;
+    virtual core::behavior::ConstraintResolution* createConstraintResolution(const BaseInternalConstraint * cst) const = 0;
 
     /*!
      * \brief processGeometricalData
@@ -45,9 +47,10 @@ public:
 
             if (CN.size() == 0) continue;
 
-            m_container.push_back(InternalConstraint(input[i].first,input[i].second,
-                                                     CN,
-                                                     std::bind(&BaseConstraint::createConstraintResolution, this, std::placeholders::_1)));
+            InternalConstraint<FIRST,SECOND> constraint(input[i].first,input[i].second,CN,
+                                                        std::bind(&BaseConstraint::createConstraintResolution, this, std::placeholders::_1));
+
+            m_container.push_back(constraint);
         }
     }
 
@@ -118,7 +121,7 @@ public:
      * \param res
      * \param lambda
      */
-    virtual void storeLambda(const InternalConstraint & cst, const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::linearalgebra::BaseVector* lambda) {
+    virtual void storeLambda(const InternalConstraint<FIRST,SECOND> & cst, const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::linearalgebra::BaseVector* lambda) {
         cst.storeLambda(cParams,res,lambda);
     }
 
@@ -150,7 +153,7 @@ public:
 
 
 protected:
-    std::vector<InternalConstraint>  m_container;
+    std::vector<InternalConstraint<FIRST,SECOND> >  m_container;
     unsigned m_nbConstraints;
 };
 

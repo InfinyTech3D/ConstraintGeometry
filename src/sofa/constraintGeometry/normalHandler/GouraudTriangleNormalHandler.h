@@ -13,6 +13,15 @@ public:
 
     SOFA_CLASS(GouraudTriangleNormalHandler, BaseNormalHandler);
 
+    core::objectmodel::SingleLink<GouraudTriangleNormalHandler, BaseGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+
+    GouraudTriangleNormalHandler()
+    : l_geometry(initLink("handler", "link to the second normal handler")) {
+        l_geometry.setPath("@.");
+    }
+
+    BaseGeometry * getGeometry() override { return l_geometry.get(); }
+
     void prepareDetection() override {}
 
     const std::type_info & getTypeInfo() override { return typeid(GouraudTriangleNormalHandler); }

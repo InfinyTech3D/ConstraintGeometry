@@ -19,7 +19,7 @@ public:
 
     virtual void createResponseDirections(ConstraintNormal & /*cst*/) {} // by default nothing to do
 
-    virtual core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint & cst) const = 0;
+    virtual core::behavior::ConstraintResolution* createConstraintResolution(const BaseInternalConstraint * cst) const = 0;
 
 };
 

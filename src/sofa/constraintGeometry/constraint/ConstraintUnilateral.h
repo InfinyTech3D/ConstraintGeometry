@@ -13,14 +13,15 @@ namespace constraintGeometry {
  * \brief The ConstraintUnilateral class
  * Applies specified algorithm on 'from' and 'dest' geometry
  */
-class ConstraintUnilateral : public BaseConstraint {
+class ConstraintUnilateral : public BaseConstraint<collisionAlgorithm::BaseProximity,collisionAlgorithm::BaseProximity> {
 public:
-    SOFA_CLASS(ConstraintUnilateral , BaseConstraint);
+    SOFA_CLASS(ConstraintUnilateral , SOFA_TEMPLATE2(BaseConstraint,collisionAlgorithm::BaseProximity,collisionAlgorithm::BaseProximity) );
 
     Data<double> d_friction;
     Data<double> d_maxforce0;
     Data<double> d_maxforce1;
     Data<double> d_maxforce2;
+
     core::objectmodel::SingleLink<ConstraintUnilateral,ConstraintDirection, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_directions;
 
     ConstraintUnilateral()
@@ -30,12 +31,7 @@ public:
     , d_maxforce2(initData(&d_maxforce2, std::numeric_limits<double>::max(), "maxForce2", "Max force applied on the third axis"))
     , l_directions(initLink("directions", "link to the default direction")) {}
 
-//    void init() { // make sure we have a direction
-//        if (this->l_directions == NULL) l_directions = sofa::core::objectmodel::New<ContactDirection>();
-//        this->addSlave(l_directions.get());
-//    }
-
-    ConstraintNormal createConstraintNormal(const ConstraintProximity::SPtr & first, const ConstraintProximity::SPtr & second) const override {
+    ConstraintNormal createConstraintNormal(const BaseProximity::SPtr & first, const BaseProximity::SPtr & second) const override {
         if (l_directions==NULL) return ConstraintNormal();
 
         ConstraintNormal CN = l_directions->createConstraintsNormal(first,second);
@@ -49,20 +45,15 @@ public:
         return CN;
     }
 
-////        CN.UpdateConstraintViolationWithProximityPosition(cid, detection, pf, getF, pd, getD, delta);
-
-//        return CN;
-//    }
-
     /*!
      * \brief createConstraintResolution : factory method for constraint solvers
      * \param cst : InternalConstraint
      * \return (UnilateralConstraint|UnilateralFriction)Resolution => abstract ConstraintResolution ptr
      */
-    core::behavior::ConstraintResolution* createConstraintResolution(const InternalConstraint & cst) const {
-        if (cst.size() == 1) return new UnilateralConstraintResolution(d_maxforce0.getValue());
-        else if (cst.size() == 3) return new UnilateralFrictionResolution(d_friction.getValue(),d_maxforce0.getValue(),d_maxforce1.getValue(),d_maxforce2.getValue());
-        std::cerr << "Error the size of the constraint is not correct in ConstraintUnilateral size=" << cst.size() << std::endl;
+    core::behavior::ConstraintResolution* createConstraintResolution(const BaseInternalConstraint * cst) const override {
+        if (cst->size() == 1) return new UnilateralConstraintResolution(d_maxforce0.getValue());
+        else if (cst->size() == 3) return new UnilateralFrictionResolution(d_friction.getValue(),d_maxforce0.getValue(),d_maxforce1.getValue(),d_maxforce2.getValue());
+        std::cerr << "Error the size of the constraint is not correct in ConstraintUnilateral size=" << cst->size() << std::endl;
         return NULL;
     }
 

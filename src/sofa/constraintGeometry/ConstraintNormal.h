@@ -3,26 +3,35 @@
 #include <sofa/type/vector.h>
 #include <sofa/defaulttype/VecTypes.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
-#include <sofa/constraintGeometry/ConstraintGenerator.h>
 
 namespace sofa::constraintGeometry {
-
-class InternalConstraint;
 
 /*!
  * \brief The ConstraintNormal class
  */
-class ConstraintNormal {
-    friend class InternalConstraint;
 
+class PairViolationContainer {
+public:
+    virtual type::Vector3 getFirstPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
+
+    virtual type::Vector3 getSecondPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
+};
+
+class ConstraintNormal {
 public:
 
-    typedef std::function<double(const ConstraintProximity::SPtr & , const ConstraintProximity::SPtr , const type::Vector3 &)> ViolationFunction;
+    typedef collisionAlgorithm::BaseProximity BaseProximity;
+    typedef std::function<double(const PairViolationContainer *, const type::Vector3 &)> ViolationFunction;
 
-    static double defaultViolationFunction(const ConstraintProximity::SPtr & first, const ConstraintProximity::SPtr second, const type::Vector3 & normal) {
-        const type::Vector3 & PFree = first->getPosition(core::VecCoordId::freePosition());
-        const type::Vector3 & QFree = second->getPosition(core::VecCoordId::freePosition());
+    static double defaultViolationFunction(const PairViolationContainer * container, const type::Vector3 & normal) {
+        const type::Vector3 & PFree = container->getFirstPosition(core::VecCoordId::freePosition());
+        const type::Vector3 & QFree = container->getSecondPosition(core::VecCoordId::freePosition());
+
         return dot(PFree - QFree, normal);
+    }
+
+    static inline ViolationFunction getViolationFunc() {
+        return std::bind(&ConstraintNormal::defaultViolationFunction, std::placeholders::_1, std::placeholders::_2);
     }
 
     ConstraintNormal() {}
@@ -32,12 +41,12 @@ public:
         m_functions = cn.m_functions;
     }
 
-    ConstraintNormal(const type::Vector3 & N, ViolationFunction f = std::bind(&ConstraintNormal::defaultViolationFunction, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)) {
+    ConstraintNormal(const type::Vector3 & N, ViolationFunction f = getViolationFunc()) {
         m_dirs.push_back(N.normalized());
         m_functions.push_back(f);
     }
 
-    ConstraintNormal & add(const type::Vector3 & N, ViolationFunction f = std::bind(&ConstraintNormal::defaultViolationFunction, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)) {
+    ConstraintNormal & add(const type::Vector3 & N, ViolationFunction f = getViolationFunc()) {
         m_dirs.push_back(N.normalized());
         m_functions.push_back(f);
         return *this;
@@ -48,7 +57,7 @@ public:
         return m_dirs.size();
     }
 
-    ConstraintNormal & addOrthogonalDirection(ViolationFunction f = std::bind(&ConstraintNormal::defaultViolationFunction, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)) {
+    ConstraintNormal & addOrthogonalDirection(ViolationFunction f = getViolationFunc()) {
         if (m_dirs.size() == 0) {
             m_dirs.push_back(type::Vector3(1,0,0));
             m_functions.push_back(f);
@@ -76,9 +85,9 @@ public:
         return *this;
     }
 
-    void computeViolations(unsigned  cid, const ConstraintProximity::SPtr & first, const ConstraintProximity::SPtr & second, linearalgebra::BaseVector * delta) const {
+    void computeViolations(unsigned  cid, const PairViolationContainer * container, linearalgebra::BaseVector * delta) const {
         for (unsigned i=0;i<m_dirs.size();i++) {
-            double v = m_functions[i](first,second, m_dirs[i]);
+            double v = m_functions[i](container, m_dirs[i]);
             delta->set(cid + i, v);
         }
     }
@@ -97,6 +106,8 @@ public:
         return *this;
 
     }
+
+    const sofa::type::vector<type::Vector3> & getDirs() const { return m_dirs; }
 
 protected:
     //pai of directions (vec3) and function to compute the violation of a par proximity

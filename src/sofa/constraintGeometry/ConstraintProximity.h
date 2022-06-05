@@ -29,19 +29,19 @@ public:
     : m_prox(p)
     , m_normalFunc(n) {}
 
-    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
+    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
         return m_prox->getPosition(v);
     }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const {
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
         m_prox->buildJacobianConstraint(cId,dir,fact,constraintId);
     }
 
-    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::linearalgebra::BaseVector* lambda) const {
+    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::linearalgebra::BaseVector* lambda) const override {
         m_prox->storeLambda(cParams,resId,cid_global,cid_local,lambda);
     }
 
-    type::Vector3 getNormal() const {
+    type::Vector3 getNormal() const override {
         return m_normalFunc(m_prox);
     }
 

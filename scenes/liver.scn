@@ -2,31 +2,20 @@
 <Node name="Root" gravity="0 -15 0" dt="0.05">
         <RequiredPlugin pluginName="CollisionAlgorithm"/>
         <RequiredPlugin pluginName="ConstraintGeometry"/>
-		<RequiredPlugin name='SofaConstraint'/>  
-		<RequiredPlugin name='SofaSparseSolver'/>
-		<RequiredPlugin name='SofaGeneralLoader'/>
-		<RequiredPlugin name='SofaSimpleFem'/>
-		<RequiredPlugin name='SofaTopologyMapping'/>
-		<RequiredPlugin name='SofaOpenglVisual'/>
 		
         <VisualStyle displayFlags="showVisualModels hideBehaviorModels showCollisionModels hideMappings hideForceFields showWireframe showInteractionForceFields" />
         <FreeMotionAnimationLoop name="CollisionAnimationLoop"/>
         <GenericConstraintSolver maxIterations="200" tolerance="0.0001" />
 
         <CollisionLoop />
-<!--        <FindClosestProximityAlgorithm name="algo" dest="@Liver/Collision/Geometry" from="@Plane/Geometry" />-->
+
         <FindClosestProximityAlgorithm name="algo" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
 <!--         <DistanceFilter name="distance" algo="@algo" distance="0.1" /> -->
     
         
-        
-<!--         <NormalFilter name="normal" algo="@algo" angle="-1 0.5" /> -->
-<!--         <AABBSearchMethod algo="@algo" /> -->
-<!--        <FindClosestPointAlgorithm name="algo" filters="@distance @normal" distance="@dist.distance" dest="@Liver/Collision/TriangleGeometry" from="@Plane/TriangleGeometry" />-->
-
         <Node name="Liver">
                 <EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
-                <SparseLDLSolver />
+                <SparseLDLSolver template="CompressedRowSparseMatrixMat3x3d" />
 
                 <MeshGmshLoader name="loader" filename="mesh/liver.msh"/>
                 <MeshTopology name="Topology" tetrahedra="@loader.tetrahedra" />
@@ -43,8 +32,9 @@
                         <MechanicalObject name="state" />
 
                         <TriangleGeometry name="Geometry" color="0 1 0 1" />
-                        <AABBGeometry name="AABB" geometry="@Geometry" nbox="8 8 8" />
-
+                        <AABBBroadPhase name="AABB" geometry="@Geometry" nbox="8 8 8" />
+						<PhongTriangleNormalHandler name="handler" geometry="@Geometry" />
+						
                         <BarycentricMapping name="BarycentricMapping"/>
                 </Node>
 
@@ -64,14 +54,14 @@
                 <MechanicalObject name="State3D1" dy="1" position="@loader.position" />
                 <OglModel name="OglModel" color="1 1 1 0.8"/>
                 <TriangleGeometry name="Geometry" color="1 1 1 0.6" />
-                <AABBGeometry name="AABB" geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" />
+				<PhongTriangleNormalHandler name="handler" geometry="@Geometry" />
+				
+<!--                 <AABBBroadPhase name="AABB" geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" /> -->
         </Node>
 
-        <PhongTriangleNormalHandler name="handler" />
-        <ContactDirection name="second" handler="@handler"/>
-<!--        <ConstraintUnilateral name="constraint" input="@algo.output" mu="0.6" directions="@second" />-->
-
-        <ConstraintGenerator name="cstGenerator" input="@algo.output" firstHandler="@handler" secondHandler="@handler" />
-        <ConstraintUnilateral name="constraint" input="@cstGenerator.output" mu="0.6" directions="@second" />
+        
+        
+        <ContactDirection name="second" handler="@Plane/handler"/>
+        <ConstraintUnilateral name="constraint" input="@algo.output" mu="0.6" directions="@second" />
 
 </Node>
