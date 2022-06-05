@@ -15,7 +15,7 @@ public:
     core::objectmodel::SingleLink<PhongTriangleNormalHandler, BaseGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
     PhongTriangleNormalHandler()
-    : l_geometry(initLink("handler", "link to the second normal handler")) {
+    : l_geometry(initLink("geometry", "link to the second normal handler")) {
         l_geometry.setPath("@.");
     }
 
@@ -38,9 +38,9 @@ template<>
 inline type::Vector3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::TriangleProximity>(const collisionAlgorithm::TriangleProximity::SPtr & prox) {
     auto element = prox->element();
 
-    collisionAlgorithm::PointElement::SPtr p0 = element->pointElements()[0];
-    collisionAlgorithm::PointElement::SPtr p1 = element->pointElements()[1];
-    collisionAlgorithm::PointElement::SPtr p2 = element->pointElements()[2];
+    const collisionAlgorithm::PointElement::SPtr & p0 = element->pointElements()[0];
+    const collisionAlgorithm::PointElement::SPtr & p1 = element->pointElements()[1];
+    const collisionAlgorithm::PointElement::SPtr & p2 = element->pointElements()[2];
 
     type::Vector3 N0_point;
     for (auto it = p0->triangleAround().cbegin();it!=p0->triangleAround().cend();it++) {
@@ -58,8 +58,8 @@ inline type::Vector3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::T
     }
 
     type::Vector3 N = N0_point.normalized() * prox->f0() +
-        N1_point.normalized() * prox->f1() +
-        N2_point.normalized() * prox->f2();
+                      N1_point.normalized() * prox->f1() +
+                      N2_point.normalized() * prox->f2();
 
     return N;
 }
@@ -68,33 +68,14 @@ inline type::Vector3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::T
 
 template<>
 inline type::Vector3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes> >(const collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>::SPtr & prox) {
-//    auto element = prox->element();
+    const collisionAlgorithm::PointElement::SPtr & element = prox->getGeometry()->pointElements()[prox->getPId()];
 
-//    collisionAlgorithm::PointElement::SPtr p0 = element->pointElements()[0];
-//    collisionAlgorithm::PointElement::SPtr p1 = element->pointElements()[1];
-//    collisionAlgorithm::PointElement::SPtr p2 = element->pointElements()[2];
+    type::Vector3 N0_point;
+    for (auto it = element->triangleAround().cbegin();it!=element->triangleAround().cend();it++) {
+        N0_point+=(*it)->getTriangleInfo().N;
+    }
 
-//    type::Vector3 N0_point;
-//    for (auto it = p0->triangleAround().cbegin();it!=p0->triangleAround().cend();it++) {
-//        N0_point+=(*it)->getTriangleInfo().N;
-//    }
-
-//    type::Vector3 N1_point;
-//    for (auto it = p1->triangleAround().cbegin();it!=p1->triangleAround().cend();it++) {
-//        N1_point+=(*it)->getTriangleInfo().N;
-//    }
-
-//    type::Vector3 N2_point;
-//    for (auto it = p2->triangleAround().cbegin();it!=p2->triangleAround().cend();it++) {
-//        N2_point+=(*it)->getTriangleInfo().N;
-//    }
-
-//    type::Vector3 N = N0_point.normalized() * prox->f0() +
-//        N1_point.normalized() * prox->f1() +
-//        N2_point.normalized() * prox->f2();
-
-//    return N;
-    return type::Vector3(0,1,0);//m_prox->element()->getTriangleInfo().N;
+    return N0_point.normalized();
 }
 
 }

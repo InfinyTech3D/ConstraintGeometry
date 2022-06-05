@@ -38,8 +38,10 @@ public:
             return ConstraintNormal();
         }
 
-        type::Vector3 secondDir = cp->getNormal();
-        if (dot(mainDir,secondDir)<=std::numeric_limits<double>::epsilon()) mainDir=secondDir;
+        type::Vector3 secondDir = -cp->getNormal();
+        if (dot(mainDir,secondDir)<=std::numeric_limits<double>::epsilon()) {
+            mainDir=secondDir;
+        }
 
         return ConstraintNormal(mainDir);
     }

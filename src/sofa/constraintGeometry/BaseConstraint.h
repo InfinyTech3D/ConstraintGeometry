@@ -106,8 +106,8 @@ public:
 
                 glBegin(GL_LINES);
                 for (unsigned i=0;i<m_container.size();i++) {
-                    glVertex3dv(m_container[i].getFirstProximity()->getPosition().data());
-                    glVertex3dv(m_container[i].getSecondProximity()->getPosition().data());
+                    glVertex3dv(m_container[i].getFirstPosition().data());
+                    glVertex3dv(m_container[i].getSecondPosition().data());
                 }
                 glEnd();
             }

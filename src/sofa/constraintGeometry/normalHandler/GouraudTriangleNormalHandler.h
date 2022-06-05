@@ -16,7 +16,7 @@ public:
     core::objectmodel::SingleLink<GouraudTriangleNormalHandler, BaseGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
     GouraudTriangleNormalHandler()
-    : l_geometry(initLink("handler", "link to the second normal handler")) {
+    : l_geometry(initLink("geometry", "link to the second normal handler")) {
         l_geometry.setPath("@.");
     }
 
@@ -43,7 +43,15 @@ inline type::Vector3 GouraudTriangleNormalHandler::getNormal<collisionAlgorithm:
 
 template<>
 inline type::Vector3 GouraudTriangleNormalHandler::getNormal<collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>>(const collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>::SPtr & prox) {
-    return type::Vector3(0,1,0);//m_prox->element()->getTriangleInfo().N;
+    const collisionAlgorithm::PointElement::SPtr & element = prox->getGeometry()->pointElements()[prox->getPId()];
+
+    type::Vector3 N0_point;
+    for (auto it = element->triangleAround().cbegin();it!=element->triangleAround().cend();it++) {
+        N0_point+=(*it)->getTriangleInfo().N;
+        break;
+    }
+
+    return N0_point.normalized();
 }
 
 }

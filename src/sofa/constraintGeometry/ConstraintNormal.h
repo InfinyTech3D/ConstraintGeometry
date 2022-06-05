@@ -96,16 +96,16 @@ public:
         return m_dirs[i];
     }
 
-    ConstraintNormal& operator=(const ConstraintNormal& CN)
-    {
-        if(&CN == this)
-            return *this;
-        this->m_dirs = CN.m_dirs;
-        this->m_functions = CN.m_functions;
+//    ConstraintNormal& operator=(const ConstraintNormal& CN)
+//    {
+//        if(&CN == this)
+//            return *this;
+//        this->m_dirs = CN.m_dirs;
+//        this->m_functions = CN.m_functions;
 
-        return *this;
+//        return *this;
 
-    }
+//    }
 
     const sofa::type::vector<type::Vector3> & getDirs() const { return m_dirs; }
 

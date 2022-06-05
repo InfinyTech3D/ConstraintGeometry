@@ -17,7 +17,7 @@ public:
 
     VectorPointNormalHandler()
     : d_normals(initData(&d_normals, "normals", "Vector of normals"))
-    , l_geometry(initLink("handler", "link to the second normal handler")) {
+    , l_geometry(initLink("geometry", "link to the second normal handler")) {
         l_geometry.setPath("@.");
     }
 

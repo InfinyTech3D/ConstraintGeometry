@@ -92,27 +92,19 @@ public :
 
     void draw(const core::visual::VisualParams* vparams,double scale) const {
         if (m_normals.size()>0) {
-            vparams->drawTool()->drawArrow(getFirstProximity()->getPosition(), getFirstProximity()->getPosition() + m_normals.getDirs()[0] * scale, scale * 0.1, type::RGBAColor(1,0,0,1));
-//            vparams->drawTool()->drawArrow(m_p2->getPosition(), m_p2->getPosition() - m_normals.m_dirs[0] * scale, scale * 0.1, type::RGBAColor(1,0,0,1));
+            vparams->drawTool()->drawArrow(getFirstPosition(), getFirstPosition() + m_normals.getDirs()[0] * scale, scale * 0.1, type::RGBAColor(1,0,0,1));
+            vparams->drawTool()->drawArrow(getSecondPosition(), getSecondPosition() - m_normals.getDirs()[0] * scale, scale * 0.1, type::RGBAColor(1,0,0,1));
         }
 
         if (m_normals.size()>1) {
-            vparams->drawTool()->drawArrow(getFirstProximity()->getPosition(), getFirstProximity()->getPosition() + m_normals.getDirs()[1] * scale, scale * 0.1, type::RGBAColor(0,1,0,1));
-//            vparams->drawTool()->drawArrow(m_p2->getPosition(), m_p2->getPosition() - m_normals.m_dirs[1] * scale, scale * 0.1, type::RGBAColor(0,1,0,1));
+            vparams->drawTool()->drawArrow(getFirstPosition(), getFirstPosition() + m_normals.getDirs()[1] * scale, scale * 0.1, type::RGBAColor(0,1,0,1));
+            vparams->drawTool()->drawArrow(getSecondPosition(), getSecondPosition() - m_normals.getDirs()[1] * scale, scale * 0.1, type::RGBAColor(0,1,0,1));
         }
 
         if (m_normals.size()>2) {
-            vparams->drawTool()->drawArrow(getFirstProximity()->getPosition(), getFirstProximity()->getPosition() + m_normals.getDirs()[2] * scale, scale * 0.1, type::RGBAColor(0,0,1,1));
-//            vparams->drawTool()->drawArrow(m_p2->getPosition(), m_p2->getPosition() - m_normals.m_dirs[2] * scale, scale * 0.1, type::RGBAColor(0,0,1,1));
+            vparams->drawTool()->drawArrow(getFirstPosition(), getFirstPosition() + m_normals.getDirs()[2] * scale, scale * 0.1, type::RGBAColor(0,0,1,1));
+            vparams->drawTool()->drawArrow(getSecondPosition(), getSecondPosition() - m_normals.getDirs()[2] * scale, scale * 0.1, type::RGBAColor(0,0,1,1));
         }
-    }
-
-    inline typename FIRST::SPtr getFirstProximity() const {
-        return m_first;
-    }
-
-    inline typename SECOND::SPtr getSecondProximity() const {
-        return m_second;
     }
 
     type::Vector3 getFirstPosition(core::VecCoordId v = core::VecCoordId::position()) const override {

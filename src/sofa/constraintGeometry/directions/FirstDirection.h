@@ -36,7 +36,7 @@ public:
             return ConstraintNormal();
         }
 
-        return -cp->getNormal();
+        return ConstraintNormal(cp->getNormal());
     }
 
 };

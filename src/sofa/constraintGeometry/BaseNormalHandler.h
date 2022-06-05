@@ -5,6 +5,7 @@
 #include <sofa/constraintGeometry/ConstraintProximity.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/constraintGeometry/operations/ConstraintProximityOperation.h>
+#include <sofa/collisionAlgorithm/operations/CreateCenterProximity.h>
 
 namespace sofa ::constraintGeometry {
 
@@ -34,6 +35,25 @@ public:
     virtual ConstraintProximity::SPtr createConstraintProximity(const BaseProximity::SPtr & prox) {
         ConstraintProximityOperation::FUNC operation = ConstraintProximityOperation::get(getTypeInfo(),prox->getTypeInfo());
         return operation(this, prox);
+    }
+
+    void draw(const core::visual::VisualParams * vparams) override {
+        if (! vparams->displayFlags().getShowNormals()) return;
+
+        type::RGBAColor color(1,0,0,1);
+        double scale = 1.0;
+
+        glDisable(GL_LIGHTING);
+        if (color[3] == 0.0) return;
+
+        collisionAlgorithm::Operations::CreateCenterProximityOperation::FUNC operation = collisionAlgorithm::Operations::CreateCenterProximityOperation::get(getGeometry()->pointBegin());
+
+        for (auto it = getGeometry()->pointBegin();it != getGeometry()->end(); it++) {
+            auto prox = operation(it->element());
+            auto cp = createConstraintProximity(prox);
+
+            vparams->drawTool()->drawArrow(cp->getPosition(), cp->getPosition() - cp->getNormal() * scale, scale * 0.1, color);
+        }
     }
 
 };
