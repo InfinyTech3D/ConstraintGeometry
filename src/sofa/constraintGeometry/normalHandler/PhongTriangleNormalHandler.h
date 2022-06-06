@@ -38,24 +38,15 @@ template<>
 inline type::Vector3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::TriangleProximity>(const collisionAlgorithm::TriangleProximity::SPtr & prox) {
     auto element = prox->element();
 
-    const collisionAlgorithm::PointElement::SPtr & p0 = element->pointElements()[0];
-    const collisionAlgorithm::PointElement::SPtr & p1 = element->pointElements()[1];
-    const collisionAlgorithm::PointElement::SPtr & p2 = element->pointElements()[2];
+    const collisionAlgorithm::BaseProximity::SPtr & p0 = element->pointElements()[0]->getP0();
+    const collisionAlgorithm::BaseProximity::SPtr & p1 = element->pointElements()[1]->getP0();
+    const collisionAlgorithm::BaseProximity::SPtr & p2 = element->pointElements()[2]->getP0();
 
-    type::Vector3 N0_point;
-    for (auto it = p0->triangleAround().cbegin();it!=p0->triangleAround().cend();it++) {
-        N0_point+=(*it)->getTriangleInfo().N;
-    }
+    ConstraintProximityOperation::FUNC operation = ConstraintProximityOperation::get(getTypeInfo(),p0->getTypeInfo());
 
-    type::Vector3 N1_point;
-    for (auto it = p1->triangleAround().cbegin();it!=p1->triangleAround().cend();it++) {
-        N1_point+=(*it)->getTriangleInfo().N;
-    }
-
-    type::Vector3 N2_point;
-    for (auto it = p2->triangleAround().cbegin();it!=p2->triangleAround().cend();it++) {
-        N2_point+=(*it)->getTriangleInfo().N;
-    }
+    type::Vector3 N0_point = operation(this,p0)->getNormal();
+    type::Vector3 N1_point = operation(this,p1)->getNormal();
+    type::Vector3 N2_point = operation(this,p2)->getNormal();
 
     type::Vector3 N = N0_point.normalized() * prox->f0() +
                       N1_point.normalized() * prox->f1() +
