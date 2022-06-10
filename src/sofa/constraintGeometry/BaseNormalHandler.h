@@ -46,7 +46,7 @@ public:
         glDisable(GL_LIGHTING);
         if (color[3] == 0.0) return;
 
-        collisionAlgorithm::Operations::CreateCenterProximityOperation::FUNC operation = collisionAlgorithm::Operations::CreateCenterProximityOperation::get(getGeometry()->pointBegin());
+        collisionAlgorithm::Operations::CreateCenterProximity::FUNC operation = collisionAlgorithm::Operations::CreateCenterProximity::Operation::get(getGeometry()->pointBegin());
 
         for (auto it = getGeometry()->pointBegin();it != getGeometry()->end(); it++) {
             auto prox = operation(it->element());
