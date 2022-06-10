@@ -78,4 +78,36 @@ public:
     virtual sofa::type::Vector3 getNormal() const = 0;
 };
 
+
+
+class DefaultConstraintProximity : public ConstraintProximity {
+public:
+
+    DefaultConstraintProximity(const collisionAlgorithm::BaseProximity::SPtr & p)
+    : m_prox(p) {}
+
+    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
+        return m_prox->getPosition(v);
+    }
+
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
+        m_prox->buildJacobianConstraint(cId,dir,fact,constraintId);
+    }
+
+    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::linearalgebra::BaseVector* lambda) const override {
+        m_prox->storeLambda(cParams,resId,cid_global,cid_local,lambda);
+    }
+
+    type::Vector3 getNormal() const override {
+        return type::Vector3();
+    }
+
+    static ConstraintProximity::SPtr create(const collisionAlgorithm::BaseProximity::SPtr & p) {
+        return ConstraintProximity::SPtr(new DefaultConstraintProximity(p));
+    }
+
+protected:
+    collisionAlgorithm::BaseProximity::SPtr m_prox;
+};
+
 }
