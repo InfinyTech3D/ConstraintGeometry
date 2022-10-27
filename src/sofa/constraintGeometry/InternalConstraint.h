@@ -14,9 +14,11 @@ public:
 
 };
 
-template<class FIRST,class SECOND>
-class InternalConstraint : public BaseInternalConstraint, public PairViolationContainer {
+class InternalConstraint : public BaseInternalConstraint {
 public :
+
+    typedef collisionAlgorithm::BaseBaseProximity FIRST;
+    typedef collisionAlgorithm::BaseBaseProximity SECOND;
 
     typedef collisionAlgorithm::BaseProximity BaseProximity;
     typedef std::function<core::behavior::ConstraintResolution*(const BaseInternalConstraint *)> ResolutionCreator;
@@ -30,9 +32,18 @@ public :
      * \param creator : resolutionCreator (factory)
      */
     InternalConstraint(const typename FIRST::SPtr & first, const typename SECOND::SPtr & second, const ConstraintNormal normals, ResolutionCreator creator)
-    : m_first(first)
-    , m_second(second)
-    , m_normals(normals)
+    : m_creator(creator)
+    , m_cid(0)
+    , m_cSetId(0)
+    , m_cDirId(0)
+    {
+        m_pairs.push_back(std::pair<typename FIRST::SPtr, const typename SECOND::SPtr>(first, second));
+        m_vecNormals.push_back(normals);
+    }
+
+    InternalConstraint(const std::vector<std::pair<typename FIRST::SPtr,typename SECOND::SPtr>> & pairs, const std::vector<ConstraintNormal> & vecNormals, ResolutionCreator creator)
+    : m_pairs(pairs)
+    , m_vecNormals(vecNormals)
     , m_creator(creator)
     , m_cid(0)
     , m_cSetId(0)
@@ -48,15 +59,21 @@ public :
     void buildConstraintMatrix(core::MultiMatrixDerivId cId, unsigned int & constraintId) const {
         m_cid = constraintId;
 
-        m_first->buildJacobianConstraint(cId, m_normals.getDirs(),  1.0, constraintId);
-        m_second->buildJacobianConstraint(cId, m_normals.getDirs(), -1.0, constraintId);
+        for (unsigned i=0; i<m_vecNormals.size(); i++) {
+            m_pairs[i].first->buildJacobianConstraint(cId, m_vecNormals[i].getDirs(),  1.0, constraintId);
+            m_pairs[i].second->buildJacobianConstraint(cId, m_vecNormals[i].getDirs(), -1.0, constraintId);
 
-        constraintId += m_normals.size();
+            constraintId += m_vecNormals[i].size();
+        }
     }
 
     void getConstraintViolation(linearalgebra::BaseVector *v) const {
         //the ConstraintNormal will compute the all violation (i.e. 1 to 3 depending on the size of the ConstraintNormal)
-        m_normals.computeViolations(m_cid, this, v);
+        unsigned int lcid = m_cid;
+        for (unsigned i=0; i<m_vecNormals.size(); i++) {
+            m_vecNormals[i].computeViolations(lcid, m_pairs[i].first, m_pairs[i].second, v);
+            ++ lcid; /* +=m_vecNormals[i].size();*/
+        }
     }
 
     /*!
@@ -74,9 +91,13 @@ public :
      * \param lambda
      */
     void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::linearalgebra::BaseVector* lambda) const {
-        for (unsigned i=0;i<m_normals.size();i++) {
-            m_first->storeLambda(cParams,res,m_cid,i,lambda);
-            m_second->storeLambda(cParams,res,m_cid,i,lambda);
+        unsigned int lcid=m_cid;
+        for (unsigned k=0; k<m_vecNormals.size(); k++) {
+            for (unsigned i=0;i<m_vecNormals[k].size();i++) {
+                m_pairs[k].first->storeLambda(cParams,res,/*m_cid*/lcid,i,lambda);
+                m_pairs[k].second->storeLambda(cParams,res,/*m_cid*/lcid,i,lambda);
+            }
+            lcid += m_vecNormals[k].size();
         }
     }
 
@@ -91,37 +112,43 @@ public :
     }
 
     void draw(const core::visual::VisualParams* vparams,double scale) const {
-        if (m_normals.size()>0) {
-            vparams->drawTool()->drawArrow(getFirstPosition(), getFirstPosition() + m_normals.getDirs()[0] * scale, scale * 0.1, type::RGBAColor(1,0,0,1));
-            vparams->drawTool()->drawArrow(getSecondPosition(), getSecondPosition() - m_normals.getDirs()[0] * scale, scale * 0.1, type::RGBAColor(1,0,0,1));
-        }
-
-        if (m_normals.size()>1) {
-            vparams->drawTool()->drawArrow(getFirstPosition(), getFirstPosition() + m_normals.getDirs()[1] * scale, scale * 0.1, type::RGBAColor(0,1,0,1));
-            vparams->drawTool()->drawArrow(getSecondPosition(), getSecondPosition() - m_normals.getDirs()[1] * scale, scale * 0.1, type::RGBAColor(0,1,0,1));
-        }
-
-        if (m_normals.size()>2) {
-            vparams->drawTool()->drawArrow(getFirstPosition(), getFirstPosition() + m_normals.getDirs()[2] * scale, scale * 0.1, type::RGBAColor(0,0,1,1));
-            vparams->drawTool()->drawArrow(getSecondPosition(), getSecondPosition() - m_normals.getDirs()[2] * scale, scale * 0.1, type::RGBAColor(0,0,1,1));
+        for (unsigned i=0; i<m_vecNormals.size(); i++) {
+            draw(vparams,scale,i);
         }
     }
 
-    type::Vector3 getFirstPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
-        return m_first->getPosition(v);
+    void draw(const core::visual::VisualParams* vparams,double scale, unsigned i) const {
+        if (m_vecNormals[i].size()>0) {
+            vparams->drawTool()->drawArrow(m_pairs[i].first->getPosition(), m_pairs[i].first->getPosition() + m_vecNormals[i].getDirs()[0] * scale, scale * 0.1, type::RGBAColor(1,0,0,1));
+            vparams->drawTool()->drawArrow(m_pairs[i].second->getPosition(), m_pairs[i].second->getPosition() - m_vecNormals[i].getDirs()[0] * scale, scale * 0.1, type::RGBAColor(1,0,0,1));
+        }
+
+        if (m_vecNormals[i].size()>1) {
+            vparams->drawTool()->drawArrow(m_pairs[i].first->getPosition(), m_pairs[i].first->getPosition() + m_vecNormals[i].getDirs()[1] * scale, scale * 0.1, type::RGBAColor(0,1,0,1));
+            vparams->drawTool()->drawArrow(m_pairs[i].second->getPosition(), m_pairs[i].second->getPosition() - m_vecNormals[i].getDirs()[1] * scale, scale * 0.1, type::RGBAColor(0,1,0,1));
+        }
+
+        if (m_vecNormals[i].size()>2) {
+            vparams->drawTool()->drawArrow(m_pairs[i].first->getPosition(), m_pairs[i].first->getPosition() + m_vecNormals[i].getDirs()[2] * scale, scale * 0.1, type::RGBAColor(0,0,1,1));
+            vparams->drawTool()->drawArrow(m_pairs[i].second->getPosition(), m_pairs[i].second->getPosition() - m_vecNormals[i].getDirs()[2] * scale, scale * 0.1, type::RGBAColor(0,0,1,1));
+        }
     }
 
-    type::Vector3 getSecondPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
-        return m_second->getPosition(v);
+
+    const std::vector<ConstraintNormal> & getConstraintNormal() const {
+        return m_vecNormals;
     }
 
-
-    const ConstraintNormal getConstraintNormal() const {
-        return m_normals;
+    const std::vector<std::pair<typename FIRST::SPtr, typename SECOND::SPtr>> & getPairs() const {
+        return m_pairs;
     }
 
     unsigned size() const override {
-        return m_normals.size();
+        unsigned lcid=0;
+        for(unsigned i=0; i<m_vecNormals.size(); i++) {
+            lcid += m_vecNormals[i].size();
+        }
+        return lcid;
     }
 
     unsigned id() const {
@@ -172,10 +199,12 @@ public :
 
 
  protected:
-    typename FIRST::SPtr m_first;
-    typename SECOND::SPtr m_second;
+//    typename FIRST::SPtr m_first;
+//    typename SECOND::SPtr m_second;
 
-    ConstraintNormal m_normals;
+    std::vector<std::pair<typename FIRST::SPtr, typename SECOND::SPtr>> m_pairs;
+
+    std::vector<ConstraintNormal> m_vecNormals;
     ResolutionCreator m_creator;
     mutable unsigned m_cid;
 

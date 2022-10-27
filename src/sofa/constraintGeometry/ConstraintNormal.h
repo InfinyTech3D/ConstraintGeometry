@@ -10,28 +10,24 @@ namespace sofa::constraintGeometry {
  * \brief The ConstraintNormal class
  */
 
-class PairViolationContainer {
-public:
-    virtual type::Vector3 getFirstPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
-
-    virtual type::Vector3 getSecondPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
-};
 
 class ConstraintNormal {
 public:
 
     typedef collisionAlgorithm::BaseProximity BaseProximity;
-    typedef std::function<double(const PairViolationContainer *, const type::Vector3 &)> ViolationFunction;
+    typedef collisionAlgorithm::BaseBaseProximity FIRST;
+    typedef collisionAlgorithm::BaseBaseProximity SECOND;
+    typedef std::function<double(const typename FIRST::SPtr &, const typename SECOND::SPtr &, const type::Vector3 &)> ViolationFunction;
 
-    static double defaultViolationFunction(const PairViolationContainer * container, const type::Vector3 & normal) {
-        const type::Vector3 & PFree = container->getFirstPosition(core::VecCoordId::freePosition());
-        const type::Vector3 & QFree = container->getSecondPosition(core::VecCoordId::freePosition());
+    static double defaultViolationFunction(const typename FIRST::SPtr & first, const typename SECOND::SPtr & second, const type::Vector3 & normal) {
+        const type::Vector3 & PFree = first->getPosition(core::VecCoordId::freePosition());
+        const type::Vector3 & QFree = second->getPosition(core::VecCoordId::freePosition());
 
         return dot(PFree - QFree, normal);
     }
 
     static inline ViolationFunction getViolationFunc() {
-        return std::bind(&ConstraintNormal::defaultViolationFunction, std::placeholders::_1, std::placeholders::_2);
+        return std::bind(&ConstraintNormal::defaultViolationFunction, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     }
 
     ConstraintNormal() {}
@@ -85,9 +81,9 @@ public:
         return *this;
     }
 
-    void computeViolations(unsigned  cid, const PairViolationContainer * container, linearalgebra::BaseVector * delta) const {
+    void computeViolations(unsigned  cid, const typename FIRST::SPtr & first, const typename SECOND::SPtr & second, linearalgebra::BaseVector * delta) const {
         for (unsigned i=0;i<m_dirs.size();i++) {
-            double v = m_functions[i](container, m_dirs[i]);
+            double v = m_functions[i](first, second, m_dirs[i]);
             delta->set(cid + i, v);
         }
     }
