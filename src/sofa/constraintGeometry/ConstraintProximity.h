@@ -12,6 +12,12 @@ public:
 
     virtual type::Vector3 getNormal() const = 0;
 
+    virtual sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {}
+
+    virtual void buildJacobianConstraint(core::MultiMatrixDerivId , const sofa::type::vector<sofa::type::Vector3> & , double , Index ) const {}
+
+    virtual void storeLambda(const core::ConstraintParams* , core::MultiVecDerivId , Index , Index , const sofa::linearalgebra::BaseVector* ) const {}
+
 };
 
 template<class PROXIMITY>
