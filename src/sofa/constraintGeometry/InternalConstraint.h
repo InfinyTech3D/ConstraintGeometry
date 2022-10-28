@@ -37,11 +37,11 @@ public :
     , m_cSetId(0)
     , m_cDirId(0)
     {
-        m_pairs.push_back(std::pair<typename FIRST::SPtr, const typename SECOND::SPtr>(first, second));
+        m_pairs.push_back(std::pair<typename FIRST::SPtr, typename SECOND::SPtr>(first, second));
         m_vecNormals.push_back(normals);
     }
 
-    InternalConstraint(const std::vector<std::pair<typename FIRST::SPtr,typename SECOND::SPtr>> & pairs, const std::vector<ConstraintNormal> & vecNormals, ResolutionCreator creator)
+    InternalConstraint(/*const*/ std::vector<std::pair<typename FIRST::SPtr, typename SECOND::SPtr>> & pairs, /*const*/ std::vector<ConstraintNormal> & vecNormals, ResolutionCreator creator)
     : m_pairs(pairs)
     , m_vecNormals(vecNormals)
     , m_creator(creator)
