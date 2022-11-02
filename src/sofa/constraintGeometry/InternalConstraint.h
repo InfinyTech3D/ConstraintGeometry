@@ -37,11 +37,11 @@ public :
     , m_cSetId(0)
     , m_cDirId(0)
     {
-        m_pairs.push_back(std::pair<typename FIRST::SPtr, typename SECOND::SPtr>(first, second));
+        m_pairs.push_back(std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>(first, second));
         m_vecNormals.push_back(normals);
     }
 
-    InternalConstraint(/*const*/ std::vector<std::pair<typename FIRST::SPtr, typename SECOND::SPtr>> & pairs, /*const*/ std::vector<ConstraintNormal> & vecNormals, ResolutionCreator creator)
+    InternalConstraint(/*const*/ std::vector<std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>> & pairs, /*const*/ std::vector<ConstraintNormal> & vecNormals, ResolutionCreator creator)
     : m_pairs(pairs)
     , m_vecNormals(vecNormals)
     , m_creator(creator)
@@ -139,7 +139,7 @@ public :
         return m_vecNormals;
     }
 
-    const std::vector<std::pair<typename FIRST::SPtr, typename SECOND::SPtr>> & getPairs() const {
+    const std::vector<std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>> & getPairs() const {
         return m_pairs;
     }
 
@@ -202,7 +202,7 @@ public :
 //    typename FIRST::SPtr m_first;
 //    typename SECOND::SPtr m_second;
 
-    std::vector<std::pair<typename FIRST::SPtr, typename SECOND::SPtr>> m_pairs;
+    std::vector<std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>> m_pairs;
 
     std::vector<ConstraintNormal> m_vecNormals;
     ResolutionCreator m_creator;
