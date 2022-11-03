@@ -5,6 +5,7 @@
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/type/vector.h>
 
+
 namespace sofa::constraintGeometry {
 
 class BaseInternalConstraint {
@@ -41,7 +42,7 @@ public :
         m_vecNormals.push_back(normals);
     }
 
-    InternalConstraint(/*const*/ std::vector<std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>> & pairs, /*const*/ std::vector<ConstraintNormal> & vecNormals, ResolutionCreator creator)
+    InternalConstraint(std::vector<std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>> & pairs, std::vector<ConstraintNormal> & vecNormals, ResolutionCreator creator)
     : m_pairs(pairs)
     , m_vecNormals(vecNormals)
     , m_creator(creator)
@@ -72,7 +73,7 @@ public :
         unsigned int lcid = m_cid;
         for (unsigned i=0; i<m_vecNormals.size(); i++) {
             m_vecNormals[i].computeViolations(lcid, m_pairs[i].first, m_pairs[i].second, v);
-            ++ lcid; /* +=m_vecNormals[i].size();*/
+            /*++ lcid;*/  lcid += m_vecNormals[i].size();
         }
     }
 
