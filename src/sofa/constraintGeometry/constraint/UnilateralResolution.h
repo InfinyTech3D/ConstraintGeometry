@@ -84,7 +84,7 @@ public:
         double corr1= -inv * d[line+1];
         force[line+1] += corr1;
 
-        d[line+2] += w[line+2][line+0] * corr0 + w[line+2][line+0] * corr1;
+        d[line+2] += w[line+2][line+0] * corr0 + w[line+2][line+1] * corr1;
         inv=1.0/(w[line+2][line+2]);
         double corr2= -inv * d[line+2];
         force[line+2] += corr2;
