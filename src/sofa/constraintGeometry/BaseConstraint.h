@@ -3,6 +3,7 @@
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/behavior/BaseConstraint.h>
+#include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/constraintGeometry/ConstraintNormal.h>
 #include <sofa/constraintGeometry/InternalConstraint.h>
 #include <sofa/constraintGeometry/ConstraintResponse.h>
@@ -13,7 +14,7 @@ namespace sofa::constraintGeometry {
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseConstraint
  */
-template<class FIRST = collisionAlgorithm::BaseProximity, class SECOND = collisionAlgorithm::BaseProximity>
+template<class FIRST = collisionAlgorithm::BaseBaseProximity, class SECOND = collisionAlgorithm::BaseBaseProximity>
 class BaseConstraint : public sofa::core::behavior::BaseConstraint {
 public:
     SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseConstraint);
@@ -47,8 +48,9 @@ public:
 
             if (CN.size() == 0) continue;
 
-            InternalConstraint<FIRST,SECOND> constraint(input[i].first,input[i].second,CN,
+            InternalConstraint constraint(input[i].first,input[i].second,CN,
                                                         std::bind(&BaseConstraint::createConstraintResolution, this, std::placeholders::_1));
+
 
             m_container.push_back(constraint);
         }
@@ -106,8 +108,10 @@ public:
 
                 glBegin(GL_LINES);
                 for (unsigned i=0;i<m_container.size();i++) {
-                    glVertex3dv(m_container[i].getFirstPosition().data());
-                    glVertex3dv(m_container[i].getSecondPosition().data());
+                    for (unsigned j=0; j<m_container[i].getPairs().size(); j++) {
+                        glVertex3dv(m_container[i].getPairs()[j].first->getPosition().data());
+                        glVertex3dv(m_container[i].getPairs()[j].second->getPosition().data());
+                    }
                 }
                 glEnd();
             }
@@ -121,7 +125,7 @@ public:
      * \param res
      * \param lambda
      */
-    virtual void storeLambda(const InternalConstraint<FIRST,SECOND> & cst, const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::linearalgebra::BaseVector* lambda) {
+    virtual void storeLambda(const InternalConstraint & cst, const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::linearalgebra::BaseVector* lambda) {
         cst.storeLambda(cParams,res,lambda);
     }
 
@@ -153,7 +157,7 @@ public:
 
 
 protected:
-    std::vector<InternalConstraint<FIRST,SECOND> >  m_container;
+    std::vector<InternalConstraint>  m_container;
     unsigned m_nbConstraints;
 };
 
