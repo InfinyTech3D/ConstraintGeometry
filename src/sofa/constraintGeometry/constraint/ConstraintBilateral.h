@@ -6,9 +6,9 @@
 
 namespace sofa::constraintGeometry {
 
-class ConstraintBilateral : public BaseConstraint<collisionAlgorithm::BaseProximity,collisionAlgorithm::BaseProximity> {
+class ConstraintBilateral : public TBaseConstraint<collisionAlgorithm::BaseProximity,collisionAlgorithm::BaseProximity> {
 public:
-    SOFA_CLASS(ConstraintBilateral , SOFA_TEMPLATE2(BaseConstraint,BaseProximity,BaseProximity));
+    SOFA_CLASS(ConstraintBilateral , SOFA_TEMPLATE2(TBaseConstraint,BaseProximity,BaseProximity));
 
     Data<sofa::type::vector<double> > d_maxForce;
     Data<sofa::type::vector<double> > d_compliance;

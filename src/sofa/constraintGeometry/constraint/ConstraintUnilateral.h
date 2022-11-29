@@ -13,9 +13,9 @@ namespace constraintGeometry {
  * \brief The ConstraintUnilateral class
  * Applies specified algorithm on 'from' and 'dest' geometry
  */
-class ConstraintUnilateral : public BaseConstraint<collisionAlgorithm::BaseProximity,collisionAlgorithm::BaseProximity> {
+class ConstraintUnilateral : public TBaseConstraint<collisionAlgorithm::BaseProximity,collisionAlgorithm::BaseProximity> {
 public:
-    SOFA_CLASS(ConstraintUnilateral , SOFA_TEMPLATE2(BaseConstraint,collisionAlgorithm::BaseProximity,collisionAlgorithm::BaseProximity) );
+    SOFA_CLASS(ConstraintUnilateral , SOFA_TEMPLATE2(TBaseConstraint,collisionAlgorithm::BaseProximity,collisionAlgorithm::BaseProximity) );
 
     Data<double> d_friction;
     Data<double> d_maxforce0;

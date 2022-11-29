@@ -11,11 +11,29 @@
 
 namespace sofa::constraintGeometry {
 
+
+class BaseConstraint : public sofa::core::behavior::BaseConstraint{
+public:
+
+	virtual ~BaseConstraint(){};
+	unsigned getCId ()
+	{
+		return this->m_cId;
+	}
+
+	unsigned getSize ()
+	{
+		return m_nbConstraints;
+	}
+	unsigned m_nbConstraints;
+
+};
+
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseConstraint
  */
 template<class FIRST = collisionAlgorithm::BaseBaseProximity, class SECOND = collisionAlgorithm::BaseBaseProximity>
-class BaseConstraint : public sofa::core::behavior::BaseConstraint {
+class TBaseConstraint : public BaseConstraint {
 public:
     SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseConstraint);
 
@@ -25,7 +43,7 @@ public:
     Data<bool> d_draw;
     Data<collisionAlgorithm::DetectionOutput<FIRST,SECOND> > d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
 
-    BaseConstraint()
+	TBaseConstraint()
         : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
         , d_draw(initData(&d_draw, true, "draw", "draw "))
         , d_input(initData(&d_input, "input", "Link to detection output"))
@@ -49,7 +67,7 @@ public:
             if (CN.size() == 0) continue;
 
             InternalConstraint constraint(input[i].first,input[i].second,CN,
-                                                        std::bind(&BaseConstraint::createConstraintResolution, this, std::placeholders::_1));
+                                                        std::bind(&TBaseConstraint::createConstraintResolution, this, std::placeholders::_1));
 
 
             m_container.push_back(constraint);
@@ -145,20 +163,10 @@ public:
 
     void updateForceMask() {}
 
-    unsigned getCId ()
-    {
-        return this->m_cId;
-    }
-
-    unsigned getSize ()
-    {
-        return m_nbConstraints;
-    }
 
 
 protected:
     std::vector<InternalConstraint>  m_container;
-    unsigned m_nbConstraints;
 };
 
 }
