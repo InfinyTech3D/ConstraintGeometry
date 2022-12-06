@@ -23,6 +23,17 @@ public :
 
     typedef collisionAlgorithm::BaseProximity BaseProximity;
     typedef std::function<core::behavior::ConstraintResolution*(const BaseInternalConstraint *)> ResolutionCreator;
+    typedef std::function<void(const InternalConstraint * ic,linearalgebra::BaseVector *v)> ViolationFunc;
+
+    static void defaultViolationFunc(const InternalConstraint * ic, linearalgebra::BaseVector *v) {
+        //the ConstraintNormal will compute the all violation (i.e. 1 to 3 depending on the size of the ConstraintNormal)
+        unsigned int lcid = ic->m_cid;
+        for (unsigned i=0; i<ic->m_vecNormals.size(); i++) {
+            ic->m_vecNormals[i].computeViolations(lcid, ic->m_pairs[i].first, ic->m_pairs[i].second, v);
+
+            /*++ lcid;*/  lcid += ic->m_vecNormals[i].size();
+        }
+    }
 
     // create function should be used
     /*!
@@ -32,23 +43,25 @@ public :
      * \param normals : ConstraintNormals
      * \param creator : resolutionCreator (factory)
      */
-    InternalConstraint(const typename FIRST::SPtr & first, const typename SECOND::SPtr & second, const ConstraintNormal normals, ResolutionCreator creator)
+    InternalConstraint(const typename FIRST::SPtr & first, const typename SECOND::SPtr & second, const ConstraintNormal normals, ResolutionCreator creator, ViolationFunc f = &defaultViolationFunc )
     : m_creator(creator)
     , m_cid(0)
     , m_cSetId(0)
     , m_cDirId(0)
+    , m_violation(f)
     {
         m_pairs.push_back(std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>(first, second));
         m_vecNormals.push_back(normals);
     }
 
-    InternalConstraint(std::vector<std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>> & pairs, std::vector<ConstraintNormal> & vecNormals, ResolutionCreator creator)
+    InternalConstraint(std::vector<std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>> & pairs, std::vector<ConstraintNormal> & vecNormals, ResolutionCreator creator, ViolationFunc f = &defaultViolationFunc)
     : m_pairs(pairs)
     , m_vecNormals(vecNormals)
     , m_creator(creator)
     , m_cid(0)
     , m_cSetId(0)
     , m_cDirId(0)
+    , m_violation(f)
     {}
 
     /*!
@@ -69,12 +82,7 @@ public :
     }
 
     void getConstraintViolation(linearalgebra::BaseVector *v) const {
-        //the ConstraintNormal will compute the all violation (i.e. 1 to 3 depending on the size of the ConstraintNormal)
-        unsigned int lcid = m_cid;
-        for (unsigned i=0; i<m_vecNormals.size(); i++) {
-            m_vecNormals[i].computeViolations(lcid, m_pairs[i].first, m_pairs[i].second, v);
-            /*++ lcid;*/  lcid += m_vecNormals[i].size();
-        }
+        m_violation(this,v);
     }
 
     /*!
@@ -207,6 +215,7 @@ public :
 
     std::vector<ConstraintNormal> m_vecNormals;
     ResolutionCreator m_creator;
+    ViolationFunc m_violation;
     mutable unsigned m_cid;
 
     mutable unsigned m_cSetId;

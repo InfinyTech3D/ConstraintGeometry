@@ -14,6 +14,8 @@ public:
 
     virtual sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {}
 
+    virtual sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {}
+
     virtual void buildJacobianConstraint(core::MultiMatrixDerivId , const sofa::type::vector<sofa::type::Vector3> & , double , Index ) const override {}
 
     virtual void storeLambda(const core::ConstraintParams* , core::MultiVecDerivId , Index , Index , const sofa::linearalgebra::BaseVector* ) const override {}
@@ -31,6 +33,10 @@ public:
 
     sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
         return m_prox->getPosition(v);
+    }
+
+    sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
+        return m_prox->getVelocity(v);
     }
 
     void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
@@ -67,6 +73,10 @@ public:
         return PROXIMITY::getPosition(v);
     }
 
+    sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
+        return PROXIMITY::getVelocity(v);
+    }
+
     void buildJacobianConstraint(core::MultiMatrixDerivId id, const sofa::type::vector<sofa::type::Vector3> & N, double f, Index i) const override {
         PROXIMITY::buildJacobianConstraint(id,N,f,i);
     }
@@ -90,6 +100,10 @@ public:
 
     sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
         return m_prox->getPosition(v);
+    }
+
+    sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
+        return m_prox->getVelocity(v);
     }
 
     void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
@@ -124,6 +138,12 @@ public:
     sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
         sofa::type::Vector3 P(0,0,0);
         for (unsigned i=0; i<m_proximities.size(); i++) P+=m_proximities[i]->getPosition(v);
+        return P*1.0/m_proximities.size();
+    }
+
+    sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
+        sofa::type::Vector3 P(0,0,0);
+        for (unsigned i=0; i<m_proximities.size(); i++) P+=m_proximities[i]->getVelocity(v);
         return P*1.0/m_proximities.size();
     }
 
