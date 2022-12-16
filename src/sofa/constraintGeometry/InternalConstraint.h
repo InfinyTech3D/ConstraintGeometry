@@ -13,6 +13,8 @@ public:
 
     virtual unsigned size() const = 0;
 
+    virtual unsigned id() const = 0;
+
 };
 
 class InternalConstraint : public BaseInternalConstraint {
@@ -160,7 +162,7 @@ public :
         return lcid;
     }
 
-    unsigned id() const {
+    unsigned id() const override {
         return m_cid;
     }
 
