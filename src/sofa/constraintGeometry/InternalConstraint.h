@@ -13,6 +13,8 @@ public:
 
     virtual unsigned size() const = 0;
 
+    virtual void scale(double s) = 0;
+
     virtual unsigned id() const = 0;
 
 };
@@ -207,6 +209,9 @@ public :
         return m_cDirId;
     }
 
+    void scale(double s) override {
+        for (unsigned i=0; i<m_vecNormals.size(); i++) m_vecNormals[i].scale(s);
+    }
 
 
  protected:

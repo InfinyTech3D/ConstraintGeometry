@@ -105,6 +105,10 @@ public:
 
     const sofa::type::vector<type::Vector3> & getDirs() const { return m_dirs; }
 
+    void scale(double s) {
+        for (unsigned i=0; i<m_dirs.size(); i++) m_dirs[i] *= s;
+    }
+
 protected:
     //pai of directions (vec3) and function to compute the violation of a par proximity
     sofa::type::vector<type::Vector3> m_dirs;
