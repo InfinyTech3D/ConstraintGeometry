@@ -3,15 +3,10 @@
 @PACKAGE_GUARD@
 @PACKAGE_INIT@
 
-find_package(CollisionAlgorithm REQUIRED)
+find_package(CollisionAlgorithm QUIET REQUIRED)
 
 if(NOT TARGET @PROJECT_NAME@)
         include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 endif()
 
 check_required_components(@PROJECT_NAME@)
-
-
-
-
-
