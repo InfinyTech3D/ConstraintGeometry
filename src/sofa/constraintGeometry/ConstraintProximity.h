@@ -12,9 +12,9 @@ public:
 
     virtual type::Vector3 getNormal() const = 0;
 
-    virtual sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {}
+    virtual sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override { return  sofa::type::Vector3{}; }
 
-    virtual sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {}
+    virtual sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override { return  sofa::type::Vector3{}; }
 
     virtual void buildJacobianConstraint(core::MultiMatrixDerivId , const sofa::type::vector<sofa::type::Vector3> & , double , Index ) const override {}
 
