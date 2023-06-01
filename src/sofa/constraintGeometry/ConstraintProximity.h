@@ -10,13 +10,13 @@ public:
 
     typedef std::shared_ptr<ConstraintProximity> SPtr;
 
-    virtual type::Vector3 getNormal() const = 0;
+    virtual type::Vec3 getNormal() const = 0;
 
-    virtual sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override { return  sofa::type::Vector3{}; }
+    virtual sofa::type::Vec3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override { return  sofa::type::Vec3{}; }
 
-    virtual sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override { return  sofa::type::Vector3{}; }
+    virtual sofa::type::Vec3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override { return  sofa::type::Vec3{}; }
 
-    virtual void buildJacobianConstraint(core::MultiMatrixDerivId , const sofa::type::vector<sofa::type::Vector3> & , double , Index ) const override {}
+    virtual void buildJacobianConstraint(core::MultiMatrixDerivId , const sofa::type::vector<sofa::type::Vec3> & , double , Index ) const override {}
 
     virtual void storeLambda(const core::ConstraintParams* , core::MultiVecDerivId , Index , Index , const sofa::linearalgebra::BaseVector* ) const override {}
 
@@ -25,21 +25,21 @@ public:
 template<class PROXIMITY>
 class TConstraintProximity : public ConstraintProximity {
 public:
-    typedef std::function<type::Vector3(const typename PROXIMITY::SPtr & p)> FUNC_GET_NORMAL;
+    typedef std::function<type::Vec3(const typename PROXIMITY::SPtr & p)> FUNC_GET_NORMAL;
 
     TConstraintProximity(const typename PROXIMITY::SPtr & p,FUNC_GET_NORMAL n)
     : m_prox(p)
     , m_normalFunc(n) {}
 
-    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
+    sofa::type::Vec3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
         return m_prox->getPosition(v);
     }
 
-    sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
+    sofa::type::Vec3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
         return m_prox->getVelocity(v);
     }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vec3> & dir, double fact, Index constraintId) const override {
         m_prox->buildJacobianConstraint(cId,dir,fact,constraintId);
     }
 
@@ -47,7 +47,7 @@ public:
         m_prox->storeLambda(cParams,resId,cid_global,cid_local,lambda);
     }
 
-    type::Vector3 getNormal() const override {
+    type::Vec3 getNormal() const override {
         return m_normalFunc(m_prox);
     }
 
@@ -69,15 +69,15 @@ public:
     BaseProximityNormal(ARGS... args)
     : PROXIMITY(args...) {}
 
-    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
+    sofa::type::Vec3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
         return PROXIMITY::getPosition(v);
     }
 
-    sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
+    sofa::type::Vec3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
         return PROXIMITY::getVelocity(v);
     }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId id, const sofa::type::vector<sofa::type::Vector3> & N, double f, Index i) const override {
+    void buildJacobianConstraint(core::MultiMatrixDerivId id, const sofa::type::vector<sofa::type::Vec3> & N, double f, Index i) const override {
         PROXIMITY::buildJacobianConstraint(id,N,f,i);
     }
 
@@ -85,7 +85,7 @@ public:
         PROXIMITY::storeLambda(cp,id,i,j,l);
     }
 
-    virtual sofa::type::Vector3 getNormal() const = 0;
+    virtual sofa::type::Vec3 getNormal() const = 0;
 };
 
 
@@ -98,15 +98,15 @@ public:
     DefaultConstraintProximity(const collisionAlgorithm::BaseProximity::SPtr & p)
     : m_prox(p) {}
 
-    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
+    sofa::type::Vec3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
         return m_prox->getPosition(v);
     }
 
-    sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
+    sofa::type::Vec3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
         return m_prox->getVelocity(v);
     }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vec3> & dir, double fact, Index constraintId) const override {
         m_prox->buildJacobianConstraint(cId,dir,fact,constraintId);
     }
 
@@ -114,8 +114,8 @@ public:
         m_prox->storeLambda(cParams,resId,cid_global,cid_local,lambda);
     }
 
-    type::Vector3 getNormal() const override {
-        return type::Vector3();
+    type::Vec3 getNormal() const override {
+        return type::Vec3();
     }
 
     static ConstraintProximity::SPtr create(const collisionAlgorithm::BaseProximity::SPtr & p) {
@@ -135,19 +135,19 @@ public:
     MultiConstraintProximity(const std::vector<ConstraintProximity::SPtr> & p)
     : m_proximities(p) {}
 
-    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
-        sofa::type::Vector3 P(0,0,0);
+    sofa::type::Vec3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
+        sofa::type::Vec3 P(0,0,0);
         for (unsigned i=0; i<m_proximities.size(); i++) P+=m_proximities[i]->getPosition(v);
         return P*1.0/m_proximities.size();
     }
 
-    sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
-        sofa::type::Vector3 P(0,0,0);
+    sofa::type::Vec3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
+        sofa::type::Vec3 P(0,0,0);
         for (unsigned i=0; i<m_proximities.size(); i++) P+=m_proximities[i]->getVelocity(v);
         return P*1.0/m_proximities.size();
     }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vec3> & dir, double fact, Index constraintId) const override {
         fact *= 1.0/m_proximities.size();
         for (unsigned i=0; i<m_proximities.size(); i++) {
             m_proximities[i]->buildJacobianConstraint(cId,dir,fact,constraintId);
@@ -160,8 +160,8 @@ public:
         }
     }
 
-    type::Vector3 getNormal() const override {
-        sofa::type::Vector3 N(0,0,0);
+    type::Vec3 getNormal() const override {
+        sofa::type::Vec3 N(0,0,0);
         for (unsigned i=0; i<m_proximities.size(); i++) N+=m_proximities[i]->getNormal();
         return N*1.0/m_proximities.size();
     }

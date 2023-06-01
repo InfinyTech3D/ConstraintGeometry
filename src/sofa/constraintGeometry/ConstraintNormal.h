@@ -17,11 +17,11 @@ public:
     typedef collisionAlgorithm::BaseProximity BaseProximity;
     typedef collisionAlgorithm::BaseBaseProximity FIRST;
     typedef collisionAlgorithm::BaseBaseProximity SECOND;
-    typedef std::function<double(const typename FIRST::SPtr &, const typename SECOND::SPtr &, const type::Vector3 &)> ViolationFunction;
+    typedef std::function<double(const typename FIRST::SPtr &, const typename SECOND::SPtr &, const type::Vec3 &)> ViolationFunction;
 
-    static double defaultViolationFunction(const typename FIRST::SPtr & first, const typename SECOND::SPtr & second, const type::Vector3 & normal) {
-        const type::Vector3 & PFree = first->getPosition(core::VecCoordId::freePosition());
-        const type::Vector3 & QFree = second->getPosition(core::VecCoordId::freePosition());
+    static double defaultViolationFunction(const typename FIRST::SPtr & first, const typename SECOND::SPtr & second, const type::Vec3 & normal) {
+        const type::Vec3 & PFree = first->getPosition(core::VecCoordId::freePosition());
+        const type::Vec3 & QFree = second->getPosition(core::VecCoordId::freePosition());
 
         return dot(PFree - QFree, normal);
     }
@@ -37,12 +37,12 @@ public:
         m_functions = cn.m_functions;
     }
 
-    ConstraintNormal(const type::Vector3 & N, ViolationFunction f = getViolationFunc()) {
+    ConstraintNormal(const type::Vec3 & N, ViolationFunction f = getViolationFunc()) {
         m_dirs.push_back(N.normalized());
         m_functions.push_back(f);
     }
 
-    ConstraintNormal & add(const type::Vector3 & N, ViolationFunction f = getViolationFunc()) {
+    ConstraintNormal & add(const type::Vec3 & N, ViolationFunction f = getViolationFunc()) {
         m_dirs.push_back(N.normalized());
         m_functions.push_back(f);
         return *this;
@@ -55,17 +55,17 @@ public:
 
     ConstraintNormal & addOrthogonalDirection(ViolationFunction f = getViolationFunc()) {
         if (m_dirs.size() == 0) {
-            m_dirs.push_back(type::Vector3(1,0,0));
+            m_dirs.push_back(type::Vec3(1,0,0));
             m_functions.push_back(f);
             return *this;
         }
 
         if (m_dirs.size() == 1) {
             //gram schmidt orthogonalization
-            type::Vector3 gramm_schmidt = type::Vector3(0,1,0) - m_dirs[0] * dot(m_dirs[0],type::Vector3(0,1,0));
+            type::Vec3 gramm_schmidt = type::Vec3(0,1,0) - m_dirs[0] * dot(m_dirs[0],type::Vec3(0,1,0));
 
             //Change with othogonalization around Z if the initial direction is aligned with Y
-            if (gramm_schmidt.norm() < std::numeric_limits<double>::epsilon()) gramm_schmidt = type::Vector3(0,0,1) - m_dirs[0] * dot(m_dirs[0],type::Vector3(0,0,1));
+            if (gramm_schmidt.norm() < std::numeric_limits<double>::epsilon()) gramm_schmidt = type::Vec3(0,0,1) - m_dirs[0] * dot(m_dirs[0],type::Vec3(0,0,1));
 
             m_dirs.push_back(gramm_schmidt.normalized());
             m_functions.push_back(f);
@@ -88,7 +88,7 @@ public:
         }
     }
 
-    const type::Vector3 operator[](int i) const {
+    const type::Vec3 operator[](int i) const {
         return m_dirs[i];
     }
 
@@ -103,7 +103,7 @@ public:
 
 //    }
 
-    const sofa::type::vector<type::Vector3> & getDirs() const { return m_dirs; }
+    const sofa::type::vector<type::Vec3> & getDirs() const { return m_dirs; }
 
     void scale(double s) {
         for (unsigned i=0; i<m_dirs.size(); i++) m_dirs[i] *= s;
@@ -111,7 +111,7 @@ public:
 
 protected:
     //pai of directions (vec3) and function to compute the violation of a par proximity
-    sofa::type::vector<type::Vector3> m_dirs;
+    sofa::type::vector<type::Vec3> m_dirs;
     sofa::type::vector<ViolationFunction> m_functions;
 
 };

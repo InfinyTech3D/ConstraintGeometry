@@ -27,7 +27,7 @@ public:
     const std::type_info & getTypeInfo() override { return typeid(GouraudTriangleNormalHandler); }
 
     template<class PROXIMITY>
-    type::Vector3 getNormal(const typename PROXIMITY::SPtr & prox);
+    type::Vec3 getNormal(const typename PROXIMITY::SPtr & prox);
 
     template<class PROXIMITY>
     static inline ConstraintProximity::SPtr buildCstProximity(GouraudTriangleNormalHandler * handler, typename PROXIMITY::SPtr prox) {
@@ -36,16 +36,16 @@ public:
 };
 
 template<>
-inline type::Vector3 GouraudTriangleNormalHandler::getNormal<collisionAlgorithm::TriangleProximity>(const collisionAlgorithm::TriangleProximity::SPtr & prox) {
+inline type::Vec3 GouraudTriangleNormalHandler::getNormal<collisionAlgorithm::TriangleProximity>(const collisionAlgorithm::TriangleProximity::SPtr & prox) {
     return prox->element()->getTriangleInfo().N;
 }
 
 
 template<>
-inline type::Vector3 GouraudTriangleNormalHandler::getNormal<collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>>(const collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>::SPtr & prox) {
+inline type::Vec3 GouraudTriangleNormalHandler::getNormal<collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>>(const collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>::SPtr & prox) {
     const collisionAlgorithm::PointElement::SPtr & element = prox->getGeometry()->pointElements()[prox->getPId()];
 
-    type::Vector3 N0_point;
+    type::Vec3 N0_point;
     for (auto it = element->triangleAround().cbegin();it!=element->triangleAround().cend();it++) {
         N0_point+=(*it)->getTriangleInfo().N;
         break;

@@ -171,11 +171,11 @@ public :
 //    void buildProximityMappingMatrix(core::MultiMatrixDerivId cId, unsigned int & csetId) const {
 //        m_cSetId = csetId;
 
-//        sofa::type::vector<type::Vector3> dirs;
+//        sofa::type::vector<type::Vec3> dirs;
 //        dirs.clear();
-//        dirs.push_back(type::Vector3(1,0,0));
-//        dirs.push_back(type::Vector3(0,1,0));
-//        dirs.push_back(type::Vector3(0,0,1));
+//        dirs.push_back(type::Vec3(1,0,0));
+//        dirs.push_back(type::Vec3(0,1,0));
+//        dirs.push_back(type::Vec3(0,0,1));
 
 //        m_first->buildJacobianConstraint(cId, dirs,  1.0, csetId*3);
 //        m_second->buildJacobianConstraint(cId, dirs, -1.0, csetId*3);
@@ -183,7 +183,7 @@ public :
 //        csetId ++;
 //    }
 
-//    void buildConstraintNormalMatrix(sofa::type::vector<sofa::type::Vector3> & normal, sofa::type::vector<int> & cstInd, unsigned int & cdirId) const {
+//    void buildConstraintNormalMatrix(sofa::type::vector<sofa::type::Vec3> & normal, sofa::type::vector<int> & cstInd, unsigned int & cdirId) const {
 //        m_cDirId = cdirId;
 
 //        for (unsigned i=0;i<m_normals.size();i++) {
@@ -195,8 +195,8 @@ public :
 //    }
 
 //    void SetProximityFreePosition(sofa::core::MultiVecDerivId /*pfreeId*/) const {
-////        const type::Vector3 & PFree = m_detection.first->getPosition(core::VecCoordId::freePosition());
-////        const type::Vector3 & QFree = m_detection.second->getPosition(core::VecCoordId::freePosition());
+////        const type::Vec3 & PFree = m_detection.first->getPosition(core::VecCoordId::freePosition());
+////        const type::Vec3 & QFree = m_detection.second->getPosition(core::VecCoordId::freePosition());
 
 
 //    }
