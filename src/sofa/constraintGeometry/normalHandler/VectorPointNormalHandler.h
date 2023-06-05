@@ -12,7 +12,7 @@ public:
 
     SOFA_CLASS(VectorPointNormalHandler, BaseNormalHandler);
 
-    Data<type::vector<type::Vector3> > d_normals;
+    Data<type::vector<type::Vec3> > d_normals;
     core::objectmodel::SingleLink<VectorPointNormalHandler,collisionAlgorithm::BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
     VectorPointNormalHandler()
@@ -26,7 +26,7 @@ public:
     void prepareDetection() override {}
 
     template<class PROXIMITY>
-    type::Vector3 getNormal(const typename PROXIMITY::SPtr & prox);
+    type::Vec3 getNormal(const typename PROXIMITY::SPtr & prox);
 
     const std::type_info & getTypeInfo() override { return typeid(VectorPointNormalHandler); }
 
@@ -37,8 +37,8 @@ public:
 };
 
 template<>
-inline type::Vector3 VectorPointNormalHandler::getNormal<collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>>(const collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>::SPtr & prox) {
-    type::Vector3 N;
+inline type::Vec3 VectorPointNormalHandler::getNormal<collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>>(const collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>::SPtr & prox) {
+    type::Vec3 N;
 
     if (prox->getPId()>=d_normals.getValue().size()) {
         std::cerr << "Wrong id in VectorPointNormalHandler" << std::endl;

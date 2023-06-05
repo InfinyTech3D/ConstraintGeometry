@@ -22,7 +22,7 @@ public:
     BaseGeometry * getGeometry() override { return l_geometry.get(); }
 
     void prepareDetection() override {
-        m_gcenter = type::Vector3();
+        m_gcenter = type::Vec3();
 
         unsigned nbPoints = 0;
         for (auto it=l_geometry->pointBegin();it!=l_geometry->end();it++) {
@@ -34,7 +34,7 @@ public:
     }
 
     template<class PROXIMITY>
-    type::Vector3 getNormal(const typename PROXIMITY::SPtr & prox);
+    type::Vec3 getNormal(const typename PROXIMITY::SPtr & prox);
 
     const std::type_info & getTypeInfo() override { return typeid(GravityPointNormalHandler); }
 
@@ -44,12 +44,12 @@ public:
     }
 
 private :
-    type::Vector3 m_gcenter;
+    type::Vec3 m_gcenter;
 };
 
 template<>
-inline type::Vector3 GravityPointNormalHandler::getNormal<collisionAlgorithm::PointProximity>(const collisionAlgorithm::PointProximity::SPtr & prox) {
-    type::Vector3 N = (prox->getPosition() - m_gcenter).normalized();
+inline type::Vec3 GravityPointNormalHandler::getNormal<collisionAlgorithm::PointProximity>(const collisionAlgorithm::PointProximity::SPtr & prox) {
+    type::Vec3 N = (prox->getPosition() - m_gcenter).normalized();
     return N;
 }
 

@@ -24,7 +24,7 @@ public:
     void prepareDetection() override {}
 
     template<class PROXIMITY>
-    type::Vector3 getNormal(const typename PROXIMITY::SPtr & prox);
+    type::Vec3 getNormal(const typename PROXIMITY::SPtr & prox);
 
     const std::type_info & getTypeInfo() override { return typeid(EdgeNormalHandler); }
 
@@ -35,7 +35,7 @@ public:
 };
 
 template<>
-type::Vector3 EdgeNormalHandler::getNormal<collisionAlgorithm::EdgeProximity>(const collisionAlgorithm::EdgeProximity::SPtr & prox) {
+type::Vec3 EdgeNormalHandler::getNormal<collisionAlgorithm::EdgeProximity>(const collisionAlgorithm::EdgeProximity::SPtr & prox) {
     return (prox->element()->getP1()->getPosition() - prox->element()->getP0()->getPosition()).normalized();
 }
 

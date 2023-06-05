@@ -30,7 +30,7 @@ public:
     ConstraintNormal createConstraintsNormal(const BaseProximity::SPtr & first, const BaseProximity::SPtr & second) const override {
         if (l_handler==NULL) return ConstraintNormal();
 
-        type::Vector3 mainDir = (first->getPosition() - second->getPosition()).normalized();
+        type::Vec3 mainDir = (first->getPosition() - second->getPosition()).normalized();
 
         const ConstraintProximity::SPtr & cp = l_handler->createConstraintProximity(second);
         if (cp==NULL) {
@@ -38,7 +38,7 @@ public:
             return ConstraintNormal();
         }
 
-        type::Vector3 secondDir = -cp->getNormal();
+        type::Vec3 secondDir = -cp->getNormal();
         if (dot(mainDir,secondDir)<=std::numeric_limits<double>::epsilon()) {
             mainDir=secondDir;
         }

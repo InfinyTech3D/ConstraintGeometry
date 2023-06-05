@@ -26,7 +26,7 @@ public:
     const std::type_info & getTypeInfo() override { return typeid(PhongTriangleNormalHandler); }
 
     template<class PROXIMITY>
-    type::Vector3 getNormal(const typename PROXIMITY::SPtr & prox);
+    type::Vec3 getNormal(const typename PROXIMITY::SPtr & prox);
 
     template<class PROXIMITY>
     static inline ConstraintProximity::SPtr buildCstProximity(PhongTriangleNormalHandler * handler, typename PROXIMITY::SPtr prox) {
@@ -35,7 +35,7 @@ public:
 };
 
 template<>
-inline type::Vector3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::TriangleProximity>(const collisionAlgorithm::TriangleProximity::SPtr & prox) {
+inline type::Vec3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::TriangleProximity>(const collisionAlgorithm::TriangleProximity::SPtr & prox) {
     auto element = prox->element();
 
     const collisionAlgorithm::BaseProximity::SPtr & p0 = element->pointElements()[0]->getP0();
@@ -44,11 +44,11 @@ inline type::Vector3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::T
 
     ConstraintProximityOperation::FUNC operation = ConstraintProximityOperation::get(getTypeInfo(),p0->getTypeInfo());
 
-    type::Vector3 N0_point = operation(this,p0)->getNormal();
-    type::Vector3 N1_point = operation(this,p1)->getNormal();
-    type::Vector3 N2_point = operation(this,p2)->getNormal();
+    type::Vec3 N0_point = operation(this,p0)->getNormal();
+    type::Vec3 N1_point = operation(this,p1)->getNormal();
+    type::Vec3 N2_point = operation(this,p2)->getNormal();
 
-    type::Vector3 N = N0_point.normalized() * prox->f0() +
+    type::Vec3 N = N0_point.normalized() * prox->f0() +
                       N1_point.normalized() * prox->f1() +
                       N2_point.normalized() * prox->f2();
 
@@ -58,10 +58,10 @@ inline type::Vector3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::T
 
 
 template<>
-inline type::Vector3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes> >(const collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>::SPtr & prox) {
+inline type::Vec3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes> >(const collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>::SPtr & prox) {
     const collisionAlgorithm::PointElement::SPtr & element = prox->getGeometry()->pointElements()[prox->getPId()];
 
-    type::Vector3 N0_point;
+    type::Vec3 N0_point;
     for (auto it = element->triangleAround().cbegin();it!=element->triangleAround().cend();it++) {
         N0_point+=(*it)->getTriangleInfo().N;
     }
