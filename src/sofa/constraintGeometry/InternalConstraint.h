@@ -222,11 +222,11 @@ public :
 
     std::vector<ConstraintNormal> m_vecNormals;
     ResolutionCreator m_creator;
-    ViolationFunc m_violation;
     mutable unsigned m_cid;
 
     mutable unsigned m_cSetId;
     mutable unsigned m_cDirId;
+    ViolationFunc m_violation;
 };
 
 }
