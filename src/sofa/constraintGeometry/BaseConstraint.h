@@ -15,7 +15,8 @@ namespace sofa::constraintGeometry {
 class BaseConstraint : public sofa::core::behavior::BaseConstraint{
 public:
 
-	virtual ~BaseConstraint(){};
+    virtual ~BaseConstraint(){}
+
 	unsigned getCId ()
 	{
 		return this->m_cId;
