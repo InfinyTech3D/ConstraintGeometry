@@ -201,6 +201,21 @@ public :
 
 //    }
 
+    inline friend std::istream& operator >> ( std::istream& in, InternalConstraint &) {
+        return in;
+    }
+
+    inline friend std::ostream& operator << ( std::ostream& out, const InternalConstraint & c ) {
+        out << "(" << c.m_cid << ") : ";
+        for (unsigned i=0;i<c.m_pairs.size();i++) {
+            if (c.m_pairs.size()>1) out << "<";
+            out << sofa::helper::NameDecoder::decodeFullName(c.m_pairs[i].first->getTypeInfo()) << "    ---   "
+                << sofa::helper::NameDecoder::decodeFullName(c.m_pairs[i].second->getTypeInfo());
+            if (c.m_pairs.size()>1) out << ">" << std::endl;
+        }
+        return out;
+    }
+
     unsigned constraintSetId() const {
         return m_cSetId;
     }
@@ -213,6 +228,19 @@ public :
         for (unsigned i=0; i<m_vecNormals.size(); i++) m_vecNormals[i].scale(s);
     }
 
+    void operator=(const InternalConstraint & c) {
+        m_pairs.clear();
+        for (unsigned i=0;i<c.m_pairs.size();i++)
+            m_pairs.push_back(c.m_pairs[i]);
+
+        m_vecNormals = c.m_vecNormals;
+        m_creator = c.m_creator;
+        m_cid = c.m_cid;
+
+        m_cSetId = c.m_cSetId;
+        m_cDirId = c.m_cDirId;
+        m_violation = c.m_violation;
+    }
 
  protected:
 //    typename FIRST::SPtr m_first;

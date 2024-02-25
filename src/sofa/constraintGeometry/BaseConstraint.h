@@ -9,6 +9,24 @@
 #include <sofa/constraintGeometry/ConstraintResponse.h>
 #include <sofa/constraintGeometry/ConstraintDirection.h>
 
+namespace std {
+
+inline std::istream& operator >> ( std::istream& in, std::vector<sofa::constraintGeometry::InternalConstraint> &) {
+    return in;
+}
+
+inline std::ostream& operator << ( std::ostream& out, const std::vector<sofa::constraintGeometry::InternalConstraint> & v) {
+    for (unsigned i=0;i<v.size();i++) {
+        if (v.size()>1) out << "[";
+        out << v[i];
+        if (v.size()>1) out << "]" << std::endl;
+    }
+    return out;
+}
+
+
+}
+
 namespace sofa::constraintGeometry {
 
 
@@ -30,6 +48,8 @@ public:
 
 };
 
+
+
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseConstraint
  */
@@ -43,11 +63,13 @@ public:
     Data<double> d_drawScale;
     Data<bool> d_draw;
     Data<collisionAlgorithm::DetectionOutput<FIRST,SECOND> > d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
+    Data<std::vector<InternalConstraint> > d_container;
 
 	TBaseConstraint()
         : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
         , d_draw(initData(&d_draw, true, "draw", "draw "))
         , d_input(initData(&d_input, "input", "Link to detection output"))
+        , d_container(initData(&d_container, "internalConstraint", "Internal constraint vector"))
     {}
 
     virtual ConstraintNormal createConstraintNormal(const typename FIRST::SPtr & first, const typename SECOND::SPtr & second) const = 0;
@@ -59,7 +81,9 @@ public:
      * Clears constraint container and recreates constraints
      */
     virtual void processGeometricalData() {
-        m_container.clear();//clear previsou constraints
+        auto & container = *d_container.beginEdit();
+
+        container.clear();//clear previsou constraints
 
         auto & input = d_input.getValue();
         for (unsigned i=0;i<input.size();i++) {
@@ -71,8 +95,10 @@ public:
                                                         std::bind(&TBaseConstraint::createConstraintResolution, this, std::placeholders::_1));
 
 
-            m_container.push_back(constraint);
+            container.push_back(constraint);
         }
+
+        d_container.endEdit();
     }
 
     /*!
@@ -83,10 +109,10 @@ public:
     virtual void buildConstraintMatrix(const core::ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned int &constraintId) {
         setConstraintId(constraintId);
         m_nbConstraints = 0;
-        for (unsigned i=0;i<m_container.size();i++)
+        for (unsigned i=0;i<d_container.getValue().size();i++)
         {
-            m_container[i].buildConstraintMatrix(cId,constraintId);
-            m_nbConstraints += m_container[i].size();
+            d_container.getValue()[i].buildConstraintMatrix(cId,constraintId);
+            m_nbConstraints += d_container.getValue()[i].size();
 
         }
     }
@@ -96,8 +122,8 @@ public:
      * \param v
      */
     virtual void getConstraintViolation(const core::ConstraintParams* /*cParams*/, linearalgebra::BaseVector *v,unsigned /*cid*/) {
-        for (unsigned i=0;i<m_container.size();i++)
-            m_container[i].getConstraintViolation(v);
+        for (unsigned i=0;i<d_container.getValue().size();i++)
+            d_container.getValue()[i].getConstraintViolation(v);
     }
 
     /*!
@@ -106,9 +132,9 @@ public:
      * \param offset
      */
     virtual void getConstraintResolution(const core::ConstraintParams* /*cParams*/, std::vector<core::behavior::ConstraintResolution*>& resTab, unsigned int& offset) {
-        for (unsigned i=0;i<m_container.size();i++) {
-            resTab[offset] = m_container[i].createConstraintResolution();
-            offset += m_container[i].size();
+        for (unsigned i=0;i<d_container.getValue().size();i++) {
+            resTab[offset] = d_container.getValue()[i].createConstraintResolution();
+            offset += d_container.getValue()[i].size();
         }
     }
 
@@ -117,8 +143,8 @@ public:
         if(d_drawScale.getValue()>std::numeric_limits<double>::min())
         {
             if (vparams->displayFlags().getShowInteractionForceFields()) {
-                for (unsigned i=0;i<m_container.size();i++)
-                    m_container[i].draw(vparams,d_drawScale.getValue());
+                for (unsigned i=0;i<d_container.getValue().size();i++)
+                    d_container.getValue()[i].draw(vparams,d_drawScale.getValue());
             }
 
             if (vparams->displayFlags().getShowCollisionModels()) {
@@ -126,10 +152,10 @@ public:
                 glColor4f(0,1,0,1);
 
                 glBegin(GL_LINES);
-                for (unsigned i=0;i<m_container.size();i++) {
-                    for (unsigned j=0; j<m_container[i].getPairs().size(); j++) {
-                        glVertex3dv(m_container[i].getPairs()[j].first->getPosition().data());
-                        glVertex3dv(m_container[i].getPairs()[j].second->getPosition().data());
+                for (unsigned i=0;i<d_container.getValue().size();i++) {
+                    for (unsigned j=0; j<d_container.getValue()[i].getPairs().size(); j++) {
+                        glVertex3dv(d_container.getValue()[i].getPairs()[j].first->getPosition().data());
+                        glVertex3dv(d_container.getValue()[i].getPairs()[j].second->getPosition().data());
                     }
                 }
                 glEnd();
@@ -158,8 +184,8 @@ public:
         if (! cParams)
             return;
 
-        for (unsigned i=0;i<m_container.size();i++)
-            storeLambda(m_container[i],cParams,res,lambda);
+        for (unsigned i=0;i<d_container.getValue().size();i++)
+            storeLambda(d_container.getValue()[i],cParams,res,lambda);
     }
 
     void updateForceMask() {}
@@ -167,7 +193,7 @@ public:
 
 
 protected:
-    std::vector<InternalConstraint>  m_container;
+
 };
 
 }
