@@ -9,24 +9,6 @@
 #include <sofa/constraintGeometry/ConstraintResponse.h>
 #include <sofa/constraintGeometry/ConstraintDirection.h>
 
-namespace std {
-
-inline std::istream& operator >> ( std::istream& in, std::vector<sofa::constraintGeometry::InternalConstraint> &) {
-    return in;
-}
-
-inline std::ostream& operator << ( std::ostream& out, const std::vector<sofa::constraintGeometry::InternalConstraint> & v) {
-    for (unsigned i=0;i<v.size();i++) {
-        if (v.size()>1) out << "[";
-        out << v[i];
-        if (v.size()>1) out << "]" << std::endl;
-    }
-    return out;
-}
-
-
-}
-
 namespace sofa::constraintGeometry {
 
 
@@ -53,7 +35,7 @@ public:
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseConstraint
  */
-template<class FIRST = collisionAlgorithm::BaseBaseProximity, class SECOND = collisionAlgorithm::BaseBaseProximity>
+template<class FIRST = collisionAlgorithm::BaseProximity, class SECOND = collisionAlgorithm::BaseProximity>
 class TBaseConstraint : public BaseConstraint {
 public:
     SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseConstraint);
@@ -63,7 +45,7 @@ public:
     Data<double> d_drawScale;
     Data<bool> d_draw;
     Data<collisionAlgorithm::DetectionOutput<FIRST,SECOND> > d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
-    Data<std::vector<InternalConstraint> > d_container;
+    Data<std::vector<BaseInternalConstraint::SPtr> > d_container;
 
 	TBaseConstraint()
         : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
@@ -87,15 +69,14 @@ public:
 
         auto & input = d_input.getValue();
         for (unsigned i=0;i<input.size();i++) {
-            ConstraintNormal CN = createConstraintNormal(input[i].first,input[i].second);
+            BaseInternalConstraint::SPtr constraint(new
+                InternalConstraint<FIRST,SECOND>(
+                    input[i].first,input[i].second,
+                    std::bind(&TBaseConstraint::createConstraintNormal, this, std::placeholders::_1,std::placeholders::_2),
+                    std::bind(&TBaseConstraint::createConstraintResolution, this, std::placeholders::_1)));
 
-            if (CN.size() == 0) continue;
 
-            InternalConstraint constraint(input[i].first,input[i].second,CN,
-                                                        std::bind(&TBaseConstraint::createConstraintResolution, this, std::placeholders::_1));
-
-
-            container.push_back(constraint);
+            if (constraint->size()) container.push_back(constraint);
         }
 
         d_container.endEdit();
@@ -111,8 +92,8 @@ public:
         m_nbConstraints = 0;
         for (unsigned i=0;i<d_container.getValue().size();i++)
         {
-            d_container.getValue()[i].buildConstraintMatrix(cId,constraintId);
-            m_nbConstraints += d_container.getValue()[i].size();
+            d_container.getValue()[i]->buildConstraintMatrix(cId,constraintId);
+            m_nbConstraints += d_container.getValue()[i]->size();
 
         }
     }
@@ -123,7 +104,7 @@ public:
      */
     virtual void getConstraintViolation(const core::ConstraintParams* /*cParams*/, linearalgebra::BaseVector *v,unsigned /*cid*/) {
         for (unsigned i=0;i<d_container.getValue().size();i++)
-            d_container.getValue()[i].getConstraintViolation(v);
+            d_container.getValue()[i]->getConstraintViolation(v);
     }
 
     /*!
@@ -133,8 +114,8 @@ public:
      */
     virtual void getConstraintResolution(const core::ConstraintParams* /*cParams*/, std::vector<core::behavior::ConstraintResolution*>& resTab, unsigned int& offset) {
         for (unsigned i=0;i<d_container.getValue().size();i++) {
-            resTab[offset] = d_container.getValue()[i].createConstraintResolution();
-            offset += d_container.getValue()[i].size();
+            resTab[offset] = d_container.getValue()[i]->createConstraintResolution();
+            offset += d_container.getValue()[i]->size();
         }
     }
 
@@ -144,7 +125,7 @@ public:
         {
             if (vparams->displayFlags().getShowInteractionForceFields()) {
                 for (unsigned i=0;i<d_container.getValue().size();i++)
-                    d_container.getValue()[i].draw(vparams,d_drawScale.getValue());
+                    d_container.getValue()[i]->draw(vparams,d_drawScale.getValue());
             }
 
             if (vparams->displayFlags().getShowCollisionModels()) {
@@ -153,9 +134,9 @@ public:
 
                 glBegin(GL_LINES);
                 for (unsigned i=0;i<d_container.getValue().size();i++) {
-                    for (unsigned j=0; j<d_container.getValue()[i].getPairs().size(); j++) {
-                        glVertex3dv(d_container.getValue()[i].getPairs()[j].first->getPosition().data());
-                        glVertex3dv(d_container.getValue()[i].getPairs()[j].second->getPosition().data());
+                    for (unsigned j=0; j<d_container.getValue()[i]->getPairSize(); j++) {
+                        glVertex3dv(d_container.getValue()[i]->getFirstPair(j)->getPosition().data());
+                        glVertex3dv(d_container.getValue()[i]->getSecondPair(j)->getPosition().data());
                     }
                 }
                 glEnd();
@@ -170,8 +151,8 @@ public:
      * \param res
      * \param lambda
      */
-    virtual void storeLambda(const InternalConstraint & cst, const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::linearalgebra::BaseVector* lambda) {
-        cst.storeLambda(cParams,res,lambda);
+    virtual void storeLambda(const BaseInternalConstraint::SPtr cst, const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::linearalgebra::BaseVector* lambda) {
+        cst->storeLambda(cParams,res,lambda);
     }
 
     /*!
