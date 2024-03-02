@@ -243,7 +243,10 @@ public :
         for (unsigned i=0;i<m_pairs.size();i++) {
             if (m_pairs.size()>1) out << "<";
             out << sofa::helper::NameDecoder::decodeFullName(m_pairs[i].first->getTypeInfo()) << "    ---   "
-                << sofa::helper::NameDecoder::decodeFullName(m_pairs[i].second->getTypeInfo());
+                << sofa::helper::NameDecoder::decodeFullName(m_pairs[i].second->getTypeInfo()) << std::endl;;
+            out << "  - " << m_pairs[i].first->getPosition() << std::endl;
+            out << "  - " << m_pairs[i].second->getPosition() << std::endl;
+
             if (m_pairs.size()>1) out << ">" << std::endl;
         }
     }
