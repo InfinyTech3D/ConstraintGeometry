@@ -214,40 +214,6 @@ public :
         return m_cid;
     }
 
-//    void buildProximityMappingMatrix(core::MultiMatrixDerivId cId, unsigned int & csetId) const {
-//        m_cSetId = csetId;
-
-//        sofa::type::vector<type::Vec3> dirs;
-//        dirs.clear();
-//        dirs.push_back(type::Vec3(1,0,0));
-//        dirs.push_back(type::Vec3(0,1,0));
-//        dirs.push_back(type::Vec3(0,0,1));
-
-//        m_first->buildJacobianConstraint(cId, dirs,  1.0, csetId*3);
-//        m_second->buildJacobianConstraint(cId, dirs, -1.0, csetId*3);
-
-//        csetId ++;
-//    }
-
-//    void buildConstraintNormalMatrix(sofa::type::vector<sofa::type::Vec3> & normal, sofa::type::vector<int> & cstInd, unsigned int & cdirId) const {
-//        m_cDirId = cdirId;
-
-//        for (unsigned i=0;i<m_normals.size();i++) {
-//            normal.push_back(m_normals.m_dirs[i]);
-//        }
-
-//        cdirId += m_normals.size();
-//        cstInd.push_back(cdirId);
-//    }
-
-//    void SetProximityFreePosition(sofa::core::MultiVecDerivId /*pfreeId*/) const {
-////        const type::Vec3 & PFree = m_detection.first->getPosition(core::VecCoordId::freePosition());
-////        const type::Vec3 & QFree = m_detection.second->getPosition(core::VecCoordId::freePosition());
-
-
-//    }
-
-
     void toString(std::ostream& out) const override {
         out << "(" << m_cid << ") : ";
         for (unsigned i=0;i<m_pairs.size();i++) {
@@ -302,6 +268,10 @@ public :
         return out;
     }
 
+    NormalsFunc getNormalFunc() { return m_normalFunc; }
+
+    NormalsFunc getViolationFunc() { return m_violationFunc; }
+
 
  protected:
     std::vector<std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>> m_pairs;
@@ -315,13 +285,5 @@ public :
     ViolationFunc m_violationFunc;
     NormalsFunc m_normalFunc;
 };
-
-}
-
-
-namespace std {
-
-
-
 
 }
