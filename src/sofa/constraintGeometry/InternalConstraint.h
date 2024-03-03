@@ -8,8 +8,6 @@
 
 namespace sofa::constraintGeometry {
 
-
-
 class BaseInternalConstraint {
 public:
     typedef std::shared_ptr<BaseInternalConstraint> SPtr;
@@ -30,11 +28,11 @@ public:
 
     virtual core::behavior::ConstraintResolution* createConstraintResolution() const = 0;
 
-    virtual unsigned getPairSize() = 0;
+    virtual unsigned getPairSize() const = 0;
 
-    virtual collisionAlgorithm::BaseBaseProximity::SPtr getFirstPair(unsigned i) = 0;
+    virtual collisionAlgorithm::BaseBaseProximity::SPtr getFirstPair(unsigned i) const = 0;
 
-    virtual collisionAlgorithm::BaseBaseProximity::SPtr getSecondPair(unsigned i) = 0;
+    virtual collisionAlgorithm::BaseBaseProximity::SPtr getSecondPair(unsigned i) const = 0;
 
     virtual void draw(const core::visual::VisualParams* ,double ) const = 0;
 
@@ -97,6 +95,16 @@ public :
             m_pairs.push_back(std::pair<const typename FIRST::SPtr,const typename SECOND::SPtr>(pairs[i].first,pairs[i].second));
             m_vecNormals.push_back(m_normalFunc(pairs[i].first,pairs[i].second));
         }
+    }
+
+    static inline SPtr create(const typename FIRST::SPtr & first, const typename SECOND::SPtr & second,
+                       NormalsFunc nf, ResolutionCreator creator, ViolationFunc f = &defaultViolationFunc) {
+        return SPtr(new InternalConstraint(first,second,nf,creator,f));
+    }
+
+    static inline SPtr create(const std::vector<std::pair<const typename FIRST::SPtr,const typename SECOND::SPtr>> & pairs,
+                       NormalsFunc nf, ResolutionCreator creator, ViolationFunc f = &defaultViolationFunc) {
+        return SPtr(new InternalConstraint(pairs,nf,creator,f));
     }
 
     /*!
@@ -184,11 +192,11 @@ public :
     }
 
 
-    unsigned getPairSize() { return m_pairs.size(); }
+    unsigned getPairSize() const override { return m_pairs.size(); }
 
-    collisionAlgorithm::BaseBaseProximity::SPtr getFirstPair(unsigned i) override { return m_pairs[i].first; }
+    collisionAlgorithm::BaseBaseProximity::SPtr getFirstPair(unsigned i) const override { return m_pairs[i].first; }
 
-    collisionAlgorithm::BaseBaseProximity::SPtr getSecondPair(unsigned i) override { return m_pairs[i].second; }
+    collisionAlgorithm::BaseBaseProximity::SPtr getSecondPair(unsigned i) const override { return m_pairs[i].second; }
 
     const std::vector<std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>> & getPairs() const {
         return m_pairs;
@@ -280,10 +288,22 @@ public :
         m_normalFunc = c.m_normalFunc;
     }
 
- protected:
-//    typename FIRST::SPtr m_first;
-//    typename SECOND::SPtr m_second;
+    friend inline std::istream& operator >> ( std::istream& in, std::vector<typename sofa::constraintGeometry::InternalConstraint<FIRST,SECOND>::SPtr> &) {
+        return in;
+    }
 
+
+    friend inline std::ostream& operator << (std::ostream& out, const std::vector<typename sofa::constraintGeometry::InternalConstraint<FIRST,SECOND>::SPtr> & v) {
+        for (unsigned i=0;i<v.size();i++) {
+            if (v.size()>1) out << "[";
+            v[i]->toString(out);
+            if (v.size()>1) out << "]" << std::endl;
+        }
+        return out;
+    }
+
+
+ protected:
     std::vector<std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>> m_pairs;
 
     std::vector<ConstraintNormal> m_vecNormals;
@@ -301,18 +321,7 @@ public :
 
 namespace std {
 
-inline std::istream& operator >> ( std::istream& in, std::vector<sofa::constraintGeometry::BaseInternalConstraint::SPtr> &) {
-    return in;
-}
 
-inline std::ostream& operator << ( std::ostream& out, const std::vector<sofa::constraintGeometry::BaseInternalConstraint::SPtr> & v) {
-    for (unsigned i=0;i<v.size();i++) {
-        if (v.size()>1) out << "[";
-        v[i]->toString(out);
-        if (v.size()>1) out << "]" << std::endl;
-    }
-    return out;
-}
 
 
 }

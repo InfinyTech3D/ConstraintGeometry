@@ -41,11 +41,12 @@ public:
     SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseConstraint);
 
     typedef collisionAlgorithm::BaseProximity BaseProximity;
+    typedef InternalConstraint<FIRST,SECOND> InternalCst;
 
     Data<double> d_drawScale;
     Data<bool> d_draw;
     Data<collisionAlgorithm::DetectionOutput<FIRST,SECOND> > d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
-    Data<std::vector<BaseInternalConstraint::SPtr> > d_container;
+    Data<std::vector<typename InternalCst::SPtr> > d_container;
 
 	TBaseConstraint()
         : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
@@ -69,11 +70,11 @@ public:
 
         auto & input = d_input.getValue();
         for (unsigned i=0;i<input.size();i++) {
-            BaseInternalConstraint::SPtr constraint(new
-                InternalConstraint<FIRST,SECOND>(
-                    input[i].first,input[i].second,
-                    std::bind(&TBaseConstraint::createConstraintNormal, this, std::placeholders::_1,std::placeholders::_2),
-                    std::bind(&TBaseConstraint::createConstraintResolution, this, std::placeholders::_1)));
+            auto constraint = InternalConstraint<FIRST,SECOND>::create(
+                        input[i].first,input[i].second,
+                        std::bind(&TBaseConstraint::createConstraintNormal, this, std::placeholders::_1,std::placeholders::_2),
+                        std::bind(&TBaseConstraint::createConstraintResolution, this, std::placeholders::_1)
+                      );
 
 
             if (constraint->size()) container.push_back(constraint);
