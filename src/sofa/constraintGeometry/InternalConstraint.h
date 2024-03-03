@@ -45,6 +45,8 @@ template<class FIRST,class SECOND>
 class InternalConstraint : public BaseInternalConstraint {
 public :
 
+    typedef std::shared_ptr<InternalConstraint<FIRST,SECOND>> SPtr;
+
 //    typedef collisionAlgorithm::BaseProximity FIRST;
 //    typedef collisionAlgorithm::BaseProximity SECOND;
 
