@@ -272,6 +272,7 @@ public :
 
     NormalsFunc getViolationFunc() { return m_violationFunc; }
 
+    const std::vector<std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>> & getPairs() { return m_pairs; }
 
  protected:
     std::vector<std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>> m_pairs;
