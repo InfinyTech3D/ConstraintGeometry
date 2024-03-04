@@ -25,6 +25,7 @@ public:
 template<class PROXIMITY>
 class TConstraintProximity : public ConstraintProximity {
 public:
+    typedef std::shared_ptr<TConstraintProximity<PROXIMITY> > SPtr;
     typedef std::function<type::Vec3(const typename PROXIMITY::SPtr & p)> FUNC_GET_NORMAL;
 
     TConstraintProximity(const typename PROXIMITY::SPtr & p,FUNC_GET_NORMAL n)
@@ -51,9 +52,13 @@ public:
         return m_normalFunc(m_prox);
     }
 
-    static ConstraintProximity::SPtr create(const typename PROXIMITY::SPtr & p,FUNC_GET_NORMAL n) {
-        return ConstraintProximity::SPtr(new TConstraintProximity(p,n));
+    static typename TConstraintProximity<PROXIMITY>::SPtr create(const typename PROXIMITY::SPtr & p,FUNC_GET_NORMAL n) {
+        return TConstraintProximity<PROXIMITY>::SPtr(new TConstraintProximity(p,n));
     }
+
+    const typename PROXIMITY::SPtr & getProx() const { return m_prox; }
+
+    FUNC_GET_NORMAL getNormalFunc() const { return m_normalFunc; }
 
 protected:
     typename PROXIMITY::SPtr m_prox;
