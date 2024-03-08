@@ -104,6 +104,10 @@ public:
         for (unsigned i=0; i<m_dirs.size(); i++) m_dirs[i] *= s;
     }
 
+    void setDir(unsigned i,const type::Vec3 & n) { m_dirs[i] = n; }
+
+    ViolationFunction getViolationFunc(unsigned i) { return m_functions[i]; }
+
 protected:
     //pai of directions (vec3) and function to compute the violation of a par proximity
     sofa::type::vector<type::Vec3> m_dirs;
