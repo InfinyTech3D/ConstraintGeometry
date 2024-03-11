@@ -41,12 +41,11 @@ public:
     SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseConstraint);
 
     typedef collisionAlgorithm::BaseProximity BaseProximity;
-    typedef InternalConstraint<FIRST,SECOND> InternalCst;
 
     Data<double> d_drawScale;
     Data<bool> d_draw;
     Data<collisionAlgorithm::DetectionOutput<FIRST,SECOND> > d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
-    Data<std::vector<typename InternalCst::SPtr> > d_container;
+    Data<std::vector<BaseInternalConstraint::SPtr> > d_container;
 
 	TBaseConstraint()
         : d_drawScale(initData(&d_drawScale, 1.0, "draw_scale", "draw scale"))
