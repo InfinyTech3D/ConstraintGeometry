@@ -50,10 +50,6 @@ public:
         }
         return out;
     }
-
-    virtual const std::type_info & getFirstType() const = 0;
-
-    virtual const std::type_info & getSecondType() const = 0;
 };
 
 template<class FIRST,class SECOND>
@@ -79,10 +75,6 @@ public :
             /*++ lcid;*/  lcid += ic->m_vecNormals[i].size();
         }
     }
-
-    const std::type_info & getFirstType() const override { return typeid(FIRST); }
-
-    const std::type_info & getSecondType() const override { return typeid(SECOND); }
 
     // create function should be used
     /*!
