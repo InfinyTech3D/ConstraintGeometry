@@ -58,24 +58,23 @@ public:
             m_dirs.push_back(type::Vec3(1,0,0));
             m_functions.push_back(f);
             return *this;
-        }
-
-        if (m_dirs.size() == 1) {
+        } else if (m_dirs.size() == 1) {
             //gram schmidt orthogonalization
-            type::Vec3 gramm_schmidt = type::Vec3(0,1,0) - m_dirs[0] * dot(m_dirs[0],type::Vec3(0,1,0));
+            type::Vec3 gramm_schmidt = type::Vec3(0,0,1) - m_dirs[0] * dot(m_dirs[0],type::Vec3(0,0,1));
 
             //Change with othogonalization around Z if the initial direction is aligned with Y
-            if (gramm_schmidt.norm() < std::numeric_limits<double>::epsilon()) gramm_schmidt = type::Vec3(0,0,1) - m_dirs[0] * dot(m_dirs[0],type::Vec3(0,0,1));
+            if (gramm_schmidt.norm() < std::numeric_limits<double>::epsilon())
+                gramm_schmidt = type::Vec3(0,1,0) - m_dirs[0] * dot(m_dirs[0],type::Vec3(0,1,0));
 
             m_dirs.push_back(gramm_schmidt.normalized());
             m_functions.push_back(f);
             return *this;
-        }
-
-        if (m_dirs.size() == 2) {
+        } else if (m_dirs.size() == 2) {
             m_dirs.push_back(cross(m_dirs[0],m_dirs[1]).normalized());
             m_functions.push_back(f);
             return *this;
+        } else {
+            std::cerr << "Cannot add orthogonal direction for more than 3 constraints " << std::endl;
         }
 
         return *this;
@@ -104,7 +103,9 @@ public:
         for (unsigned i=0; i<m_dirs.size(); i++) m_dirs[i] *= s;
     }
 
-    void setDir(unsigned i,const type::Vec3 & n) { m_dirs[i] = n; }
+    void setDir(unsigned i,const type::Vec3 & n) {
+        m_dirs[i] = n.normalized();
+    }
 
     ViolationFunction getViolationFunc(unsigned i) { return m_functions[i]; }
 
