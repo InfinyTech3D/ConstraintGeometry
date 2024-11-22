@@ -5,8 +5,6 @@ namespace sofa {
 
 namespace constraintGeometry {
 
-SOFA_DECL_CLASS(FixedFrameDirection)
-
 int FixedFrameDirectionClass = core::RegisterObject("FixedFrameDirection")
 .add< FixedFrameDirection >();
 

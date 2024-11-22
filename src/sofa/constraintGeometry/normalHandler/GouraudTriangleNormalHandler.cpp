@@ -4,12 +4,8 @@
 
 namespace sofa::constraintGeometry {
 
-SOFA_DECL_CLASS(GouraudTriangleNormalHandler)
-
 int GouraudTriangleNormalHandlerClass = core::RegisterObject("GouraudTriangleNormalHandler")
 .add< GouraudTriangleNormalHandler>();
-
-
 
 int gouraud_reg_tri = ConstraintProximityOperation::register_func<GouraudTriangleNormalHandler,collisionAlgorithm::TriangleProximity>
 (&GouraudTriangleNormalHandler::buildCstProximity<collisionAlgorithm::TriangleProximity>);

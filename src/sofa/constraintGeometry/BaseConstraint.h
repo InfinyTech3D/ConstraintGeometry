@@ -19,7 +19,7 @@ public:
 
 	unsigned getCId ()
 	{
-        return this->m_constraintIndex.getValue();
+        return this->d_constraintIndex.getValue();
 	}
 
 	unsigned getSize ()

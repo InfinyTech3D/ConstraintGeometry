@@ -4,8 +4,6 @@
 
 namespace sofa::constraintGeometry {
 
-SOFA_DECL_CLASS(PhongTriangleNormalHandler)
-
 int PhongTriangleNormalHandlerClass = core::RegisterObject("PhongTriangleNormalHandler")
 .add< PhongTriangleNormalHandler >();
 
