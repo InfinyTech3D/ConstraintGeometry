@@ -20,8 +20,8 @@ public:
     typedef std::function<double(const typename FIRST::SPtr &, const typename SECOND::SPtr &, const type::Vec3 &)> ViolationFunction;
 
     static double defaultViolationFunction(const typename FIRST::SPtr & first, const typename SECOND::SPtr & second, const type::Vec3 & normal) {
-        const type::Vec3 & PFree = first->getPosition(core::VecCoordId::freePosition());
-        const type::Vec3 & QFree = second->getPosition(core::VecCoordId::freePosition());
+        const type::Vec3 & PFree = first->getPosition(core::vec_id::write_access::freePosition);
+        const type::Vec3 & QFree = second->getPosition(core::vec_id::write_access::freePosition);
 
         return dot(PFree - QFree, normal);
     }
