@@ -27,7 +27,9 @@ public:
 
     virtual ConstraintNormal createConstraintNormal(const BaseProximity::SPtr & first, const BaseProximity::SPtr & second) const override {
         if (l_directions == NULL) return ConstraintNormal();
-        return l_directions->createConstraintsNormal(first,second);
+        ConstraintNormal cst(l_directions->createConstraintsNormal(first,second));
+        cst.addOrthogonalDirection().addOrthogonalDirection();
+        return ConstraintNormal().add(cst[1]).add(cst[2]);// l_directions->createConstraintsNormal(first, second);
     }
 
     core::behavior::ConstraintResolution* createConstraintResolution(const BaseInternalConstraint * cst) const {
