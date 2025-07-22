@@ -10,12 +10,14 @@ class ConstraintInsertion : public TBaseConstraint<collisionAlgorithm::BaseProxi
 public:
     SOFA_CLASS(ConstraintInsertion , SOFA_TEMPLATE2(TBaseConstraint,BaseProximity,BaseProximity));
 
+    Data<SReal> d_friction;
     Data<sofa::type::vector<double> > d_maxForce;
     Data<sofa::type::vector<double> > d_compliance;
     core::objectmodel::SingleLink<ConstraintInsertion,ConstraintDirection, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_directions;
 
     ConstraintInsertion()
-    : d_maxForce(initData(&d_maxForce, "maxForce", "Max force"))
+    : d_friction(initData(&d_friction, 0.0, "mu" , "friction coefficient"))
+    , d_maxForce(initData(&d_maxForce, "maxForce", "Max force"))
     , d_compliance(initData(&d_compliance, "compliance", "Max force"))
     , l_directions(initLink("directions", "link to the default direction")) {}
 
