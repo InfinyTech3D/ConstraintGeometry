@@ -39,34 +39,31 @@ public:
 
     virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/)
     {
-        //we solve the first two bilateral constraints
-        double inv;
-        inv=1.0/(w[line][line]);
-        double corr0 = -inv * d[line+0];
-        force[line+0] += corr0;
+        std::array<SReal, 3> corr = { 0.0, 0.0, 0.0 };
 
-        d[line+1] += w[line+1][line+0] * corr0;
-        inv=1.0/(w[line+1][line+1]);
-        double corr1= -inv * d[line+1];
-        force[line+1] += corr1;
+        for (int j = 0; j < 3; j++)
+            corr[0] -= invW[0][j] * d[line+j];
+        corr[0] *= m_frictionCoeff;
 
-        for(int i=0; i<2; i++) {
+        // Back solve 2x2 system with friction on the RHS
+        const SReal denom = w[1][1] * w[2][2] - w[1][2] * w[2][1];
+        const SReal nom1 = w[1][2] * (d[line+2] + w[2][0] * corr[0]);
+        const SReal nom2 = w[2][2] * (d[line+1] + w[1][0] * corr[0]);
+        corr[1] = (nom1 - nom2) / denom;
+
+        corr[2] = -(d[line+2] + w[2][0] * corr[0] + w[2][1] * corr[1]) / w[2][2];
+
+        for (int i = 0; i < 3; i++) 
+            force[line+i] += corr[i];
+
+        for(int i = 0; i < 3; i++) {
             if (force[line+i] > m_maxForce[i]) force[line+i]=m_maxForce[i];
             else if (force[line+i] < -m_maxForce[i]) force[line+i]=-m_maxForce[i];
         }
 
-        // then solve for the frictional constraint
-        d[line+2] += w[line+2][line+0] * corr0 + w[line+2][line+1] * corr1;
-        inv=1.0/(w[line+2][line+2]);
-        double corr2= -inv * d[line+2];
-        force[line+2] += corr2;
-
-        SReal slip_force = m_frictionCoeff;
-        if (force[line+2] >  slip_force) force[line+2] = slip_force;
-        else if (force[line+2] < -slip_force) force[line+2] = -slip_force;
-
-        if (force[line+2] > m_maxForce[2]) force[line+2]=m_maxForce[2];
-        else if (force[line+2] < -m_maxForce[2]) force[line+2]=-m_maxForce[2];
+        //SReal slip_force = m_frictionCoeff;
+        //if (force[line+2] >  slip_force) force[line+2] = slip_force;
+        //else if (force[line+2] < -slip_force) force[line+2] = -slip_force;
     }
 
     double m_maxForce[3];
