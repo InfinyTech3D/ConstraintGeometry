@@ -10,13 +10,13 @@ class ConstraintInsertion : public TBaseConstraint<collisionAlgorithm::BaseProxi
 public:
     SOFA_CLASS(ConstraintInsertion , SOFA_TEMPLATE2(TBaseConstraint,BaseProximity,BaseProximity));
 
-    Data<SReal> d_frictionLimit;
+    Data<SReal> d_frictionCoeff;
     Data<sofa::type::vector<double> > d_maxForce;
     Data<sofa::type::vector<double> > d_compliance;
     core::objectmodel::SingleLink<ConstraintInsertion,ConstraintDirection, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_directions;
 
     ConstraintInsertion()
-    : d_frictionLimit(initData(&d_frictionLimit, 0.0, "frictionLimit" , "static friction force upper limit"))
+    : d_frictionCoeff(initData(&d_frictionCoeff, 0.0, "frictionCoeff" , "static friction coefficient (should be less than 1)"))
     , d_maxForce(initData(&d_maxForce, "maxForce", "Max force"))
     , d_compliance(initData(&d_compliance, "compliance", "Max force"))
     , l_directions(initLink("directions", "link to the default direction")) {}
@@ -46,7 +46,7 @@ public:
         if (d_compliance.getValue().size()>1) comp[1]=d_compliance.getValue()[1];
         if (d_compliance.getValue().size()>2) comp[2]=d_compliance.getValue()[2];
 
-        return new InsertionConstraintResolution(d_frictionLimit.getValue(), maxf[0],maxf[1],maxf[2],comp[0],comp[1],comp[2]);
+        return new InsertionConstraintResolution(d_frictionCoeff.getValue(), maxf[0],maxf[1],maxf[2],comp[0],comp[1],comp[2]);
 
         std::cerr << "Error the size of the constraint is not correct in ConstraintInsertion size=" << cst->size() << std::endl;
         return NULL;

@@ -10,7 +10,7 @@ namespace constraintGeometry {
 
 class InsertionConstraintResolution : public sofa::core::behavior::ConstraintResolution {
 public:
-    InsertionConstraintResolution(SReal frictionLimit, double maxf1 = std::numeric_limits<double>::max(),double maxf2 = std::numeric_limits<double>::max(),double maxf3 = std::numeric_limits<double>::max(),
+    InsertionConstraintResolution(SReal frictionCoeff, double maxf1 = std::numeric_limits<double>::max(),double maxf2 = std::numeric_limits<double>::max(),double maxf3 = std::numeric_limits<double>::max(),
                                    double comp1 = 0.0,double comp2 = 0.0,double comp3 = 0.0) : sofa::core::behavior::ConstraintResolution(3) {
         m_maxForce[0] = maxf1;
         m_maxForce[1] = maxf2;
@@ -20,7 +20,7 @@ public:
         m_compliance[1] = comp2;
         m_compliance[2] = comp3;
 
-        m_frictionLimit = frictionLimit;
+        m_frictionCoeff = frictionCoeff;
     }
 
     virtual void init(int line, double** w, double * /*force*/)
@@ -61,7 +61,7 @@ public:
         double corr2= -inv * d[line+2];
         force[line+2] += corr2;
 
-        SReal slip_force = m_frictionLimit;
+        SReal slip_force = m_frictionCoeff;
         if (force[line+2] >  slip_force) force[line+2] = slip_force;
         else if (force[line+2] < -slip_force) force[line+2] = -slip_force;
 
@@ -72,7 +72,7 @@ public:
     double m_maxForce[3];
     double m_compliance[3];
     sofa::type::Mat<3,3,double> invW;
-    SReal m_frictionLimit;
+    SReal m_frictionCoeff;
 };
 
 }
