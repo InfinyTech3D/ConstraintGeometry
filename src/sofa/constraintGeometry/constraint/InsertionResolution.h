@@ -46,12 +46,12 @@ public:
         corr[0] *= m_frictionCoeff;
 
         // Back solve 2x2 system with friction on the RHS
-        const SReal denom = w[1][1] * w[2][2] - w[1][2] * w[2][1];
-        const SReal nom1 = w[1][2] * (d[line+2] + w[2][0] * corr[0]);
-        const SReal nom2 = w[2][2] * (d[line+1] + w[1][0] * corr[0]);
+        const SReal denom = w[line+1][line+1] * w[line+2][line+2] - w[line+1][line+2] * w[line+2][line+1];
+        const SReal nom1 = w[line+1][line+2] * (d[line+2] + w[line+2][line+0] * corr[0]);
+        const SReal nom2 = w[line+2][line+2] * (d[line+1] + w[line+1][line+0] * corr[0]);
         corr[1] = (nom1 - nom2) / denom;
 
-        corr[2] = -(d[line+2] + w[2][0] * corr[0] + w[2][1] * corr[1]) / w[2][2];
+        corr[2] = -(d[line+2] + w[line+2][line+0] * corr[0] + w[line+2][line+1] * corr[1]) / w[line+2][line+2];
 
         for (int i = 0; i < 3; i++) 
             force[line+i] += corr[i];
