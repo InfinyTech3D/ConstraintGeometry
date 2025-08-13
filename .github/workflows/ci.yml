@@ -21,12 +21,31 @@ jobs:
           sofa_root: ${{ github.workspace }}/sofa
           sofa_version: ${{ matrix.sofa_branch }}
           sofa_scope: 'standard'
-      - name: Checkout source code
+      - name: Checkout CollisionAlgorithm
         uses: actions/checkout@v2
         with:
-          path: ${{ env.WORKSPACE_SRC_PATH }}        
-      
-      - name: Build and install
+          repository: InfinyTech3D/CollisionAlgorithm
+          path: collision_src
+      - name: Build & install CollisionAlgorithm
+        shell: bash
+        run: |
+          mkdir -p collision_build
+          cd collision_build
+          cmake \
+            -GNinja \
+            -DCMAKE_PREFIX_PATH="$SOFA_ROOT/lib/cmake" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/deps" \
+            ../collision_src
+          ninja install
+
+      # Now checkout ConstraintGeometry
+      - name: Checkout ConstraintGeometry
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.WORKSPACE_SRC_PATH }}
+
+      - name: Build and install ConstraintGeometry
         id: build-install
         shell: bash
         run: |
@@ -35,9 +54,9 @@ jobs:
               && cd /d $WORKSPACE_BUILD_PATH \
               && cmake \
                   -GNinja \
-                  -DCMAKE_PREFIX_PATH="$SOFA_ROOT/lib/cmake" \
+                  -DCMAKE_PREFIX_PATH=\"$SOFA_ROOT/lib/cmake;$GITHUB_WORKSPACE/deps/lib/cmake\" \
                   -DCMAKE_BUILD_TYPE=Release \
-                  -DCMAKE_INSTALL_PREFIX="$WORKSPACE_INSTALL_PATH" \
+                  -DCMAKE_INSTALL_PREFIX=\"$WORKSPACE_INSTALL_PATH\" \
                   ../src \
               && ninja install"
           else
@@ -47,7 +66,7 @@ jobs:
               -GNinja \
               -DCMAKE_C_COMPILER_LAUNCHER=ccache \
               -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-              -DCMAKE_PREFIX_PATH=$SOFA_ROOT/lib/cmake \
+              -DCMAKE_PREFIX_PATH="$SOFA_ROOT/lib/cmake;$GITHUB_WORKSPACE/deps/lib/cmake" \
               -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_INSTALL_PREFIX="$WORKSPACE_INSTALL_PATH" \
               ../src
