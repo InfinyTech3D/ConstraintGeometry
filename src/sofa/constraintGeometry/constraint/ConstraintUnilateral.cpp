@@ -1,14 +1,12 @@
 #include <sofa/constraintGeometry/constraint/ConstraintUnilateral.h>
 #include <sofa/core/ObjectFactory.h>
 
-namespace sofa {
-
-namespace constraintGeometry {
-
-int ConstraintUnilateralClass = core::RegisterObject("ConstraintUnilateral")
-.add< ConstraintUnilateral >();
-
-}
-
-}
-
+namespace sofa::constraintGeometry
+{
+    void registerConstraintUnilateral(sofa::core::ObjectFactory* factory)
+    {
+        factory->registerObjects(
+            sofa::core::ObjectRegistrationData("Implements unilateral constraints between an origin and a destination geometry")
+            .add<ConstraintUnilateral>());
+    }
+}  // namespace sofa::constraintGeometry

@@ -1,14 +1,12 @@
 #include <sofa/constraintGeometry/directions/FirstDirection.h>
 #include <sofa/core/ObjectFactory.h>
 
-namespace sofa {
-
-namespace constraintGeometry {
-
-int FirstDirectionClass = core::RegisterObject("FirstDirection")
-.add< FirstDirection >();
-
-}
-
-}
-
+namespace sofa::constraintGeometry
+{
+    void registerFirstDirection(sofa::core::ObjectFactory* factory)
+    {
+        factory->registerObjects(
+            sofa::core::ObjectRegistrationData("Computes the constraint direction from the 1st proximity in pair and a normal handler")
+            .add<FirstDirection>());
+    }
+}  // namespace sofa::constraintGeometry
