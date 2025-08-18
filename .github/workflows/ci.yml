@@ -21,12 +21,17 @@ jobs:
           sofa_root: ${{ github.workspace }}/sofa
           sofa_version: ${{ matrix.sofa_branch }}
           sofa_scope: 'standard'
+          
+      - name: Checkout dependency source code
+        uses: actions/checkout@v2
+        with:
+          path: InfinyTech3D/CollisionAlgorithm
+          repository:  InfinyTech3D/CollisionAlgorithm
+          
       - name: Checkout source code
         uses: actions/checkout@v2
         with:
-          #path: ${{ env.WORKSPACE_SRC_PATH }}
-          path: InfinyTech3D/CollisionAlgorithm
-          repository:  InfinyTech3D/CollisionAlgorithm
+          path: ${{ env.WORKSPACE_SRC_PATH }}
       
       - name: Build and install
         id: build-install
