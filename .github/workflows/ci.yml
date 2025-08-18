@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           #path: ${{ env.WORKSPACE_SRC_PATH }}
-          path: InfinyTech3D/CollisionAlgorithms
+          path: InfinyTech3D/CollisionAlgorithm
           repository:  InfinyTech3D/CollisionAlgorithm
       
       - name: Build and install
