@@ -24,7 +24,9 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v2
         with:
-          path: ${{ env.WORKSPACE_SRC_PATH }}        
+          #path: ${{ env.WORKSPACE_SRC_PATH }}
+          path: ${{ env.WORKSPACE }}/CollisionAlgorithms
+          repository:  InfinyTech3D/CollisionAlgorithm
       
       - name: Build and install
         id: build-install
