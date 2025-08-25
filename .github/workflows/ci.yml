@@ -37,11 +37,10 @@ jobs:
             cmd //c "${{ steps.sofa.outputs.vs_vsdevcmd }} \
               && cmake \
                   -GNinja \
-                  -DCMAKE_PREFIX_PATH=$SOFA_ROOT/lib/cmake \
+                  -DCMAKE_PREFIX_PATH="$SOFA_ROOT/lib/cmake" \
                   -DCMAKE_BUILD_TYPE=Release \
-                  -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install/CollisionAlgorithm \
-                  .. \
-              && ninja install"
+                  -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/CollisionAlgorithm" \
+                  .. && ninja install"
           else
             cmake \
               -GNinja \
