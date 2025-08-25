@@ -25,8 +25,26 @@ jobs:
       - name: Checkout dependency source code
         uses: actions/checkout@v2
         with:
-          path: InfinyTech3D/CollisionAlgorithm
+          path: deps/CollisionAlgorithm
           repository:  InfinyTech3D/CollisionAlgorithm
+
+      - name: Build and install CollisionAlgorithm
+        shell: bash
+        run: |
+          mkdir -p deps/CollisionAlgorithm/build
+          cd deps/CollisionAlgorithm/build
+          cmake \
+            -GNinja \
+            -DCMAKE_PREFIX_PATH=$SOFA_ROOT/lib/cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install/CollisionAlgorithm \
+            ..
+          ninja install
+          # Flatten the CollisionAlgorithm install structure
+          mkdir -p $GITHUB_WORKSPACE/install/CollisionAlgorithm/include/CollisionAlgorithm
+          mv $GITHUB_WORKSPACE/install/CollisionAlgorithm/include/include/CollisionAlgorithm/CollisionAlgorithm/src/* \
+             $GITHUB_WORKSPACE/install/CollisionAlgorithm/include/CollisionAlgorithm/
+          rm -rf $GITHUB_WORKSPACE/install/CollisionAlgorithm/include/include
           
       - name: Checkout source code
         uses: actions/checkout@v2
@@ -42,11 +60,11 @@ jobs:
               && cd /d $WORKSPACE_BUILD_PATH \
               && cmake \
                   -GNinja \
-                  -DCMAKE_PREFIX_PATH="$SOFA_ROOT/lib/cmake" \
+                  -DCMAKE_PREFIX_PATH="$SOFA_ROOT/lib/cmake;$GITHUB_WORKSPACE/install/CollisionAlgorithm" \
                   -DCMAKE_BUILD_TYPE=Release \
                   -DCMAKE_INSTALL_PREFIX="$WORKSPACE_INSTALL_PATH" \
                   ../src \
-              && ninja install"
+              && ninja -v install"
           else
             cd "$WORKSPACE_BUILD_PATH"
             ccache -z
@@ -54,11 +72,11 @@ jobs:
               -GNinja \
               -DCMAKE_C_COMPILER_LAUNCHER=ccache \
               -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-              -DCMAKE_PREFIX_PATH=$SOFA_ROOT/lib/cmake \
+              -DCMAKE_PREFIX_PATH="$SOFA_ROOT/lib/cmake;$GITHUB_WORKSPACE/install/CollisionAlgorithm" \
               -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_INSTALL_PREFIX="$WORKSPACE_INSTALL_PATH" \
               ../src
-            ninja install
+            ninja -v install
             echo ${CCACHE_BASEDIR}
             ccache -s
           fi
