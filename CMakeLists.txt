@@ -35,6 +35,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/ignored")
 find_package(CollisionAlgorithm REQUIRED)
 find_package(Sofa.Component.StateContainer REQUIRED)
 find_package(Sofa.Component.Constraint.Lagrangian.Solver REQUIRED)
+find_package(Sofa.GL REQUIRED)
 
 set_source_files_properties(${IGNORED_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 
@@ -44,6 +45,7 @@ target_link_libraries(${PROJECT_NAME}
     CollisionAlgorithm
     Sofa.Component.StateContainer
     Sofa.Component.Constraint.Lagrangian.Solver
+    Sofa.GL
 )
 
 
