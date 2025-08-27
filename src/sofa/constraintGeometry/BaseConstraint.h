@@ -2,7 +2,7 @@
 
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/core/behavior/BaseConstraint.h>
+#include <sofa/core/behavior/BaseLagrangianConstraint.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/constraintGeometry/ConstraintNormal.h>
 #include <sofa/constraintGeometry/InternalConstraint.h>
@@ -12,7 +12,7 @@
 namespace sofa::constraintGeometry {
 
 
-class BaseConstraint : public sofa::core::behavior::BaseConstraint{
+class BaseConstraint : public sofa::core::behavior::BaseLagrangianConstraint{
 public:
 
     virtual ~BaseConstraint(){}
@@ -33,12 +33,12 @@ public:
 
 
 /*!
- * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseConstraint
+ * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseLagrangianConstraint
  */
 template<class FIRST = collisionAlgorithm::BaseProximity, class SECOND = collisionAlgorithm::BaseProximity>
 class TBaseConstraint : public BaseConstraint {
 public:
-    SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseConstraint);
+    SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseLagrangianConstraint);
 
     typedef collisionAlgorithm::BaseProximity BaseProximity;
 
