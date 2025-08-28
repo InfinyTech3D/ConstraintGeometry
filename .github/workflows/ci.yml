@@ -75,15 +75,6 @@ jobs:
         shell: bash
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then
-            WIN_BUILD_PATH=$(cygpath -w "$WORKSPACE_BUILD_PATH")
-            WIN_SRC_PATH=$(cygpath -w "$WORKSPACE_SRC_PATH")
-            WIN_INSTALL_PATH=$(cygpath -w "$WORKSPACE_INSTALL_PATH")
-            WIN_SOFA_ROOT=$(cygpath -w "$SOFA_ROOT")
-            WIN_COLLISION_PATH=$(cygpath -w "$GITHUB_WORKSPACE/install/CollisionAlgorithm")
-            #&& echo Src path:   $WIN_SRC_PATH \
-            #&& echo Install:    $WIN_INSTALL_PATH \
-            #&& dir $WIN_BUILD_PATH \
-            #&& dir $WIN_SRC_PATH \
             cmd //c "${{ steps.sofa.outputs.vs_vsdevcmd }} \
               && cd /d %GITHUB_WORKSPACE%/build \
               && cmake \
@@ -92,7 +83,7 @@ jobs:
                   -DCMAKE_BUILD_TYPE=Release \
                   -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%/install \
                   ../src \
-              && ninja -v install"
+              && ninja install"
           else
             cd "$WORKSPACE_BUILD_PATH"
             ccache -z
@@ -104,7 +95,7 @@ jobs:
               -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_INSTALL_PREFIX="$WORKSPACE_INSTALL_PATH" \
               ../src
-            ninja -v install
+            ninja install
             echo ${CCACHE_BASEDIR}
             ccache -s
           fi
