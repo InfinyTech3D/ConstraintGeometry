@@ -1,7 +1,7 @@
 #pragma once
 
-#include <sofa/constraintGeometry/BaseConstraint.h>
-#include <sofa/constraintGeometry/directions/ContactDirection.h>
+#include <ConstraintGeometry/BaseConstraint.h>
+#include <ConstraintGeometry/directions/ContactDirection.h>
 #include <sofa/core/behavior/ConstraintResolution.h>
 
 

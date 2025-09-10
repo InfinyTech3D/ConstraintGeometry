@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CollisionAlgorithm/BaseOperation.h>
-#include <sofa/constraintGeometry/ConstraintProximity.h>
+#include <ConstraintGeometry/ConstraintProximity.h>
 
 namespace sofa::constraintGeometry {
 

@@ -1,4 +1,4 @@
-#include <sofa/constraintGeometry/directions/ContactDirection.h>
+#include <ConstraintGeometry/directions/ContactDirection.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa::constraintGeometry

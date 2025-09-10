@@ -1,5 +1,5 @@
-#include <sofa/constraintGeometry/normalHandler/GravityPointNormalHandler.h>
-#include <sofa/constraintGeometry/operations/ConstraintProximityOperation.h>
+#include <ConstraintGeometry/normalHandler/GravityPointNormalHandler.h>
+#include <ConstraintGeometry/operations/ConstraintProximityOperation.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa::constraintGeometry

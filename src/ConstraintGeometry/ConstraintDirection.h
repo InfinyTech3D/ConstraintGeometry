@@ -3,8 +3,8 @@
 #include <CollisionAlgorithm/BaseAlgorithm.h>
 #include <CollisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/behavior/BaseLagrangianConstraint.h>
-#include <sofa/constraintGeometry/ConstraintNormal.h>
-#include <sofa/constraintGeometry/InternalConstraint.h>
+#include <ConstraintGeometry/ConstraintNormal.h>
+#include <ConstraintGeometry/InternalConstraint.h>
 
 namespace sofa::constraintGeometry {
 

@@ -1,4 +1,4 @@
-#include <sofa/constraintGeometry/directions/BindDirection.h>
+#include <ConstraintGeometry/directions/BindDirection.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa::constraintGeometry

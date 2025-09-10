@@ -1,8 +1,8 @@
 #pragma once
 
-#include <sofa/constraintGeometry/BaseConstraint.h>
-#include <sofa/constraintGeometry/directions/ContactDirection.h>
-#include <sofa/constraintGeometry/constraint/UnilateralResolution.h>
+#include <ConstraintGeometry/BaseConstraint.h>
+#include <ConstraintGeometry/directions/ContactDirection.h>
+#include <ConstraintGeometry/constraint/UnilateralResolution.h>
 
 namespace sofa {
 

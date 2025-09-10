@@ -2,9 +2,9 @@
 
 #include <CollisionAlgorithm/CollisionPipeline.h>
 #include <CollisionAlgorithm/BaseProximity.h>
-#include <sofa/constraintGeometry/ConstraintProximity.h>
+#include <ConstraintGeometry/ConstraintProximity.h>
 #include <CollisionAlgorithm/BaseGeometry.h>
-#include <sofa/constraintGeometry/operations/ConstraintProximityOperation.h>
+#include <ConstraintGeometry/operations/ConstraintProximityOperation.h>
 #include <CollisionAlgorithm/operations/CreateCenterProximity.h>
 
 namespace sofa ::constraintGeometry {

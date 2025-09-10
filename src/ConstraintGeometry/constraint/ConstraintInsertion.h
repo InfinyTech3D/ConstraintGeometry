@@ -1,8 +1,8 @@
 #pragma once
 
-#include <sofa/constraintGeometry/BaseConstraint.h>
-#include <sofa/constraintGeometry/directions/BindDirection.h>
-#include <sofa/constraintGeometry/constraint/InsertionResolution.h>
+#include <ConstraintGeometry/BaseConstraint.h>
+#include <ConstraintGeometry/directions/BindDirection.h>
+#include <ConstraintGeometry/constraint/InsertionResolution.h>
 
 namespace sofa::constraintGeometry {
 

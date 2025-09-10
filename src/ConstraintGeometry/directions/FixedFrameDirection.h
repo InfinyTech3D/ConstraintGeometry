@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/constraintGeometry/ConstraintDirection.h>
+#include <ConstraintGeometry/ConstraintDirection.h>
 #include <sofa/type/Vec.h>
 
 namespace sofa::constraintGeometry {

@@ -1,5 +1,5 @@
-#include <sofa/constraintGeometry/normalHandler/PhongTriangleNormalHandler.h>
-#include <sofa/constraintGeometry/operations/ConstraintProximityOperation.h>
+#include <ConstraintGeometry/normalHandler/PhongTriangleNormalHandler.h>
+#include <ConstraintGeometry/operations/ConstraintProximityOperation.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa::constraintGeometry

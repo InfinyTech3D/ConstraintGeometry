@@ -1,4 +1,4 @@
-#include <sofa/constraintGeometry/constraint/ConstraintInsertion.h>
+#include <ConstraintGeometry/constraint/ConstraintInsertion.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa::constraintGeometry

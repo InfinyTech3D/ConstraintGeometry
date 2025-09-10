@@ -1,4 +1,4 @@
-#include <sofa/constraintGeometry/directions/FirstDirection.h>
+#include <ConstraintGeometry/directions/FirstDirection.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa::constraintGeometry

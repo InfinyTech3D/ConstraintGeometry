@@ -4,10 +4,10 @@
 #include <CollisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/behavior/BaseLagrangianConstraint.h>
 #include <CollisionAlgorithm/BaseProximity.h>
-#include <sofa/constraintGeometry/ConstraintNormal.h>
-#include <sofa/constraintGeometry/InternalConstraint.h>
-#include <sofa/constraintGeometry/ConstraintResponse.h>
-#include <sofa/constraintGeometry/ConstraintDirection.h>
+#include <ConstraintGeometry/ConstraintNormal.h>
+#include <ConstraintGeometry/InternalConstraint.h>
+#include <ConstraintGeometry/ConstraintResponse.h>
+#include <ConstraintGeometry/ConstraintDirection.h>
 
 namespace sofa::constraintGeometry {
 
