@@ -39,7 +39,7 @@ jobs:
                   -GNinja \
                   -DCMAKE_PREFIX_PATH="$SOFA_ROOT/lib/cmake" \
                   -DCMAKE_BUILD_TYPE=Release \
-                  -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install/CollisionAlgorithm" \
+                  -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%/deps/CollisionAlgorithm/install \
                   .. \
               && ninja install"
           else
@@ -48,22 +48,10 @@ jobs:
               -GNinja \
               -DCMAKE_PREFIX_PATH=$SOFA_ROOT/lib/cmake \
               -DCMAKE_BUILD_TYPE=Release \
-              -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install/CollisionAlgorithm \
+              -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/deps/CollisionAlgorithm/install \
               ..
             ninja install
           fi
-          # Move the CollisionAlgorithm installation to match ConstraintGeometry CMake
-          SRC_PATH="$GITHUB_WORKSPACE/install/CollisionAlgorithm/include/include/CollisionAlgorithm/CollisionAlgorithm/src"
-          DEST_PATH="$GITHUB_WORKSPACE/install/CollisionAlgorithm/include/CollisionAlgorithm"
-          # If Windows, convert paths 
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            SRC_PATH=$(cygpath -u "$SRC_PATH")
-            DEST_PATH=$(cygpath -u "$DEST_PATH")
-          fi
-          # Flatten install structure
-          mkdir -p "$DEST_PATH"
-          mv "$SRC_PATH"/* "$DEST_PATH"/
-          rm -rf "$GITHUB_WORKSPACE/install/CollisionAlgorithm/include/include"
           
       - name: Checkout source code
         uses: actions/checkout@v2
@@ -79,7 +67,7 @@ jobs:
               && cd /d %GITHUB_WORKSPACE%/build \
               && cmake \
                   -GNinja \
-                  -DCMAKE_PREFIX_PATH=$SOFA_ROOT/lib/cmake;%GITHUB_WORKSPACE%/install/CollisionAlgorithm \
+                  -DCMAKE_PREFIX_PATH=$SOFA_ROOT/lib/cmake;%GITHUB_WORKSPACE%/deps/CollisionAlgorithm/install/lib/cmake \
                   -DCMAKE_BUILD_TYPE=Release \
                   -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%/install \
                   ../src \
@@ -91,7 +79,7 @@ jobs:
               -GNinja \
               -DCMAKE_C_COMPILER_LAUNCHER=ccache \
               -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-              -DCMAKE_PREFIX_PATH="$SOFA_ROOT/lib/cmake;$GITHUB_WORKSPACE/install/CollisionAlgorithm" \
+              -DCMAKE_PREFIX_PATH="$SOFA_ROOT/lib/cmake;$GITHUB_WORKSPACE/deps/CollisionAlgorithm/install/lib/cmake" \
               -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_INSTALL_PREFIX="$WORKSPACE_INSTALL_PATH" \
               ../src
