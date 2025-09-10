@@ -1,11 +1,11 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/CollisionPipeline.h>
-#include <sofa/collisionAlgorithm/BaseProximity.h>
+#include <CollisionAlgorithm/CollisionPipeline.h>
+#include <CollisionAlgorithm/BaseProximity.h>
 #include <sofa/constraintGeometry/ConstraintProximity.h>
-#include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <CollisionAlgorithm/BaseGeometry.h>
 #include <sofa/constraintGeometry/operations/ConstraintProximityOperation.h>
-#include <sofa/collisionAlgorithm/operations/CreateCenterProximity.h>
+#include <CollisionAlgorithm/operations/CreateCenterProximity.h>
 
 namespace sofa ::constraintGeometry {
 

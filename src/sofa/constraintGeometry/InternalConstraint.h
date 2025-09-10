@@ -2,7 +2,7 @@
 
 #include <sofa/constraintGeometry/ConstraintNormal.h>
 #include <sofa/core/behavior/BaseLagrangianConstraint.h>
-#include <sofa/collisionAlgorithm/BaseAlgorithm.h>
+#include <CollisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/type/vector.h>
 
 

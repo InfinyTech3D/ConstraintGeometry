@@ -1,9 +1,9 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseAlgorithm.h>
-#include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <CollisionAlgorithm/BaseAlgorithm.h>
+#include <CollisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/behavior/BaseLagrangianConstraint.h>
-#include <sofa/collisionAlgorithm/BaseProximity.h>
+#include <CollisionAlgorithm/BaseProximity.h>
 #include <sofa/constraintGeometry/ConstraintNormal.h>
 #include <sofa/constraintGeometry/InternalConstraint.h>
 #include <sofa/constraintGeometry/ConstraintResponse.h>

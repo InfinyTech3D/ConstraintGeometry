@@ -1,9 +1,9 @@
 #pragma once
 
 #include <sofa/constraintGeometry/BaseNormalHandler.h>
-#include <sofa/collisionAlgorithm/geometry/EdgeGeometry.h>
+#include <CollisionAlgorithm/geometry/EdgeGeometry.h>
 #include <sofa/constraintGeometry/ConstraintProximity.h>
-#include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
+#include <CollisionAlgorithm/proximity/EdgeProximity.h>
 
 namespace sofa::constraintGeometry {
 

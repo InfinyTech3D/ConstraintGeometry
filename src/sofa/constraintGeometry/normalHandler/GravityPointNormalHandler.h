@@ -1,8 +1,8 @@
 #pragma once
 
 #include <sofa/constraintGeometry/BaseNormalHandler.h>
-#include <sofa/collisionAlgorithm/proximity/PointProximity.h>
-#include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <CollisionAlgorithm/proximity/PointProximity.h>
+#include <CollisionAlgorithm/BaseGeometry.h>
 #include <sofa/constraintGeometry/ConstraintProximity.h>
 
 namespace sofa::constraintGeometry {
