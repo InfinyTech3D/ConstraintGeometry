@@ -12,7 +12,7 @@ public:
 
     SOFA_CLASS(GravityPointNormalHandler, BaseNormalHandler);
 
-    core::objectmodel::SingleLink<GravityPointNormalHandler,collisionAlgorithm::BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+    core::objectmodel::SingleLink<GravityPointNormalHandler,collisionalgorithm::BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
     GravityPointNormalHandler()
     : l_geometry(initLink("geometry","Link to TriangleGeometry")){
@@ -48,7 +48,7 @@ private :
 };
 
 template<>
-inline type::Vec3 GravityPointNormalHandler::getNormal<collisionAlgorithm::PointProximity>(const collisionAlgorithm::PointProximity::SPtr & prox) {
+inline type::Vec3 GravityPointNormalHandler::getNormal<collisionalgorithm::PointProximity>(const collisionalgorithm::PointProximity::SPtr & prox) {
     type::Vec3 N = (prox->getPosition() - m_gcenter).normalized();
     return N;
 }

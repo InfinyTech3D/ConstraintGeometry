@@ -15,7 +15,7 @@ void registerGravityPointNormalHandler(sofa::core::ObjectFactory* factory)
 
 int gravityPoint_reg =
     ConstraintProximityOperation::register_func<GravityPointNormalHandler,
-                                                collisionAlgorithm::PointProximity>(
-        &GravityPointNormalHandler::buildCstProximity<collisionAlgorithm::PointProximity>);
+                                                collisionalgorithm::PointProximity>(
+        &GravityPointNormalHandler::buildCstProximity<collisionalgorithm::PointProximity>);
 
 }  // namespace sofa::constraintGeometry

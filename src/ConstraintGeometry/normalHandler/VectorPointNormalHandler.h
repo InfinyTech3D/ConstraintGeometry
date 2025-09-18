@@ -13,7 +13,7 @@ public:
     SOFA_CLASS(VectorPointNormalHandler, BaseNormalHandler);
 
     Data<type::vector<type::Vec3> > d_normals;
-    core::objectmodel::SingleLink<VectorPointNormalHandler,collisionAlgorithm::BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+    core::objectmodel::SingleLink<VectorPointNormalHandler,collisionalgorithm::BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
     VectorPointNormalHandler()
     : d_normals(initData(&d_normals, "normals", "Vector of normals"))
@@ -37,7 +37,7 @@ public:
 };
 
 template<>
-inline type::Vec3 VectorPointNormalHandler::getNormal<collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>>(const collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>::SPtr & prox) {
+inline type::Vec3 VectorPointNormalHandler::getNormal<collisionalgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>>(const collisionalgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>::SPtr & prox) {
     type::Vec3 N;
 
     if (prox->getPId()>=d_normals.getValue().size()) {

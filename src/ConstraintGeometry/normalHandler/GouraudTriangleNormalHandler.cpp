@@ -13,13 +13,13 @@ void registerGouraudTriangleNormalHandler(sofa::core::ObjectFactory* factory)
 
 int gouraud_reg_tri =
     ConstraintProximityOperation::register_func<GouraudTriangleNormalHandler,
-                                                collisionAlgorithm::TriangleProximity>(
-        &GouraudTriangleNormalHandler::buildCstProximity<collisionAlgorithm::TriangleProximity>);
+                                                collisionalgorithm::TriangleProximity>(
+        &GouraudTriangleNormalHandler::buildCstProximity<collisionalgorithm::TriangleProximity>);
 
 int gouraud_reg_mech = ConstraintProximityOperation::register_func<
     GouraudTriangleNormalHandler,
-    collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>>(
+    collisionalgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>>(
     &GouraudTriangleNormalHandler::buildCstProximity<
-        collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>>);
+        collisionalgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>>);
 
 }  // namespace sofa::constraintGeometry

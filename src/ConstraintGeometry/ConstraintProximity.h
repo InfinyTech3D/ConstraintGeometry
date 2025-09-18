@@ -5,7 +5,7 @@
 
 namespace sofa::constraintGeometry {
 
-class ConstraintProximity : public virtual collisionAlgorithm::BaseBaseProximity {
+class ConstraintProximity : public virtual collisionalgorithm::BaseBaseProximity {
 public:
 
     typedef std::shared_ptr<ConstraintProximity> SPtr;
@@ -100,7 +100,7 @@ public:
 
     typedef std::shared_ptr<DefaultConstraintProximity> SPtr;
 
-    DefaultConstraintProximity(const collisionAlgorithm::BaseProximity::SPtr & p)
+    DefaultConstraintProximity(const collisionalgorithm::BaseProximity::SPtr & p)
     : m_prox(p) {}
 
     sofa::type::Vec3 getPosition(core::VecCoordId v = core::vec_id::write_access::position) const override {
@@ -123,12 +123,12 @@ public:
         return type::Vec3();
     }
 
-    static ConstraintProximity::SPtr create(const collisionAlgorithm::BaseProximity::SPtr & p) {
+    static ConstraintProximity::SPtr create(const collisionalgorithm::BaseProximity::SPtr & p) {
         return ConstraintProximity::SPtr(new DefaultConstraintProximity(p));
     }
 
 protected:
-    collisionAlgorithm::BaseProximity::SPtr m_prox;
+    collisionalgorithm::BaseProximity::SPtr m_prox;
 };
 
 

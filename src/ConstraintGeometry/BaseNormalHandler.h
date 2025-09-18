@@ -12,12 +12,12 @@ namespace sofa ::constraintGeometry {
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseConstraint
  */
-class BaseNormalHandler : public collisionAlgorithm::CollisionComponent {
+class BaseNormalHandler : public collisionalgorithm::CollisionComponent {
 public:
-    SOFA_ABSTRACT_CLASS(BaseNormalHandler, collisionAlgorithm::CollisionComponent);
+    SOFA_ABSTRACT_CLASS(BaseNormalHandler, collisionalgorithm::CollisionComponent);
 
-    typedef collisionAlgorithm::BaseGeometry BaseGeometry;
-    typedef collisionAlgorithm::BaseProximity BaseProximity;
+    typedef collisionalgorithm::BaseGeometry BaseGeometry;
+    typedef collisionalgorithm::BaseProximity BaseProximity;
 
     void init() {
         if (getGeometry()==NULL) {
@@ -46,7 +46,7 @@ public:
         glDisable(GL_LIGHTING);
         if (color[3] == 0.0) return;
 
-        collisionAlgorithm::Operations::CreateCenterProximity::FUNC operation = collisionAlgorithm::Operations::CreateCenterProximity::Operation::get(getGeometry()->pointBegin());
+        collisionalgorithm::Operations::CreateCenterProximity::FUNC operation = collisionalgorithm::Operations::CreateCenterProximity::Operation::get(getGeometry()->pointBegin());
 
         for (auto it = getGeometry()->pointBegin();it != getGeometry()->end(); it++) {
             auto prox = operation(it->element());

@@ -35,7 +35,7 @@ public:
 };
 
 template<>
-type::Vec3 EdgeNormalHandler::getNormal<collisionAlgorithm::EdgeProximity>(const collisionAlgorithm::EdgeProximity::SPtr & prox) {
+type::Vec3 EdgeNormalHandler::getNormal<collisionalgorithm::EdgeProximity>(const collisionalgorithm::EdgeProximity::SPtr & prox) {
     return (prox->element()->getP1()->getPosition() - prox->element()->getP0()->getPosition()).normalized();
 }
 

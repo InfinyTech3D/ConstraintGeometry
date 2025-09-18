@@ -35,12 +35,12 @@ public:
 };
 
 template<>
-inline type::Vec3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::TriangleProximity>(const collisionAlgorithm::TriangleProximity::SPtr & prox) {
+inline type::Vec3 PhongTriangleNormalHandler::getNormal<collisionalgorithm::TriangleProximity>(const collisionalgorithm::TriangleProximity::SPtr & prox) {
     auto element = prox->element();
 
-    const collisionAlgorithm::BaseProximity::SPtr & p0 = element->pointElements()[0]->getP0();
-    const collisionAlgorithm::BaseProximity::SPtr & p1 = element->pointElements()[1]->getP0();
-    const collisionAlgorithm::BaseProximity::SPtr & p2 = element->pointElements()[2]->getP0();
+    const collisionalgorithm::BaseProximity::SPtr & p0 = element->pointElements()[0]->getP0();
+    const collisionalgorithm::BaseProximity::SPtr & p1 = element->pointElements()[1]->getP0();
+    const collisionalgorithm::BaseProximity::SPtr & p2 = element->pointElements()[2]->getP0();
 
     ConstraintProximityOperation::FUNC operation = ConstraintProximityOperation::get(getTypeInfo(),p0->getTypeInfo());
 
@@ -58,8 +58,8 @@ inline type::Vec3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::Tria
 
 
 template<>
-inline type::Vec3 PhongTriangleNormalHandler::getNormal<collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes> >(const collisionAlgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>::SPtr & prox) {
-    const collisionAlgorithm::PointElement::SPtr & element = prox->getGeometry()->pointElements()[prox->getPId()];
+inline type::Vec3 PhongTriangleNormalHandler::getNormal<collisionalgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes> >(const collisionalgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>::SPtr & prox) {
+    const collisionalgorithm::PointElement::SPtr & element = prox->getGeometry()->pointElements()[prox->getPId()];
 
     type::Vec3 N0_point;
     for (auto it = element->triangleAround().cbegin();it!=element->triangleAround().cend();it++) {

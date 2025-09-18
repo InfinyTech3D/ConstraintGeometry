@@ -14,9 +14,9 @@ namespace sofa::constraintGeometry {
 class ConstraintNormal {
 public:
 
-    typedef collisionAlgorithm::BaseProximity BaseProximity;
-    typedef collisionAlgorithm::BaseBaseProximity FIRST;
-    typedef collisionAlgorithm::BaseBaseProximity SECOND;
+    typedef collisionalgorithm::BaseProximity BaseProximity;
+    typedef collisionalgorithm::BaseBaseProximity FIRST;
+    typedef collisionalgorithm::BaseBaseProximity SECOND;
     typedef std::function<double(const typename FIRST::SPtr &, const typename SECOND::SPtr &, const type::Vec3 &)> ViolationFunction;
 
     static double defaultViolationFunction(const typename FIRST::SPtr & first, const typename SECOND::SPtr & second, const type::Vec3 & normal) {

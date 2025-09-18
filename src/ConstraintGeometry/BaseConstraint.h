@@ -35,16 +35,16 @@ public:
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseLagrangianConstraint
  */
-template<class FIRST = collisionAlgorithm::BaseProximity, class SECOND = collisionAlgorithm::BaseProximity>
+template<class FIRST = collisionalgorithm::BaseProximity, class SECOND = collisionalgorithm::BaseProximity>
 class TBaseConstraint : public BaseConstraint {
 public:
     SOFA_CLASS(BaseConstraint, sofa::core::behavior::BaseLagrangianConstraint);
 
-    typedef collisionAlgorithm::BaseProximity BaseProximity;
+    typedef collisionalgorithm::BaseProximity BaseProximity;
 
     Data<double> d_drawScale;
     Data<bool> d_draw;
-    Data<collisionAlgorithm::DetectionOutput<FIRST,SECOND> > d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
+    Data<collisionalgorithm::DetectionOutput<FIRST,SECOND> > d_input; // THIS SHOULD BE REPLACED BY A PAIR OF CST PROXIMITY INPUT
     Data<std::vector<BaseInternalConstraint::SPtr> > d_container;
 
 	TBaseConstraint()

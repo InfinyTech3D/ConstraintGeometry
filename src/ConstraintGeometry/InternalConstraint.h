@@ -30,9 +30,9 @@ public:
 
     virtual unsigned getPairSize() const = 0;
 
-    virtual collisionAlgorithm::BaseBaseProximity::SPtr getFirstPair(unsigned i) const = 0;
+    virtual collisionalgorithm::BaseBaseProximity::SPtr getFirstPair(unsigned i) const = 0;
 
-    virtual collisionAlgorithm::BaseBaseProximity::SPtr getSecondPair(unsigned i) const = 0;
+    virtual collisionalgorithm::BaseBaseProximity::SPtr getSecondPair(unsigned i) const = 0;
 
     virtual void draw(const core::visual::VisualParams* ,double ) const = 0;
 
@@ -58,10 +58,10 @@ public :
 
     typedef std::shared_ptr<InternalConstraint<FIRST,SECOND>> SPtr;
 
-//    typedef collisionAlgorithm::BaseProximity FIRST;
-//    typedef collisionAlgorithm::BaseProximity SECOND;
+//    typedef collisionalgorithm::BaseProximity FIRST;
+//    typedef collisionalgorithm::BaseProximity SECOND;
 
-    typedef collisionAlgorithm::BaseProximity BaseProximity;
+    typedef collisionalgorithm::BaseProximity BaseProximity;
     typedef std::function<core::behavior::ConstraintResolution*(const BaseInternalConstraint *)> ResolutionCreator;
     typedef std::function<void(const InternalConstraint * ,linearalgebra::BaseVector *)> ViolationFunc;
     typedef std::function<ConstraintNormal(const typename FIRST::SPtr & ,const typename SECOND::SPtr & )> NormalsFunc;
@@ -207,9 +207,9 @@ public :
 
     unsigned getPairSize() const override { return m_pairs.size(); }
 
-    collisionAlgorithm::BaseBaseProximity::SPtr getFirstPair(unsigned i) const override { return m_pairs[i].first; }
+    collisionalgorithm::BaseBaseProximity::SPtr getFirstPair(unsigned i) const override { return m_pairs[i].first; }
 
-    collisionAlgorithm::BaseBaseProximity::SPtr getSecondPair(unsigned i) const override { return m_pairs[i].second; }
+    collisionalgorithm::BaseBaseProximity::SPtr getSecondPair(unsigned i) const override { return m_pairs[i].second; }
 
     const std::vector<std::pair<const typename FIRST::SPtr, const typename SECOND::SPtr>> & getPairs() const {
         return m_pairs;

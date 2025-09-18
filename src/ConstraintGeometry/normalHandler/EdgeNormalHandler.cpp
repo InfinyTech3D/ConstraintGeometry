@@ -14,7 +14,7 @@ void registerEdgeNormalHandler(sofa::core::ObjectFactory* factory)
 }
 
 int edge_reg = ConstraintProximityOperation::register_func<EdgeNormalHandler,
-                                                           collisionAlgorithm::EdgeProximity>(
-    &EdgeNormalHandler::buildCstProximity<collisionAlgorithm::EdgeProximity>);
+                                                           collisionalgorithm::EdgeProximity>(
+    &EdgeNormalHandler::buildCstProximity<collisionalgorithm::EdgeProximity>);
 
 }  // namespace sofa::constraintGeometry
