@@ -1,3 +1,5 @@
+#include <ConstraintGeometry/initConstraintGeometry.h>
+
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/helper/system/FileRepository.h>
 #include <sofa/helper/system/PluginManager.h>
@@ -29,18 +31,15 @@ extern void registerGouraudTriangleNormalHandler(sofa::core::ObjectFactory* fact
 extern void registerGravityPointNormalHandler(sofa::core::ObjectFactory* factory);
 extern void registerPhongTriangleNormalHandler(sofa::core::ObjectFactory* factory);
 extern void registerVectorPointNormalHandler(sofa::core::ObjectFactory* factory);
-}  // namespace sofa::constraintgeometry
 
-namespace sofa::component
-{
 extern "C"
 {
-    void initExternalModule();
-    const char* getModuleName();
-    const char* getModuleVersion();
-    const char* getModuleLicense();
-    const char* getModuleDescription();
-    void registerObjects(sofa::core::ObjectFactory* factory);
+    SOFA_CONSTRAINTGEOMETRY_API void initExternalModule();
+    SOFA_CONSTRAINTGEOMETRY_API const char* getModuleName();
+    SOFA_CONSTRAINTGEOMETRY_API const char* getModuleVersion();
+    SOFA_CONSTRAINTGEOMETRY_API const char* getModuleLicense();
+    SOFA_CONSTRAINTGEOMETRY_API const char* getModuleDescription();
+    SOFA_CONSTRAINTGEOMETRY_API void registerObjects(sofa::core::ObjectFactory* factory);
 }
 
 void initConstraintGeometry() 
@@ -48,6 +47,9 @@ void initConstraintGeometry()
     static bool first = true;
     if (first)
     {
+        // make sure that this plugin is registered into the PluginManager
+        sofa::helper::system::PluginManager::getInstance().registerPlugin(MODULE_NAME);
+
         first = false;
 #ifdef PLUGIN_DATA_DIR
         sofa::helper::system::DataRepository.addLastPath(std::string(QUOTE(PLUGIN_DATA_DIR)));
@@ -62,7 +64,7 @@ void initExternalModule()
     initConstraintGeometry();
 }
 
-const char* getModuleName() { return "ConstraintGeometry"; }
+const char* getModuleName() { return MODULE_NAME; }
 
 const char* getModuleVersion()
 {
@@ -75,11 +77,10 @@ const char* getModuleVersion()
 
 const char* getModuleLicense() { return "LGPL"; }
 
-const char* getModuleDescription() { return "Plugin to hendle constraints"; }
+const char* getModuleDescription() { return "Plugin to handle constraints"; }
 
 void registerObjects(sofa::core::ObjectFactory* factory)
 {
-    using namespace sofa::constraintgeometry;
     // Constraints
     registerConstraintUnilateral(factory);
     registerConstraintBilateral(factory);
@@ -100,4 +101,4 @@ void registerObjects(sofa::core::ObjectFactory* factory)
     registerVectorPointNormalHandler(factory);
 }
 
-}  // namespace sofa::component
+}  // namespace sofa::constraintgeometry
