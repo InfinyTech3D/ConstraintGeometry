@@ -3,7 +3,7 @@
 #include <ConstraintGeometry/ConstraintDirection.h>
 #include <sofa/type/Vec.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 /*!
  * \brief The BindDirection class

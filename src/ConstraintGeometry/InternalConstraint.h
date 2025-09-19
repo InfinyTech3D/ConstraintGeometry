@@ -6,7 +6,7 @@
 #include <sofa/type/vector.h>
 
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 class BaseInternalConstraint {
 public:
@@ -267,12 +267,12 @@ public :
         m_normalFunc = c.m_normalFunc;
     }
 
-    friend inline std::istream& operator >> ( std::istream& in, std::vector<typename sofa::constraintGeometry::InternalConstraint<FIRST,SECOND>::SPtr> &) {
+    friend inline std::istream& operator >> ( std::istream& in, std::vector<typename sofa::constraintgeometry::InternalConstraint<FIRST,SECOND>::SPtr> &) {
         return in;
     }
 
 
-    friend inline std::ostream& operator << (std::ostream& out, const std::vector<typename sofa::constraintGeometry::InternalConstraint<FIRST,SECOND>::SPtr> & v) {
+    friend inline std::ostream& operator << (std::ostream& out, const std::vector<typename sofa::constraintgeometry::InternalConstraint<FIRST,SECOND>::SPtr> & v) {
         for (unsigned i=0;i<v.size();i++) {
             if (v.size()>1) out << "[";
             v[i]->toString(out);

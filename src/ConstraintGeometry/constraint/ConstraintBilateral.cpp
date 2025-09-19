@@ -1,7 +1,7 @@
 #include <ConstraintGeometry/constraint/ConstraintBilateral.h>
 #include <sofa/core/ObjectFactory.h>
 
-namespace sofa::constraintGeometry
+namespace sofa::constraintgeometry
 {
     void registerConstraintBilateral(sofa::core::ObjectFactory* factory)
     {
@@ -9,4 +9,4 @@ namespace sofa::constraintGeometry
             sofa::core::ObjectRegistrationData("Implements bilateral constraints between an origin and a destination geometry")
             .add<ConstraintBilateral>());
     }
-}  // namespace sofa::constraintGeometry
+}  // namespace sofa::constraintgeometry

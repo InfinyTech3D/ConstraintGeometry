@@ -8,7 +8,7 @@
 
 namespace sofa {
 
-namespace constraintGeometry {
+namespace constraintgeometry {
 
 /*!
  * \brief The UnilateralConstraintResolution class solves unilateral constraints

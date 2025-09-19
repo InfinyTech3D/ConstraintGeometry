@@ -5,7 +5,7 @@
 #include <ConstraintGeometry/ConstraintProximity.h>
 #include <CollisionAlgorithm/proximity/EdgeProximity.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 class EdgeNormalHandler : public BaseNormalHandler {
 public:

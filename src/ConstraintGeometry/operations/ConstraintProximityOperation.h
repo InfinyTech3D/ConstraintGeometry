@@ -3,7 +3,7 @@
 #include <CollisionAlgorithm/BaseOperation.h>
 #include <ConstraintGeometry/ConstraintProximity.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 class BaseNormalHandler;
 

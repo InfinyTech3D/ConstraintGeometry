@@ -2,7 +2,7 @@
 #include <ConstraintGeometry/operations/ConstraintProximityOperation.h>
 #include <sofa/core/ObjectFactory.h>
 
-namespace sofa::constraintGeometry
+namespace sofa::constraintgeometry
 {
 void registerVectorPointNormalHandler(sofa::core::ObjectFactory* factory)
 {
@@ -16,4 +16,4 @@ int vectorPoint_reg = ConstraintProximityOperation::register_func<
     collisionalgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes> >(
     &VectorPointNormalHandler::buildCstProximity<
         collisionalgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes> >);
-}  // namespace sofa::constraintGeometry
+}  // namespace sofa::constraintgeometry

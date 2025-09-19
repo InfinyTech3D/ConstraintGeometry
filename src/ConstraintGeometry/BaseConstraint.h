@@ -9,7 +9,7 @@
 #include <ConstraintGeometry/ConstraintResponse.h>
 #include <ConstraintGeometry/ConstraintDirection.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 
 class BaseConstraint : public sofa::core::behavior::BaseLagrangianConstraint{

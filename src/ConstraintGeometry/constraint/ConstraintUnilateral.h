@@ -6,7 +6,7 @@
 
 namespace sofa {
 
-namespace constraintGeometry {
+namespace constraintgeometry {
 
 
 /*!

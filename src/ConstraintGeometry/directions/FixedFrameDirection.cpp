@@ -1,7 +1,7 @@
 #include <ConstraintGeometry/directions/FixedFrameDirection.h>
 #include <sofa/core/ObjectFactory.h>
 
-namespace sofa::constraintGeometry
+namespace sofa::constraintgeometry
 {
     void registerFixedFrameDirection(sofa::core::ObjectFactory* factory)
     {
@@ -9,4 +9,4 @@ namespace sofa::constraintGeometry
             sofa::core::ObjectRegistrationData("Computes a fixed direction to implement constraints")
             .add<FixedFrameDirection>());
     }
-}  // namespace sofa::constraintGeometry
+}  // namespace sofa::constraintgeometry

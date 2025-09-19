@@ -8,7 +8,7 @@
 #define Q(x) #x
 #define QUOTE(x) Q(x)
 
-namespace sofa::constraintGeometry
+namespace sofa::constraintgeometry
 {
 
 // Constraints
@@ -29,7 +29,7 @@ extern void registerGouraudTriangleNormalHandler(sofa::core::ObjectFactory* fact
 extern void registerGravityPointNormalHandler(sofa::core::ObjectFactory* factory);
 extern void registerPhongTriangleNormalHandler(sofa::core::ObjectFactory* factory);
 extern void registerVectorPointNormalHandler(sofa::core::ObjectFactory* factory);
-}  // namespace sofa::constraintGeometry
+}  // namespace sofa::constraintgeometry
 
 namespace sofa::component
 {
@@ -79,7 +79,7 @@ const char* getModuleDescription() { return "Plugin to hendle constraints"; }
 
 void registerObjects(sofa::core::ObjectFactory* factory)
 {
-    using namespace sofa::constraintGeometry;
+    using namespace sofa::constraintgeometry;
     // Constraints
     registerConstraintUnilateral(factory);
     registerConstraintBilateral(factory);

@@ -4,7 +4,7 @@
 #include <ConstraintGeometry/directions/BindDirection.h>
 #include <ConstraintGeometry/constraint/BilateralResolution.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 class ConstraintBilateral : public TBaseConstraint<collisionalgorithm::BaseProximity,collisionalgorithm::BaseProximity> {
 public:

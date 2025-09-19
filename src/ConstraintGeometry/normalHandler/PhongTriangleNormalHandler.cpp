@@ -2,7 +2,7 @@
 #include <ConstraintGeometry/operations/ConstraintProximityOperation.h>
 #include <sofa/core/ObjectFactory.h>
 
-namespace sofa::constraintGeometry
+namespace sofa::constraintgeometry
 {
 
 void registerPhongTriangleNormalHandler(sofa::core::ObjectFactory* factory)
@@ -22,4 +22,4 @@ int phong_reg_mech = ConstraintProximityOperation::register_func<
     &PhongTriangleNormalHandler::buildCstProximity<
         collisionalgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>>);
 
-}  // namespace sofa::constraintGeometry
+}  // namespace sofa::constraintgeometry

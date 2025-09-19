@@ -5,7 +5,7 @@
 #include <ConstraintGeometry/ConstraintProximity.h>
 #include <CollisionAlgorithm/proximity/MechanicalProximity.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 class PhongTriangleNormalHandler : public BaseNormalHandler {
 public:

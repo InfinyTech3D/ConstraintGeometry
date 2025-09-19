@@ -6,7 +6,7 @@
 #include <CollisionAlgorithm/proximity/TriangleProximity.h>
 #include <CollisionAlgorithm/proximity/MechanicalProximity.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 class GouraudTriangleNormalHandler : public BaseNormalHandler {
 public:

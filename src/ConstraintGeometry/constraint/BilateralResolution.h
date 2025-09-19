@@ -6,7 +6,7 @@
 
 namespace sofa {
 
-namespace constraintGeometry {
+namespace constraintgeometry {
 
 class BilateralConstraintResolution1 : public sofa::core::behavior::ConstraintResolution {
 public:

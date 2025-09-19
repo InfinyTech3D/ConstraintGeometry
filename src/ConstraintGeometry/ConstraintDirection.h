@@ -6,7 +6,7 @@
 #include <ConstraintGeometry/ConstraintNormal.h>
 #include <ConstraintGeometry/InternalConstraint.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseLagrangianConstraint

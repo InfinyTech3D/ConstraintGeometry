@@ -6,7 +6,7 @@
 
 namespace sofa {
 
-namespace constraintGeometry {
+namespace constraintgeometry {
 
 class InsertionConstraintResolution : public sofa::core::behavior::ConstraintResolution {
 public:

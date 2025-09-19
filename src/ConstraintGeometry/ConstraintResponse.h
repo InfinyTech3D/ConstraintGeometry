@@ -8,7 +8,7 @@
 
 namespace sofa {
 
-namespace constraintGeometry {
+namespace constraintgeometry {
 
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseLagrangianConstraint

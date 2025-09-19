@@ -1,7 +1,7 @@
 #include <ConstraintGeometry/constraint/ConstraintInsertion.h>
 #include <sofa/core/ObjectFactory.h>
 
-namespace sofa::constraintGeometry
+namespace sofa::constraintgeometry
 {
     void registerConstraintInsertion(sofa::core::ObjectFactory* factory)
     {
@@ -9,4 +9,4 @@ namespace sofa::constraintGeometry
             sofa::core::ObjectRegistrationData("Implements frictional and bilateral constraints to model needle insertion")
             .add<ConstraintInsertion>());
     }
-}  // namespace sofa::constraintGeometry
+}  // namespace sofa::constraintgeometry

@@ -2,7 +2,7 @@
 #include <ConstraintGeometry/operations/ConstraintProximityOperation.h>
 #include <sofa/core/ObjectFactory.h>
 
-namespace sofa::constraintGeometry
+namespace sofa::constraintgeometry
 {
 
 void registerGouraudTriangleNormalHandler(sofa::core::ObjectFactory* factory)
@@ -22,4 +22,4 @@ int gouraud_reg_mech = ConstraintProximityOperation::register_func<
     &GouraudTriangleNormalHandler::buildCstProximity<
         collisionalgorithm::MechanicalProximity<sofa::defaulttype::Vec3dTypes>>);
 
-}  // namespace sofa::constraintGeometry
+}  // namespace sofa::constraintgeometry

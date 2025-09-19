@@ -3,7 +3,7 @@
 #include <CollisionAlgorithm/BaseProximity.h>
 #include <memory>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 class ConstraintProximity : public virtual collisionalgorithm::BaseBaseProximity {
 public:
@@ -66,7 +66,7 @@ protected:
 };
 
 template<class PROXIMITY>
-class BaseProximityNormal : public PROXIMITY, public constraintGeometry::ConstraintProximity {
+class BaseProximityNormal : public PROXIMITY, public constraintgeometry::ConstraintProximity {
 public:
     typedef std::shared_ptr<BaseProximityNormal> SPtr;
 

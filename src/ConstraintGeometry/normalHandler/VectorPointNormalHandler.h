@@ -5,7 +5,7 @@
 #include <CollisionAlgorithm/proximity/MechanicalProximity.h>
 #include <ConstraintGeometry/ConstraintProximity.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 class VectorPointNormalHandler : public BaseNormalHandler {
 public:

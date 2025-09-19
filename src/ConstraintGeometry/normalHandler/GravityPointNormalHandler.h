@@ -5,7 +5,7 @@
 #include <CollisionAlgorithm/BaseGeometry.h>
 #include <ConstraintGeometry/ConstraintProximity.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 class GravityPointNormalHandler : public BaseNormalHandler {
 public:

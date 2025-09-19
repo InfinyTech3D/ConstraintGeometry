@@ -4,7 +4,7 @@
 #include <ConstraintGeometry/directions/BindDirection.h>
 #include <ConstraintGeometry/constraint/InsertionResolution.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 class ConstraintInsertion : public TBaseConstraint<collisionalgorithm::BaseProximity,collisionalgorithm::BaseProximity> {
 public:

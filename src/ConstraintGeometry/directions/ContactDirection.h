@@ -3,7 +3,7 @@
 #include <ConstraintGeometry/BaseNormalHandler.h>
 #include <ConstraintGeometry/ConstraintDirection.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 /*!
  * \brief The ContactDirection class

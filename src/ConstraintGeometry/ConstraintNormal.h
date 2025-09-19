@@ -4,7 +4,7 @@
 #include <sofa/defaulttype/VecTypes.h>
 #include <CollisionAlgorithm/BaseAlgorithm.h>
 
-namespace sofa::constraintGeometry {
+namespace sofa::constraintgeometry {
 
 /*!
  * \brief The ConstraintNormal class
