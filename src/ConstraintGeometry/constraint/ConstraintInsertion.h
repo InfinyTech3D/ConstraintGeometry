@@ -6,7 +6,7 @@
 
 namespace sofa::constraintgeometry {
 
-class ConstraintInsertion : public TBaseConstraint<collisionalgorithm::BaseProximity,collisionalgorithm::BaseProximity> {
+class SOFA_CONSTRAINTGEOMETRY_API ConstraintInsertion : public TBaseConstraint<collisionalgorithm::BaseProximity,collisionalgorithm::BaseProximity> {
 public:
     SOFA_CLASS(ConstraintInsertion , SOFA_TEMPLATE2(TBaseConstraint,BaseProximity,BaseProximity));
 
