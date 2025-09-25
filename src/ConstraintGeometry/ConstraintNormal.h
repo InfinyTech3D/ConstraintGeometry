@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ConstraintGeometry/config.h>
 #include <sofa/type/vector.h>
 #include <sofa/defaulttype/VecTypes.h>
 #include <CollisionAlgorithm/BaseAlgorithm.h>
@@ -11,7 +12,7 @@ namespace sofa::constraintgeometry {
  */
 
 
-class ConstraintNormal {
+class SOFA_CONSTRAINTGEOMETRY_API ConstraintNormal {
 public:
 
     typedef collisionalgorithm::BaseProximity BaseProximity;
