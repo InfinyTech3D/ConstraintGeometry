@@ -1,11 +1,12 @@
 #pragma once
 
+#include <ConstraintGeometry/config.h>
 #include <CollisionAlgorithm/BaseProximity.h>
 #include <memory>
 
 namespace sofa::constraintgeometry {
 
-class ConstraintProximity : public virtual collisionalgorithm::BaseBaseProximity {
+class SOFA_CONSTRAINTGEOMETRY_API ConstraintProximity : public virtual collisionalgorithm::BaseBaseProximity {
 public:
 
     typedef std::shared_ptr<ConstraintProximity> SPtr;
