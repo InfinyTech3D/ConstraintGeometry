@@ -8,7 +8,7 @@ namespace sofa::constraintgeometry {
 class BaseNormalHandler;
 
 //Specific operation to find the closest point on a geometry (the code is in the c++ class)
-class ConstraintProximityOperation : public collisionalgorithm::Operations::GenericOperation2<ConstraintProximityOperation,//operation type
+class SOFA_CONSTRAINTGEOMETRY_API ConstraintProximityOperation : public collisionalgorithm::Operations::GenericOperation2<ConstraintProximityOperation,//operation type
                                                                                               ConstraintProximity::SPtr, // default return
                                                                                               BaseNormalHandler *, collisionalgorithm::BaseProximity::SPtr // parameters
                                                                                              > {
