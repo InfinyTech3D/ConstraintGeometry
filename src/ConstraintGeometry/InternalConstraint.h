@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ConstraintGeometry/config.h>
 #include <ConstraintGeometry/ConstraintNormal.h>
 #include <sofa/core/behavior/BaseLagrangianConstraint.h>
 #include <CollisionAlgorithm/BaseAlgorithm.h>
@@ -8,7 +9,7 @@
 
 namespace sofa::constraintgeometry {
 
-class BaseInternalConstraint {
+class SOFA_CONSTRAINTGEOMETRY_API BaseInternalConstraint {
 public:
     typedef std::shared_ptr<BaseInternalConstraint> SPtr;
 
