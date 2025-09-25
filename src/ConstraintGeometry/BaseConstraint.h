@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ConstraintGeometry/config.h>
 #include <CollisionAlgorithm/BaseAlgorithm.h>
 #include <CollisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/behavior/BaseLagrangianConstraint.h>
@@ -12,7 +13,7 @@
 namespace sofa::constraintgeometry {
 
 
-class BaseConstraint : public sofa::core::behavior::BaseLagrangianConstraint{
+class SOFA_CONSTRAINTGEOMETRY_API BaseConstraint : public sofa::core::behavior::BaseLagrangianConstraint{
 public:
 
     virtual ~BaseConstraint(){}
