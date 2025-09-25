@@ -7,7 +7,7 @@
 
 namespace sofa::constraintgeometry {
 
-class PhongTriangleNormalHandler : public BaseNormalHandler {
+class SOFA_CONSTRAINTGEOMETRY_API PhongTriangleNormalHandler : public BaseNormalHandler {
 public:
 
     SOFA_CLASS(PhongTriangleNormalHandler, BaseNormalHandler);
