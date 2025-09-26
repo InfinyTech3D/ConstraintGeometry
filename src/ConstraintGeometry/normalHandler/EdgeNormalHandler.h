@@ -7,7 +7,7 @@
 
 namespace sofa::constraintgeometry {
 
-class EdgeNormalHandler : public BaseNormalHandler {
+class SOFA_CONSTRAINTGEOMETRY_API EdgeNormalHandler : public BaseNormalHandler {
 public:
 
     SOFA_CLASS(EdgeNormalHandler, BaseNormalHandler);

@@ -13,7 +13,7 @@ namespace constraintgeometry {
  * \brief The ConstraintUnilateral class
  * Applies specified algorithm on 'from' and 'dest' geometry
  */
-class ConstraintUnilateral : public TBaseConstraint<collisionalgorithm::BaseProximity,collisionalgorithm::BaseProximity> {
+class SOFA_CONSTRAINTGEOMETRY_API ConstraintUnilateral : public TBaseConstraint<collisionalgorithm::BaseProximity,collisionalgorithm::BaseProximity> {
 public:
     SOFA_CLASS(ConstraintUnilateral , SOFA_TEMPLATE2(TBaseConstraint,collisionalgorithm::BaseProximity,collisionalgorithm::BaseProximity) );
 

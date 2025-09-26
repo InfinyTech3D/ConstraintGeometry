@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ConstraintGeometry/config.h>
 #include <CollisionAlgorithm/BaseAlgorithm.h>
 #include <CollisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/behavior/BaseLagrangianConstraint.h>
@@ -13,7 +14,7 @@ namespace constraintgeometry {
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseLagrangianConstraint
  */
-class ConstraintResponse : public sofa::core::objectmodel::BaseObject {
+class SOFA_CONSTRAINTGEOMETRY_API ConstraintResponse : public sofa::core::objectmodel::BaseObject {
 public:
     SOFA_CLASS(ConstraintResponse, sofa::core::objectmodel::BaseObject);
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ConstraintGeometry/config.h>
 #include <CollisionAlgorithm/CollisionPipeline.h>
 #include <CollisionAlgorithm/BaseProximity.h>
 #include <ConstraintGeometry/ConstraintProximity.h>
@@ -12,7 +13,7 @@ namespace sofa ::constraintgeometry {
 /*!
  * \brief The BaseConstraint abstract class is the implementation of sofa's abstract BaseConstraint
  */
-class BaseNormalHandler : public collisionalgorithm::CollisionComponent {
+class SOFA_CONSTRAINTGEOMETRY_API BaseNormalHandler : public collisionalgorithm::CollisionComponent {
 public:
     SOFA_ABSTRACT_CLASS(BaseNormalHandler, collisionalgorithm::CollisionComponent);
 

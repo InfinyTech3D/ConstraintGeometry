@@ -7,7 +7,7 @@
 
 namespace sofa::constraintgeometry {
 
-class GravityPointNormalHandler : public BaseNormalHandler {
+class SOFA_CONSTRAINTGEOMETRY_API GravityPointNormalHandler : public BaseNormalHandler {
 public:
 
     SOFA_CLASS(GravityPointNormalHandler, BaseNormalHandler);

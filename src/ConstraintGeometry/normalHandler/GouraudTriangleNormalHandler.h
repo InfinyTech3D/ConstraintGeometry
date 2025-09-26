@@ -8,7 +8,7 @@
 
 namespace sofa::constraintgeometry {
 
-class GouraudTriangleNormalHandler : public BaseNormalHandler {
+class SOFA_CONSTRAINTGEOMETRY_API GouraudTriangleNormalHandler : public BaseNormalHandler {
 public:
 
     SOFA_CLASS(GouraudTriangleNormalHandler, BaseNormalHandler);

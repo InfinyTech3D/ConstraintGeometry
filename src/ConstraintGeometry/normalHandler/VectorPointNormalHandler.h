@@ -7,7 +7,7 @@
 
 namespace sofa::constraintgeometry {
 
-class VectorPointNormalHandler : public BaseNormalHandler {
+class SOFA_CONSTRAINTGEOMETRY_API VectorPointNormalHandler : public BaseNormalHandler {
 public:
 
     SOFA_CLASS(VectorPointNormalHandler, BaseNormalHandler);
