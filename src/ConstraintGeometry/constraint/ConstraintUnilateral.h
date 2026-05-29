@@ -18,6 +18,7 @@ public:
     SOFA_CLASS(ConstraintUnilateral , SOFA_TEMPLATE2(TBaseConstraint,collisionalgorithm::BaseProximity,collisionalgorithm::BaseProximity) );
 
     Data<double> d_friction;
+    Data<double> d_contactDistance;
     Data<double> d_maxforce0;
     Data<double> d_maxforce1;
     Data<double> d_maxforce2;
@@ -26,10 +27,22 @@ public:
 
     ConstraintUnilateral()
     : d_friction(initData(&d_friction, 0.0, "mu", "Friction"))
+    , d_contactDistance(initData(&d_contactDistance, 0.0, "contactDistance", "Standoff distance kept between the proximities in contact"))
     , d_maxforce0(initData(&d_maxforce0, std::numeric_limits<double>::max(), "maxForce0", "Max force applied on the first axis"))
     , d_maxforce1(initData(&d_maxforce1, std::numeric_limits<double>::max(), "maxForce1", "Max force applied on the second axis"))
     , d_maxforce2(initData(&d_maxforce2, std::numeric_limits<double>::max(), "maxForce2", "Max force applied on the third axis"))
     , l_directions(initLink("directions", "link to the default direction")) {}
+
+    void getConstraintViolation(const core::ConstraintParams* p,
+                                sofa::linearalgebra::BaseVector* v, unsigned cid) override
+    {
+        TBaseConstraint<collisionalgorithm::BaseProximity,collisionalgorithm::BaseProximity>::getConstraintViolation(p, v, cid);
+        // Shift violation by -contactDistance so that the constraint is maintained at a distance.
+        // ic->id() is the normal row.
+        const double cd = d_contactDistance.getValue();
+        for (const auto& ic : d_container.getValue())
+            v->add(ic->id(), -cd);
+    }
 
     ConstraintNormal createConstraintNormal(const BaseProximity::SPtr & first, const BaseProximity::SPtr & second) const override {
         if (l_directions==NULL) return ConstraintNormal();
