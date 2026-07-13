@@ -3,6 +3,7 @@
 #include <ConstraintGeometry/BaseConstraint.h>
 #include <ConstraintGeometry/directions/BindDirection.h>
 #include <sofa/core/behavior/ConstraintResolution.h>
+#include <cmath>
 
 namespace sofa {
 
@@ -11,7 +12,8 @@ namespace constraintgeometry {
 class InsertionConstraintResolution : public sofa::core::behavior::ConstraintResolution {
 public:
     InsertionConstraintResolution(SReal frictionCoeff, double maxf1 = std::numeric_limits<double>::max(),double maxf2 = std::numeric_limits<double>::max(),double maxf3 = std::numeric_limits<double>::max(),
-                                   double comp1 = 0.0,double comp2 = 0.0,double comp3 = 0.0) : sofa::core::behavior::ConstraintResolution(3) {
+                                   double comp1 = 0.0,double comp2 = 0.0,double comp3 = 0.0,
+                                   bool scaleComplianceMatrix = false) : sofa::core::behavior::ConstraintResolution(3) {
         m_maxForce[0] = maxf1;
         m_maxForce[1] = maxf2;
         m_maxForce[2] = maxf3;
@@ -21,6 +23,7 @@ public:
         m_compliance[2] = comp3;
 
         m_frictionCoeff = frictionCoeff;
+        m_scaleComplianceMatrix = scaleComplianceMatrix;
     }
 
     virtual void init(int line, double** w, double * /*force*/)
@@ -34,7 +37,25 @@ public:
             }
         }
 
-        SOFA_UNUSED(sofa::type::invertMatrix(invW,temp));
+        bool inverted = sofa::type::invertMatrix(invW, temp);
+
+        // invertMatrix rejects on |det| < machine-eps returning zeros. The scale of the entries in
+        // this matrix block depend on the physical parameters in the scene. Depending on scene
+        // configuration, a matrix can be generated which may get rejected by invertMatrix due to
+        // its scale even though it may be well-conditioned. The matrix can be optionally scaled
+        // with the diagonal mean to avoid this.
+        if (!inverted && m_scaleComplianceMatrix)
+        {
+            const double s = (std::abs(temp[0][0]) + std::abs(temp[1][1]) + std::abs(temp[2][2])) / 3.0;
+            if (s > 0.0)
+            {
+                const double invS = 1.0 / s;
+                inverted = sofa::type::invertMatrix(invW, temp * invS);
+                if (inverted) invW *= invS;
+            }
+        }
+
+        SOFA_UNUSED(inverted);
     }
 
     virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/)
@@ -70,6 +91,7 @@ public:
     double m_compliance[3];
     sofa::type::Mat<3,3,double> invW;
     SReal m_frictionCoeff;
+    bool m_scaleComplianceMatrix;
 };
 
 }

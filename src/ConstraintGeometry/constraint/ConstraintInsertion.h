@@ -13,12 +13,14 @@ public:
     Data<SReal> d_frictionCoeff;
     Data<sofa::type::vector<double> > d_maxForce;
     Data<sofa::type::vector<double> > d_compliance;
+    Data<bool> d_scaleComplianceMatrix;
     core::objectmodel::SingleLink<ConstraintInsertion,ConstraintDirection, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_directions;
 
     ConstraintInsertion()
     : d_frictionCoeff(initData(&d_frictionCoeff, 0.0, "frictionCoeff" , "static friction coefficient (should be less than 1)"))
     , d_maxForce(initData(&d_maxForce, "maxForce", "Max force"))
     , d_compliance(initData(&d_compliance, "compliance", "Max force"))
+    , d_scaleComplianceMatrix(initData(&d_scaleComplianceMatrix, false, "scaleComplianceMatrix", "If true, normalize the compliance matrix by the mean of its diagonal before inverting it, then rescale the inverse. Leaves the inverse mathematically unchanged, but prevents invertMatrix from rejecting a well-conditioned matrix whose entries are of a low magnitude"))
     , l_directions(initLink("directions", "link to the default direction")) {}
 
     void init() { // make sure we have a direction
@@ -45,7 +47,8 @@ public:
         if (d_compliance.getValue().size()>1) comp[1]=d_compliance.getValue()[1];
         if (d_compliance.getValue().size()>2) comp[2]=d_compliance.getValue()[2];
 
-        return new InsertionConstraintResolution(d_frictionCoeff.getValue(), maxf[0],maxf[1],maxf[2],comp[0],comp[1],comp[2]);
+        return new InsertionConstraintResolution(d_frictionCoeff.getValue(), maxf[0],maxf[1],maxf[2],comp[0],comp[1],comp[2],
+                                                 d_scaleComplianceMatrix.getValue());
 
         std::cerr << "Error the size of the constraint is not correct in ConstraintInsertion size=" << cst->size() << std::endl;
         return NULL;
