@@ -20,7 +20,8 @@ public:
     : d_frictionCoeff(initData(&d_frictionCoeff, 0.0, "frictionCoeff" , "static friction coefficient (should be less than 1)"))
     , d_maxForce(initData(&d_maxForce, "maxForce", "Max force"))
     , d_compliance(initData(&d_compliance, "compliance", "Max force"))
-    , d_scaleComplianceMatrix(initData(&d_scaleComplianceMatrix, false, "scaleComplianceMatrix", "If true, normalize the compliance matrix by the mean of its diagonal before inverting it, then rescale the inverse. Leaves the inverse mathematically unchanged, but prevents invertMatrix from rejecting a well-conditioned matrix whose entries are of a low magnitude"))
+    , d_scaleComplianceMatrix(initData(&d_scaleComplianceMatrix, false, "scaleComplianceMatrix"
+                , "If true, normalize the compliance matrix by the mean of its diagonal before inversion"))
     , l_directions(initLink("directions", "link to the default direction")) {}
 
     void init() { // make sure we have a direction

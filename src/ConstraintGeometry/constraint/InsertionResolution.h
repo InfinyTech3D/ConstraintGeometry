@@ -3,6 +3,7 @@
 #include <ConstraintGeometry/BaseConstraint.h>
 #include <ConstraintGeometry/directions/BindDirection.h>
 #include <sofa/core/behavior/ConstraintResolution.h>
+#include <sofa/helper/logging/Messaging.h>
 #include <cmath>
 
 namespace sofa {
@@ -39,11 +40,10 @@ public:
 
         bool inverted = sofa::type::invertMatrix(invW, temp);
 
-        // invertMatrix rejects on |det| < machine-eps returning zeros. The scale of the entries in
-        // this matrix block depend on the physical parameters in the scene. Depending on scene
-        // configuration, a matrix can be generated which may get rejected by invertMatrix due to
-        // its scale even though it may be well-conditioned. The matrix can be optionally scaled
-        // with the diagonal mean to avoid this.
+        // invertMatrix rejects the inversion if |det| < machine-eps, leaves invW empty and returns 
+        // false. However, |det| depends on the problem scale and the physical parameters. 
+        // It can happen that a matrix is well-conditioned but with a small |det|. In that case, 
+        // proceed by scaling the matrix before inversion, then scale it back up afterwards.
         if (!inverted && m_scaleComplianceMatrix)
         {
             const double s = (std::abs(temp[0][0]) + std::abs(temp[1][1]) + std::abs(temp[2][2])) / 3.0;
@@ -51,11 +51,14 @@ public:
             {
                 const double invS = 1.0 / s;
                 inverted = sofa::type::invertMatrix(invW, temp * invS);
-                if (inverted) invW *= invS;
+                invW *= invS;
             }
         }
 
-        SOFA_UNUSED(inverted);
+        // Matrix is rank-deficient. Nothing could be done.
+        if (!inverted)
+            msg_warning("InsertionConstraintResolution")
+                << "Failed to invert the compliance matrix of the constraint at line " << line << ".";
     }
 
     virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/)
