@@ -58,7 +58,7 @@ public:
         // Matrix is rank-deficient. Nothing could be done.
         if (!inverted)
             msg_warning("InsertionConstraintResolution")
-                << "Failed to invert the compliance matrix of the constraint at line " << line << ".";
+                << "Failed to invert the compliance matrix of the constraint at line " << line << ". If not already done, try to scale compliance matrix using Data scaleComplianceMatrix";
     }
 
     virtual void resolution(int line, double** w, double* d, double* force, double * /*dFree*/)
