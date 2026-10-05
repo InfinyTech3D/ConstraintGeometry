@@ -46,7 +46,7 @@
         </Node>
 
 <!--        <Node name="Needle">
-                <EulerImplicitSolver rayleighMass="0" rayleighStiffness="0" />
+                <EulerImplicitIntegrationScheme rayleighMass="0" rayleighStiffness="0" />
                 <SparseLUSolver />
 
                 <EdgeSetTopologyContainer name="Container" position="0 0 0   2 0 0    4 0 0    6 0 0    8 0 0   10 0 0   12 0 0    14 0 0   16 0 0" edges="0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8"/>
@@ -74,7 +74,7 @@
         </Node>-->
 
         <Node name="Needle">
-               <EulerImplicitSolver rayleighMass="0" rayleighStiffness="0" />
+               <EulerImplicitIntegrationScheme rayleighMass="0" rayleighStiffness="0" />
                <SparseLUSolver />
 
                 <MechanicalObject name="ms" template="Rigid" dy="20" />
@@ -117,7 +117,7 @@
         </Node>-->
 
         <Node name="GEL">
-                <EulerImplicitSolver rayleighMass="0.1" rayleighStiffness="0.1" />
+                <EulerImplicitIntegrationScheme rayleighMass="0.1" rayleighStiffness="0.1" />
                 <SparseLDLSolver name="precond" />
 
                 <TetrahedronSetTopologyContainer name="Container" src="@../Topology/GelVolume/Container" />
