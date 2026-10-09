@@ -96,6 +96,7 @@ jobs:
                   -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%/deps/CollisionAlgorithm/install \
                   -DCMAKE_INCLUDE_PATH=\"$SOFA_ROOT/include/extlibs/\" \
                   -DCMAKE_LIBRARY_PATH=\"$SOFA_ROOT/lib/;$SOFA_ROOT/bin/\" \
+                  --debug-find-var=GLEW_INCLUDE_DIR \
                   .. \
               && ninja install"
           else

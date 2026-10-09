@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 project(ConstraintGeometry VERSION 0.1 LANGUAGES CXX)
 
+message(STATUS "INC=${CMAKE_INCLUDE_PATH}")
+
 find_package(CollisionAlgorithm REQUIRED)
 find_package(Sofa.Component.StateContainer REQUIRED)
 find_package(Sofa.Component.Constraint.Lagrangian.Solver REQUIRED)
@@ -64,7 +66,7 @@ set(SOURCE_FILES
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${README_FILES})
 
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME}
     CollisionAlgorithm
     Sofa.Component.StateContainer
     Sofa.Component.Constraint.Lagrangian.Solver
@@ -72,7 +74,7 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 sofa_create_package_with_targets(
-    PACKAGE_NAME ${PROJECT_NAME} 
+    PACKAGE_NAME ${PROJECT_NAME}
     PACKAGE_VERSION ${PROJECT_VERSION}
     TARGETS ${PROJECT_NAME} AUTO_SET_TARGET_PROPERTIES
     INCLUDE_SOURCE_DIR "src"
