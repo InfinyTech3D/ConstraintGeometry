@@ -94,6 +94,8 @@ jobs:
                   -DCMAKE_PREFIX_PATH="$SOFA_ROOT/lib/cmake" \
                   -DCMAKE_BUILD_TYPE=Release \
                   -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%/deps/CollisionAlgorithm/install \
+                  -DCMAKE_INCLUDE_PATH="$SOFA_ROOT/include/extlibs/" \
+                  -DCMAKE_LIBRARY_PATH="$SOFA_ROOT/lib/;$SOFA_ROOT/bin/" \
                   .. \
               && ninja install"
           else
