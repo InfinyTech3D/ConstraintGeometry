@@ -86,6 +86,10 @@ jobs:
         shell: bash
         run: |
           mkdir -p deps/CollisionAlgorithm/build
+
+          mkdir -p $SOFA_ROOT/include/extlibs/WinDepPack/GL
+          mv $SOFA_ROOT/include/extlibs/GL/glew.h $SOFA_ROOT/include/extlibs/WinDepPack/GL
+
           if [[ "$RUNNER_OS" == "Windows" ]]; then
             cmd //c "${{ steps.sofa.outputs.vs_vsdevcmd }} \
               && cd /d %GITHUB_WORKSPACE%/deps/CollisionAlgorithm/build \
@@ -94,8 +98,6 @@ jobs:
                   -DCMAKE_PREFIX_PATH=\"$SOFA_ROOT/lib/cmake\" \
                   -DCMAKE_BUILD_TYPE=Release \
                   -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%/deps/CollisionAlgorithm/install \
-                  -DCMAKE_INCLUDE_PATH=\"$SOFA_ROOT/include/extlibs/\" \
-                  -DCMAKE_LIBRARY_PATH=\"$SOFA_ROOT/lib/;$SOFA_ROOT/bin/\" \
                   --debug-find-var=GLEW_INCLUDE_DIR \
                   .. \
               && ninja install"
