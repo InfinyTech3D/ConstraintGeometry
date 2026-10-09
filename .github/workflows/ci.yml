@@ -6,7 +6,7 @@ on:
       - main
       - master
     tags:
-      - 'v*' #release tags in format of e.g: 'v25.12.00' 
+      - 'v*' #release tags in format of e.g: 'v25.12.00'
 
   pull_request:
     types: [opened, synchronize, reopened, labeled]
@@ -91,11 +91,11 @@ jobs:
               && cd /d %GITHUB_WORKSPACE%/deps/CollisionAlgorithm/build \
               && cmake \
                   -GNinja \
-                  -DCMAKE_PREFIX_PATH="$SOFA_ROOT/lib/cmake" \
+                  -DCMAKE_PREFIX_PATH=\"$SOFA_ROOT/lib/cmake\" \
                   -DCMAKE_BUILD_TYPE=Release \
                   -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%/deps/CollisionAlgorithm/install \
-                  -DCMAKE_INCLUDE_PATH="$SOFA_ROOT/include/extlibs/" \
-                  -DCMAKE_LIBRARY_PATH="$SOFA_ROOT/lib/;$SOFA_ROOT/bin/" \
+                  -DCMAKE_INCLUDE_PATH=\"$SOFA_ROOT/include/extlibs/\" \
+                  -DCMAKE_LIBRARY_PATH=\"$SOFA_ROOT/lib/;$SOFA_ROOT/bin/\" \
                   .. \
               && ninja install"
           else
@@ -147,7 +147,7 @@ jobs:
             echo ${CCACHE_BASEDIR}
             ccache -s
           fi
-    
+
       ###################   Artifact naming   ##############
       - name: Sanitize artifact name
         id: sanitize
@@ -221,4 +221,3 @@ jobs:
             artifacts/ConstraintGeometry_*_Linux.zip
             artifacts/ConstraintGeometry_*_Windows.zip
             artifacts/ConstraintGeometry_*_macOS.zip
-
